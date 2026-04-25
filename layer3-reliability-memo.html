@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reliability Assessment — Layer3 (layer3.xyz) | Audit Workpaper</title>
+<style>
+  /* ── Reset & Base ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:       #0E1F3D;
+    --navy-mid:   #1A3461;
+    --navy-light: #2A4A82;
+    --blue:       #0057A8;
+    --blue-light: #E8F0FA;
+    --teal:       #00748A;
+    --teal-light: #E5F4F7;
+    --gold:       #B07D00;
+    --gold-light: #FDF5DC;
+    --green:      #1A6B3A;
+    --green-light:#E6F4EC;
+    --orange:     #B85000;
+    --orange-light:#FFF0E5;
+    --red:        #A8001E;
+    --red-light:  #FAEAED;
+    --gray-50:    #F8F9FA;
+    --gray-100:   #F0F1F3;
+    --gray-200:   #E2E4E8;
+    --gray-400:   #9AA0AB;
+    --gray-600:   #5A6270;
+    --gray-800:   #2C3240;
+    --text:       #1A1E2A;
+    --border:     #D0D4DC;
+    --shadow-sm:  0 1px 3px rgba(14,31,61,0.08), 0 1px 2px rgba(14,31,61,0.06);
+    --shadow-md:  0 4px 12px rgba(14,31,61,0.10), 0 2px 6px rgba(14,31,61,0.07);
+    --shadow-lg:  0 8px 28px rgba(14,31,61,0.13), 0 4px 10px rgba(14,31,61,0.08);
+    --radius:     4px;
+    --radius-lg:  8px;
+  }
+
+  html { font-size: 15px; scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text);
+    background: #ECEEF2;
+    line-height: 1.7;
+  }
+
+  /* ── Top Brand Bar ────────────────────────────────────────── */
+  .brand-bar {
+    background: var(--navy);
+    height: 5px;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  /* ── Firm Header ──────────────────────────────────────────── */
+  .firm-header {
+    background: var(--navy);
+    color: white;
+    padding: 28px 56px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .firm-logo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .firm-logo-mark {
+    width: 44px;
+    height: 44px;
+    background: white;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .firm-logo-mark svg { display: block; }
+
+  .firm-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: white;
+    line-height: 1.2;
+  }
+
+  .firm-tagline {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .firm-header-right {
+    text-align: right;
+  }
+
+  .doc-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.88);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    margin-bottom: 6px;
+  }
+
+  .doc-ref {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Confidential Banner ─────────────────────────────────── */
+  .confidential-bar {
+    background: var(--navy-mid);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    font-size: 0.67rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 7px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* ── Main Layout ──────────────────────────────────────────── */
+  .page-wrapper {
+    max-width: 1020px;
+    margin: 0 auto;
+    padding: 36px 24px 72px;
+  }
+
+  /* ── Memo Header Block ────────────────────────────────────── */
+  .memo-header {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+  }
+
+  .memo-header-title {
+    background: var(--navy-mid);
+    color: white;
+    padding: 18px 32px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .memo-header-title::before {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 18px;
+    background: #5B9BD5;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .memo-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .memo-grid:last-of-type { border-bottom: none; }
+
+  .memo-label {
+    background: var(--gray-50);
+    padding: 13px 20px 13px 32px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray-600);
+    border-right: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+  }
+
+  .memo-value {
+    padding: 13px 20px 13px 24px;
+    font-size: 0.88rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .memo-value strong { color: var(--navy); }
+
+  .classification-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--navy);
+    color: white;
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+
+  /* ── Table of Contents ────────────────────────────────────── */
+  .toc-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+
+  .toc-header {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy-mid);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .toc-list {
+    padding: 16px 28px 20px;
+    list-style: none;
+    columns: 2;
+    column-gap: 32px;
+  }
+
+  .toc-list li {
+    padding: 4px 0;
+    break-inside: avoid;
+  }
+
+  .toc-list a {
+    text-decoration: none;
+    color: var(--blue);
+    font-size: 0.84rem;
+    font-weight: 500;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    transition: color 0.15s;
+  }
+
+  .toc-list a:hover { color: var(--navy); }
+
+  .toc-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--gray-400);
+    min-width: 22px;
+    flex-shrink: 0;
+  }
+
+  /* ── Section Wrapper ──────────────────────────────────────── */
+  .section {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  .section-header {
+    background: var(--navy);
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .section-num {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.9);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 3px 9px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 0.96rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+  }
+
+  .section-body {
+    padding: 28px 32px 32px;
+  }
+
+  /* ── Subsection ───────────────────────────────────────────── */
+  .subsection { margin-bottom: 30px; }
+  .subsection:last-child { margin-bottom: 0; }
+
+  .subsection-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--navy-mid);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue-light);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .subsection-title .sub-label {
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: white;
+    background: var(--navy-light);
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  .h4 {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 18px 0 8px;
+  }
+
+  /* ── Prose ────────────────────────────────────────────────── */
+  p {
+    font-size: 0.88rem;
+    color: var(--gray-800);
+    margin-bottom: 12px;
+    line-height: 1.75;
+  }
+
+  p:last-child { margin-bottom: 0; }
+
+  strong { color: var(--text); font-weight: 700; }
+  em { color: var(--gray-600); font-style: italic; }
+
+  ul, ol {
+    margin: 10px 0 14px 20px;
+    font-size: 0.88rem;
+    color: var(--gray-800);
+    line-height: 1.7;
+  }
+
+  li { margin-bottom: 5px; }
+  li:last-child { margin-bottom: 0; }
+
+  ol { margin-left: 22px; }
+
+  ol li { padding-left: 4px; }
+
+  /* ── Callout Boxes ────────────────────────────────────────── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    border-left: 4px solid;
+    display: flex;
+    gap: 12px;
+  }
+
+  .callout-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .callout-content { flex: 1; }
+  .callout-content p { font-size: 0.85rem; margin-bottom: 0; }
+  .callout-label {
+    font-size: 0.67rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .callout-plain {
+    background: var(--teal-light);
+    border-color: var(--teal);
+  }
+  .callout-plain .callout-label { color: var(--teal); }
+
+  .callout-gap {
+    background: var(--red-light);
+    border-color: var(--red);
+  }
+  .callout-gap .callout-label { color: var(--red); }
+
+  .callout-note {
+    background: var(--blue-light);
+    border-color: var(--blue);
+  }
+  .callout-note .callout-label { color: var(--blue); }
+
+  .callout-warn {
+    background: var(--gold-light);
+    border-color: var(--gold);
+  }
+  .callout-warn .callout-label { color: var(--gold); }
+
+  /* ── Assessment Badge ─────────────────────────────────────── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    vertical-align: middle;
+  }
+
+  .badge-high      { background: var(--green-light);  color: var(--green);  border: 1px solid #A8D9BC; }
+  .badge-mod-high  { background: #E8F5EE;              color: #1A5C35;       border: 1px solid #B0D8C0; }
+  .badge-mod       { background: var(--gold-light);   color: var(--gold);   border: 1px solid #E0C87A; }
+  .badge-low-mod   { background: var(--orange-light);  color: var(--orange); border: 1px solid #F0C0A0; }
+  .badge-low       { background: var(--red-light);     color: var(--red);    border: 1px solid #E0A0B0; }
+  .badge-add-proc  { background: #EEF2FF;              color: #3730A3;       border: 1px solid #C7D2FE; }
+  .badge-eval      { background: #F5F0FF;              color: #6D28D9;       border: 1px solid #DDD6FE; }
+  .badge-partial   { background: #FFF7F0;              color: #C2460A;       border: 1px solid #FECBA1; }
+
+  .assess-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .assess-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-600);
+  }
+
+  /* ── Tables ───────────────────────────────────────────────── */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 16px 0;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+  }
+
+  thead tr {
+    background: var(--navy);
+    color: white;
+  }
+
+  thead th {
+    padding: 11px 16px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  tbody tr { border-bottom: 1px solid var(--gray-200); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:nth-child(even) { background: var(--gray-50); }
+  tbody tr:hover { background: var(--blue-light); transition: background 0.15s; }
+
+  td {
+    padding: 11px 16px;
+    vertical-align: top;
+    color: var(--gray-800);
+    line-height: 1.6;
+  }
+
+  td:first-child { font-weight: 600; color: var(--navy); }
+  td strong { color: var(--text); }
+
+  /* ── Procedure List ───────────────────────────────────────── */
+  .proc-list { list-style: none; margin: 0; padding: 0; }
+
+  .proc-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    background: white;
+    transition: box-shadow 0.15s;
+  }
+
+  .proc-item:hover { box-shadow: var(--shadow-sm); }
+
+  .proc-num {
+    width: 26px;
+    height: 26px;
+    background: var(--navy);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.72rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .proc-body { flex: 1; }
+  .proc-title { font-size: 0.88rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .proc-desc { font-size: 0.83rem; color: var(--gray-800); line-height: 1.65; margin: 0; }
+
+  .proc-group-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: white;
+    background: var(--navy-light);
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin: 18px 0 10px;
+  }
+
+  .proc-group-label:first-of-type { margin-top: 0; }
+
+  /* ── Key Takeaways ────────────────────────────────────────── */
+  .takeaway-list { list-style: none; margin: 0; padding: 0; }
+
+  .takeaway-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    background: var(--blue-light);
+    border: 1px solid #C5D8F5;
+    margin-bottom: 8px;
+    font-size: 0.87rem;
+    color: var(--gray-800);
+    line-height: 1.65;
+    align-items: flex-start;
+  }
+
+  .takeaway-icon {
+    color: var(--blue);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Next Steps ───────────────────────────────────────────── */
+  .next-step-list { list-style: none; margin: 0; padding: 0; }
+
+  .next-step-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    background: var(--green-light);
+    border: 1px solid #B8DBCA;
+    margin-bottom: 8px;
+    font-size: 0.87rem;
+    color: var(--gray-800);
+    line-height: 1.65;
+    align-items: flex-start;
+  }
+
+  .next-step-num {
+    width: 24px;
+    height: 24px;
+    background: var(--green);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Sources ──────────────────────────────────────────────── */
+  .source-group { margin-bottom: 20px; }
+  .source-group:last-child { margin-bottom: 0; }
+
+  .source-group-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .source-list { list-style: none; margin: 0; padding: 0; }
+
+  .source-item {
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 6px;
+    background: var(--gray-50);
+    font-size: 0.83rem;
+  }
+
+  .source-item a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .source-item a:hover { color: var(--navy); text-decoration: underline; }
+  .source-item .source-desc { color: var(--gray-600); font-size: 0.78rem; }
+
+  /* ── Gaps List ────────────────────────────────────────────── */
+  .gap-list { list-style: none; margin: 0; padding: 0; }
+
+  .gap-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    background: var(--orange-light);
+    border: 1px solid #F5C8A8;
+    margin-bottom: 8px;
+    font-size: 0.86rem;
+    color: var(--gray-800);
+    line-height: 1.65;
+    align-items: flex-start;
+  }
+
+  .gap-icon { color: var(--orange); font-size: 0.9rem; flex-shrink: 0; margin-top: 2px; }
+
+  /* ── Reliability Matrix (special table) ───────────────────── */
+  .matrix-table td:nth-child(2) { white-space: nowrap; }
+
+  /* ── Signature Block ──────────────────────────────────────── */
+  .sig-block {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  .sig-header {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 28px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-600);
+  }
+
+  .sig-body {
+    padding: 24px 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .sig-field label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-600);
+    margin-bottom: 8px;
+  }
+
+  .sig-line {
+    border-bottom: 1.5px solid var(--gray-400);
+    height: 32px;
+    width: 100%;
+    position: relative;
+  }
+
+  .sig-note {
+    font-size: 0.72rem;
+    color: var(--gray-400);
+    margin-top: 4px;
+  }
+
+  /* ── Footer ───────────────────────────────────────────────── */
+  .doc-footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.5);
+    padding: 20px 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+  }
+
+  .doc-footer a { color: rgba(255,255,255,0.5); text-decoration: none; }
+  .doc-footer a:hover { color: rgba(255,255,255,0.8); }
+
+  /* ── Divider ──────────────────────────────────────────────── */
+  hr { border: none; border-top: 1px solid var(--gray-200); margin: 20px 0; }
+
+  /* ── Code / Technical Terms ───────────────────────────────── */
+  code {
+    font-family: 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
+    font-size: 0.82em;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    color: var(--navy);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* ── Anchor offset for sticky header ─────────────────────── */
+  .section-anchor { scroll-margin-top: 16px; }
+
+  /* ── Print Styles ─────────────────────────────────────────── */
+  @media print {
+    body { background: white; font-size: 11pt; }
+    .brand-bar { display: none; }
+    .firm-header { background: #0E1F3D !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section, .memo-header, .toc-card, .sig-block { box-shadow: none; break-inside: avoid; }
+    .section-header { background: #0E1F3D !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page-wrapper { padding: 0; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+  }
+
+  /* ── Responsive ───────────────────────────────────────────── */
+  @media (max-width: 700px) {
+    .firm-header { padding: 20px 20px; flex-direction: column; align-items: flex-start; }
+    .firm-header-right { text-align: left; }
+    .page-wrapper { padding: 20px 12px 48px; }
+    .section-body { padding: 20px 18px 24px; }
+    .toc-list { columns: 1; }
+    .sig-body { grid-template-columns: 1fr; }
+    .doc-footer { flex-direction: column; padding: 18px 20px; text-align: center; }
+    .memo-grid { grid-template-columns: 100px 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Brand Bar ─────────────────────────────────────────────── -->
+<div class="brand-bar"></div>
+
+<!-- ── Firm Header ───────────────────────────────────────────── -->
+<header class="firm-header">
+  <div class="firm-logo">
+    <div class="firm-logo-mark">
+      <!-- Abstract geometric mark -->
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <rect x="2" y="2" width="10" height="10" fill="#0E1F3D"/>
+        <rect x="14" y="2" width="10" height="10" fill="#0057A8"/>
+        <rect x="2" y="14" width="10" height="10" fill="#0057A8"/>
+        <rect x="14" y="14" width="10" height="10" fill="#0E1F3D" opacity="0.5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="firm-name">Audit &amp; Assurance Practice</div>
+      <div class="firm-tagline">Professional Standards &amp; Technical Research</div>
+    </div>
+  </div>
+  <div class="firm-header-right">
+    <div class="doc-type-badge">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M3 5h4M3 3h4M3 7h2" stroke="currentColor" stroke-width="1"/></svg>
+      Audit Workpaper — Technical Memo
+    </div>
+    <div class="doc-ref">Ref: AWP-TECH-2026-L3 &nbsp;|&nbsp; Rev 1.0 &nbsp;|&nbsp; April 25, 2026</div>
+  </div>
+</header>
+
+<!-- ── Confidential Banner ────────────────────────────────────── -->
+<div class="confidential-bar">
+  Confidential &mdash; For Authorized Engagement Team Use Only &mdash; Do Not Distribute
+</div>
+
+<!-- ── Page Wrapper ───────────────────────────────────────────── -->
+<div class="page-wrapper">
+
+  <!-- ── Memo Header ──────────────────────────────────────────── -->
+  <div class="memo-header">
+    <div class="memo-header-title">Memorandum</div>
+    <div class="memo-grid">
+      <div class="memo-label">To</div>
+      <div class="memo-value">Audit Engagement File &nbsp;/&nbsp; Engagement Team</div>
+    </div>
+    <div class="memo-grid">
+      <div class="memo-label">From</div>
+      <div class="memo-value">[Preparer Name], CPA &mdash; Audit &amp; Assurance, Digital Assets Practice</div>
+    </div>
+    <div class="memo-grid">
+      <div class="memo-label">Date</div>
+      <div class="memo-value">April 25, 2026</div>
+    </div>
+    <div class="memo-grid">
+      <div class="memo-label">Re</div>
+      <div class="memo-value"><strong>Reliability Assessment &mdash; Layer3 (layer3.xyz) as an External Information Source for Use in GAAS and PCAOB Audits</strong></div>
+    </div>
+    <div class="memo-grid">
+      <div class="memo-label">Classification</div>
+      <div class="memo-value">
+        <span class="classification-badge">&#x1F512; Workpaper Documentation &mdash; Professional Judgment</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Table of Contents ────────────────────────────────────── -->
+  <div class="toc-card">
+    <div class="toc-header">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h6" stroke="#1A3461" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Table of Contents
+    </div>
+    <ul class="toc-list">
+      <li><a href="#sec-1"><span class="toc-num">I.</span> Purpose of This Memorandum</a></li>
+      <li><a href="#sec-2"><span class="toc-num">II.</span> Background: What Is Layer3</a></li>
+      <li><a href="#sec-3"><span class="toc-num">III.</span> Applicable Auditing Standards</a></li>
+      <li><a href="#sec-4"><span class="toc-num">IV.</span> Evaluation Against Standards</a></li>
+      <li><a href="#sec-5"><span class="toc-num">V.</span> Summary Reliability Matrix</a></li>
+      <li><a href="#sec-6"><span class="toc-num">VI.</span> Required Procedures</a></li>
+      <li><a href="#sec-7"><span class="toc-num">VII.</span> Sources &amp; Reference Standards</a></li>
+      <li><a href="#sec-8"><span class="toc-num">VIII.</span> Gaps &amp; Caveats</a></li>
+      <li><a href="#sec-9"><span class="toc-num">IX.</span> Key Takeaways</a></li>
+      <li><a href="#sec-10"><span class="toc-num">X.</span> Recommended Next Steps</a></li>
+    </ul>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION I — PURPOSE
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section section-anchor" id="sec-1">
+    <div class="section-header">
+      <span class="section-num">SECTION I</span>
+      <span class="section-title">Purpose of This Memorandum</span>
+    </div>
+    <div class="section-body">
+      <p>This memorandum documents the engagement team's assessment of whether information obtained from <strong>Layer3 (layer3.xyz)</strong> meets the reliability standards required for use as audit evidence under:</p>
+      <ul>
+        <li><strong>Generally Accepted Auditing Standards (GAAS)</strong> as codified in the AICPA's <em>Statements on Auditing Standards</em>, specifically AU-C Section 500 as updated by <strong>SAS No. 142</strong> (<em>Audit Evidence</em>, effective December 15, 2022); and</li>
+        <li><strong>PCAOB Auditing Standards</strong>, specifically <strong>AS 1105</strong> (<em>Audit Evidence</em>), including the amendments effective for fiscal years beginning on or after <strong>December 15, 2025</strong>, and the related <strong>PCAOB Staff Guidance</strong> issued October 2025 on evaluating the reliability of external electronic information.</li>
+      </ul>
+      <p>This memo also addresses applicability of <strong>AU-C 402 / PCAOB AS 2601</strong> (<em>Audit Considerations Relating to an Entity Using a Service Organization</em>) to the extent Layer3 may constitute a service organization relevant to an audit client's processing of transactions.</p>
+      <div class="callout callout-note">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <span class="callout-label">Scope Notice</span>
+          <p>This memorandum does not constitute a final opinion on the sufficiency of audit evidence in any specific engagement. Rather, it establishes a documented, risk-based framework for evaluating Layer3 data in the context of a particular audit client's facts and circumstances. Engagement-specific addenda are required for each use case.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION II — BACKGROUND
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section section-anchor" id="sec-2">
+    <div class="section-header">
+      <span class="section-num">SECTION II</span>
+      <span class="section-title">Background: What Is Layer3 and How Does It Work</span>
+    </div>
+    <div class="section-body">
+
+      <!-- 2.1 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">2.1</span> Company Overview</div>
+        <p>Layer3 is a <strong>Web3 user acquisition and engagement platform</strong> founded in 2021 and headquartered in Washington, D.C. In functional terms, it is a marketing and distribution infrastructure tool used by blockchain-based companies to attract users, distribute tokens, and incentivize specific on-chain behaviors.</p>
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4AC;</span>
+          <div class="callout-content">
+            <span class="callout-label">Plain English</span>
+            <p>Think of Layer3 as a <strong>loyalty rewards program for the blockchain world</strong> — except instead of airline miles, users earn cryptocurrency tokens or digital credentials by completing tasks (called "Quests"). A blockchain company that wants to grow its user base pays Layer3 to run a campaign: users who interact with the company's product earn a reward, and Layer3 facilitates and verifies those interactions.</p>
+          </div>
+        </div>
+        <p><strong>Notable clients:</strong> Coinbase Cloud, Aave, Arbitrum, Optimism, Uniswap, Base, 1inch, and Robinhood's blockchain operations. The platform has raised approximately <strong>$26.8 million</strong> across four funding rounds (Series A in May 2024; $4 million round in February 2025) from institutional investors including Electric Capital, Greenfield Capital, Amber Group, and ParaFi Capital.</p>
+        <p><strong>Why this matters to an auditor:</strong> An audit client may have used Layer3 to distribute tokens as part of a token launch or airdrop, record proof of user activity on their blockchain protocol, or generate verifiable records of on-chain completions. The auditor may need to rely on Layer3 data to verify token distribution records, user counts, or on-chain activity volumes.</p>
+      </div>
+
+      <!-- 2.2 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">2.2</span> Technical Architecture — On-Chain vs. Off-Chain Data</div>
+        <p>This distinction is <strong>critical</strong> for audit purposes. Layer3 operates across two data environments with materially different reliability characteristics.</p>
+
+        <div class="h4">A. Off-Chain Data (Layer3's Internal Platform)</div>
+        <div class="callout callout-note">
+          <span class="callout-icon">&#x1F4BB;</span>
+          <div class="callout-content">
+            <span class="callout-label">Technical Definition</span>
+            <p><strong>Off-chain data</strong> refers to information created, stored, and processed within Layer3's own centralized servers — not on a public blockchain. This is analogous to data housed in any SaaS company's private database.</p>
+          </div>
+        </div>
+        <p>Off-chain data includes: quest completion determinations (pre-minting logic), user account and identity records, campaign configuration data, and aggregate platform reporting dashboards. <strong>Audit implication:</strong> This data is subject to the same risks as any other third-party data — it can be modified, is privately stored, and has no independent public verification mechanism.</p>
+
+        <div class="h4">B. On-Chain Data (Blockchain-Recorded)</div>
+        <div class="callout callout-note">
+          <span class="callout-icon">&#x26D3;</span>
+          <div class="callout-content">
+            <span class="callout-label">Technical Definition</span>
+            <p><strong>On-chain data</strong> refers to information permanently recorded on a public blockchain through a confirmed network transaction. Once recorded, blockchain data is <strong>cryptographically immutable</strong> — it cannot be altered without the consensus of the entire distributed network, making tampering computationally infeasible.</p>
+          </div>
+        </div>
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4AC;</span>
+          <div class="callout-content">
+            <span class="callout-label">Plain English</span>
+            <p>Once Layer3 records something on the blockchain, it becomes a <strong>permanent, publicly verifiable entry in a distributed ledger</strong> that no single party — not even Layer3 — can change. Think of it like a permanent, tamper-proof public notarization recorded in a ledger shared by thousands of independent computers worldwide.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.3 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">2.3</span> The CUBE Credential System</div>
+        <p><strong>CUBE</strong> stands for <strong>Credentials to Unify Blockchain Events</strong>. CUBEs are <strong>ERC-721 tokens</strong> — a standardized type of non-fungible digital record on the Ethereum blockchain and compatible networks.</p>
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4AC;</span>
+          <div class="callout-content">
+            <span class="callout-label">Plain English for CPAs</span>
+            <p>An ERC-721 token is like a unique, serial-numbered digital certificate. Each one is distinct (non-fungible means no two are identical). When a user completes a Quest, Layer3 <em>mints</em> (creates and permanently records) a CUBE to that user's blockchain wallet address — capturing a timestamp, the wallet address, and metadata describing what was completed.</p>
+          </div>
+        </div>
+
+        <div class="h4">Data Contained in Each CUBE</div>
+        <ul>
+          <li>Participating blockchain project(s) and communities involved</li>
+          <li>Quest difficulty level (beginner, intermediate, advanced)</li>
+          <li>Quest title and description</li>
+          <li>Timestamp of completion (blockchain-confirmed)</li>
+          <li>Recipient wallet address</li>
+          <li>Rich metadata stored on <strong>IPFS</strong> (InterPlanetary File System — a distributed, content-addressed storage protocol)</li>
+        </ul>
+
+        <div class="h4">Smart Contract Architecture</div>
+        <p>Layer3's reward distribution system operates through three primary smart contracts:</p>
+        <ul>
+          <li><code>CUBE.sol</code> — mints and manages CUBE credentials</li>
+          <li><code>Factory.sol</code> — creates and manages individual reward campaigns</li>
+          <li><code>Escrow.sol</code> — holds token rewards and releases them upon verified quest completion</li>
+        </ul>
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4AC;</span>
+          <div class="callout-content">
+            <span class="callout-label">Plain English</span>
+            <p>A smart contract is a self-executing program stored on the blockchain that automatically performs actions when predefined conditions are met — <strong>without human intervention or override capability after deployment</strong>. Think of it like a vending machine: put in the right input, get the promised output, every time, with no cashier who could decide otherwise.</p>
+          </div>
+        </div>
+
+        <div class="h4">Smart Contract Audit &amp; Open-Source Status</div>
+        <p>In <strong>July 2024</strong>, Layer3's smart contracts were independently audited by <strong>ThreeSigma</strong>, a professional blockchain security firm. The contracts are also <strong>open source</strong> (published on GitHub under the Apache 2.0 license), enabling independent code review by the auditor's specialists. Layer3 also maintains an active bug bounty program with a dedicated security contact.</p>
+
+        <div class="h4">Cryptographic Verification — EIP-712 Signatures</div>
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4AC;</span>
+          <div class="callout-content">
+            <span class="callout-label">Plain English</span>
+            <p><strong>EIP-712</strong> is a standardized cryptographic signature protocol that binds specific structured data to a specific authorized party — like a tamper-evident wax seal. If anything in the underlying data changes after the signature is applied, the seal breaks, making any modification immediately detectable. This creates a verifiable chain of custody from data creation to on-chain recording.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION III — APPLICABLE STANDARDS
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section section-anchor" id="sec-3">
+    <div class="section-header">
+      <span class="section-num">SECTION III</span>
+      <span class="section-title">Applicable Auditing Standards and Reliability Requirements</span>
+    </div>
+    <div class="section-body">
+
+      <!-- 3.1 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">3.1</span> GAAS — AICPA AU-C 500 / SAS No. 142 (Non-Public Company Audits)</div>
+        <p><strong>SAS No. 142</strong> (<em>Audit Evidence</em>, effective December 15, 2022) replaced the prior AU-C 500 and established a modernized, principles-based framework for evaluating audit evidence. Under SAS 142, the auditor must evaluate evidence for <strong>sufficiency</strong> (quantity) and <strong>appropriateness</strong> (relevance and reliability).</p>
+        <p>For external information sources specifically, the standard requires consideration of the following reliability factors:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:18%">Factor</th>
+                <th style="width:40%">Standard's Requirement</th>
+                <th>Plain English</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Accuracy</td><td>Is the information factually correct? Does it reflect what it purports to reflect?</td><td>Is the data right?</td></tr>
+              <tr><td>Completeness</td><td>Does it capture all relevant items within the population?</td><td>Does it include everything it should?</td></tr>
+              <tr><td>Authenticity</td><td>Is it genuine and from the purported source? Has it been altered?</td><td>Is this really from Layer3, and has no one tampered with it?</td></tr>
+              <tr><td>Susceptibility to Bias</td><td>Can the source or audit client influence or alter the information?</td><td>Can anyone manipulate this data?</td></tr>
+              <tr><td>Controls over Production</td><td>What controls govern how the information is created, maintained, and transmitted?</td><td>What's stopping errors or fraud from entering the data?</td></tr>
+              <tr><td>Source Independence</td><td>Is the source independent of management and the audit client?</td><td>Did a truly outside party produce this, free from client influence?</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>SAS 142 specifically notes that <strong>external information is more likely to be reliable</strong> when it is provided to the public without restriction or to a broad range of users for a fee — because such information is less subject to influence by any single interested party.</p>
+      </div>
+
+      <!-- 3.2 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">3.2</span> GAAS — AU-C 402: Audit Considerations Relating to an Entity Using a Service Organization</div>
+        <p>If the audit client <strong>outsources a function relevant to financial reporting to Layer3</strong> (e.g., Layer3 processes and records token distributions that flow into the client's financial records), then Layer3 may constitute a <strong>service organization</strong> under AU-C 402.</p>
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4AC;</span>
+          <div class="callout-content">
+            <span class="callout-label">Plain English</span>
+            <p>AU-C 402 applies when your client hands off part of their accounting or transaction processing to a third party. If that third party's activities affect the financial statements, you need to understand what controls exist there — you cannot simply ignore it.</p>
+          </div>
+        </div>
+        <p><strong>Under AU-C 402, the auditor must:</strong></p>
+        <ol>
+          <li>Obtain an understanding of the services Layer3 provides and their relevance to the client's internal controls over financial reporting</li>
+          <li>Determine whether sufficient appropriate evidence can be obtained regarding controls at Layer3 without a direct visit</li>
+          <li>The preferred mechanism is a <strong>SOC 1 Type 2 report</strong> — an independent CPA firm's examination of the service organization's controls over a defined period</li>
+          <li>If a SOC 1 report is unavailable, the auditor must perform substitute procedures: direct inquiry, inspection of SLAs, or direct observation of controls</li>
+        </ol>
+      </div>
+
+      <!-- 3.3 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">3.3</span> PCAOB AS 1105 — Audit Evidence (Public Company Audits)</div>
+        <p><strong>AS 1105</strong> is the PCAOB's counterpart to AU-C 500 and governs evidence in audits of issuers. The standard requires that evidence be both <strong>relevant</strong> and <strong>reliable</strong>. Key existing guidance provides that evidence from independent external sources is more reliable than internally generated evidence, and that evidence obtained directly by the auditor is more reliable than evidence obtained indirectly. If a third party provides evidence subject to restrictions, limitations, or disclaimers, the auditor must evaluate those limitations on reliability.</p>
+
+        <div class="callout callout-warn">
+          <span class="callout-icon">&#x26A0;</span>
+          <div class="callout-content">
+            <span class="callout-label">New Amendment — AS 1105 Paragraph .10A (Effective December 15, 2025)</span>
+            <p>The PCAOB adopted amendments to AS 1105 in June 2024, effective for fiscal years beginning on or after December 15, 2025. <strong>Paragraph .10A</strong> directly and specifically addresses external electronic information provided by the company to the auditor.</p>
+          </div>
+        </div>
+
+        <p>Under paragraph .10A, when a company provides the auditor with external electronic information (e.g., a Layer3 data export provided by management as support for a financial statement assertion), the auditor must:</p>
+        <ul>
+          <li><strong>(a) Obtain an understanding of:</strong> the <em>source</em> of the information (Layer3 — who they are, what they do, how data is generated) and the <em>company's process</em> for receiving, maintaining, and processing that information (how the client receives and handles Layer3 data before providing it to the auditor)</li>
+          <li><strong>(b) Test either:</strong> the information itself (for accuracy, completeness, and authenticity), or the <em>relevant controls</em> (the controls that the client and/or Layer3 have in place to ensure the information is accurate and complete)</li>
+        </ul>
+
+        <div class="callout callout-note">
+          <span class="callout-icon">&#9432;</span>
+          <div class="callout-content">
+            <span class="callout-label">The "Remote Possibility" Exception (PCAOB Board Policy Statement, September 2025)</span>
+            <p>The PCAOB clarified that if the auditor concludes there is <strong>no more than a remote possibility</strong> that the information has been modified in a way that renders it unreliable, then separate testing under .10A(b) is not required. This exception is most applicable where the auditor independently obtains data from a public, tamper-proof source — such as directly querying a public blockchain.</p>
+          </div>
+        </div>
+
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4AC;</span>
+          <div class="callout-content">
+            <span class="callout-label">Plain English</span>
+            <p>Paragraph .10A says: you cannot simply take the client's word for it that a Layer3 report is accurate. You need to understand where the data came from and either test the data itself or test the controls that produced it. <strong>If you pull blockchain data directly from a public explorer yourself, you may be able to skip separate testing</strong> — because the blockchain is independently verifiable and cannot be altered.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3.4 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">3.4</span> PCAOB AS 2601 — Consideration of an Entity's Use of a Service Organization</div>
+        <p>The PCAOB equivalent of AU-C 402. Under AS 2601, if Layer3 processes transactions on behalf of the audit client in a way relevant to the financial statements, the auditor must:</p>
+        <ul>
+          <li>Obtain an understanding of Layer3's services and the client's controls over those services</li>
+          <li>Evaluate whether the services create risks of material misstatement</li>
+          <li>Determine how to obtain sufficient evidence — via a service auditor's report (SOC 1) or direct procedures at Layer3</li>
+          <li>For integrated audits (ICFR under AS 2201): consider whether controls at Layer3 are part of the client's ICFR and, if so, obtain evidence on their operating effectiveness</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION IV — EVALUATION
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section section-anchor" id="sec-4">
+    <div class="section-header">
+      <span class="section-num">SECTION IV</span>
+      <span class="section-title">Evaluation of Layer3 Against Audit Reliability Standards</span>
+    </div>
+    <div class="section-body">
+
+      <!-- 4.1 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">4.1</span> Source Reliability and Institutional Standing</div>
+        <div class="assess-header">
+          <span class="assess-label">Overall Assessment:</span>
+          <span class="badge badge-mod">&#x25CF; Moderate</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="width:30%">Criterion</th><th>Finding</th></tr></thead>
+            <tbody>
+              <tr><td>Operating History</td><td>Founded 2021 — approximately 4–5 years of operating history. Relatively young for a service organization relied upon in an audit context.</td></tr>
+              <tr><td>Institutional Credibility</td><td>$26.8M raised from institutional investors including Electric Capital, Greenfield Capital, ParaFi, and Amber Group — credible backers within the digital asset space. Not a resource-constrained startup.</td></tr>
+              <tr><td>Customer Base</td><td>Serves major blockchain protocols (Coinbase Cloud, Aave, Arbitrum, Uniswap, Base, Optimism) — suggesting the platform operates reliably at scale for its intended purpose.</td></tr>
+              <tr><td>Regulatory Status</td><td>No specific securities or financial services regulatory oversight identified. Layer3 is not registered with the SEC, FINRA, or any financial regulator. Operates under general commercial law.</td></tr>
+              <tr><td>Management Transparency</td><td>Limited public disclosure about internal governance and management controls. Typical of a venture-stage company in the blockchain sector.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>Conclusion:</strong> Layer3 is a commercially credible, institutional-investor-backed platform with meaningful market adoption. However, it is a relatively young company operating in an unregulated space with limited public disclosure of internal governance — factors the auditor must weigh when assessing overall reliability of evidence obtained from the platform.</p>
+      </div>
+
+      <!-- 4.2 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">4.2</span> On-Chain Data — Accuracy, Completeness, and Authenticity</div>
+        <div class="assess-header">
+          <span class="assess-label">Overall Assessment:</span>
+          <span class="badge badge-high">&#x25CF; High</span>
+          <span style="font-size:0.78rem; color:var(--gray-600)">for data verifiable directly on the blockchain</span>
+        </div>
+        <p>This is Layer3's most significant reliability strength. Data recorded on a public blockchain has the following properties:</p>
+        <ul>
+          <li><strong>Immutability:</strong> Once a CUBE credential or token distribution is recorded on-chain, it cannot be altered, deleted, or retroactively modified by Layer3, the client, or any other party without the cryptographic consensus of the entire network — which is computationally infeasible.</li>
+          <li><strong>Public verifiability:</strong> All on-chain transactions are visible on public blockchain explorers (Basescan for Base Network, Etherscan for Ethereum). The auditor or specialist can <strong>independently query the blockchain</strong> to verify CUBE mints, token distributions, wallet addresses, and timestamps — without relying on Layer3 to provide or certify the data.</li>
+          <li><strong>Smart contract integrity:</strong> Contracts are open source (GitHub, Apache 2.0), independently audited by ThreeSigma (July 2024), and governed by EIP-712 cryptographic signatures.</li>
+          <li><strong>IPFS metadata integrity:</strong> Content-addressed storage means the file's address IS its cryptographic hash — if the file changes, the address changes, making undetected alteration infeasible.</li>
+        </ul>
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4AC;</span>
+          <div class="callout-content">
+            <span class="callout-label">Plain English</span>
+            <p>If the client says "Layer3 distributed 1 million tokens to 50,000 wallets," the auditor can directly verify this by querying the blockchain — a public ledger that no one controls. <strong>It is like checking a public county deed record rather than taking the real estate agent's word for it.</strong></p>
+          </div>
+        </div>
+        <div class="callout callout-warn">
+          <span class="callout-icon">&#x26A0;</span>
+          <div class="callout-content">
+            <span class="callout-label">Limitation — The Oracle Problem</span>
+            <p>The reliability of on-chain data is undermined when off-chain information is used to trigger on-chain events — known as the <strong>Oracle Problem</strong> (documented in the <em>Journal of Information Systems</em>, American Accounting Association, 2021, and AICPA digital asset guidance). Layer3 must first determine <em>off-chain</em> whether a user completed a Quest before minting a CUBE on-chain. If Layer3's off-chain verification logic is flawed or manipulable, even the immutable on-chain record it produces may not accurately reflect the real-world event it purports to capture.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4.3 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">4.3</span> Off-Chain Data — Accuracy, Completeness, and Authenticity</div>
+        <div class="assess-header">
+          <span class="assess-label">Overall Assessment:</span>
+          <span class="badge badge-add-proc">&#x25CF; Requires Additional Procedures</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="width:30%">Reliability Factor</th><th>Finding</th></tr></thead>
+            <tbody>
+              <tr><td>Accuracy</td><td>Cannot be independently verified without access to Layer3's internal systems or a third-party attestation report.</td></tr>
+              <tr><td>Completeness</td><td>No public mechanism to confirm all records are captured — depends entirely on Layer3's internal data practices.</td></tr>
+              <tr><td>Authenticity</td><td>Cannot confirm that data provided by the client (obtained from Layer3) has not been filtered, modified, or selectively presented without Layer3's direct corroboration.</td></tr>
+              <tr><td>Susceptibility to Bias</td><td>Layer3 clients configure campaigns and define success criteria. Client-influenced data presentation cannot be ruled out without understanding Layer3's data segregation and reporting integrity controls.</td></tr>
+              <tr><td>Controls over Production</td><td><strong>No SOC 1 or SOC 2 report identified as of the date of this memorandum.</strong> Absent such a report, the auditor has no independent attestation of Layer3's internal control environment.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-gap">
+          <span class="callout-icon">&#x26D4;</span>
+          <div class="callout-content">
+            <span class="callout-label">Critical Gap — No SOC Report Identified</span>
+            <p>As of April 25, 2026, no evidence of a <strong>SOC 1 (Type 1 or Type 2)</strong> or <strong>SOC 2 report</strong> for Layer3 has been identified through research. A SOC 1 Type 2 report is the standard mechanism by which auditors obtain assurance over a service organization's control environment under AU-C 402 and PCAOB AS 2601. The absence of a SOC report does not render Layer3 unreliable as a platform, but it means the auditor <strong>cannot rely on Layer3's attestation of its own controls as audit evidence</strong> — additional direct procedures are required.</p>
+          </div>
+        </div>
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4AC;</span>
+          <div class="callout-content">
+            <span class="callout-label">Plain English</span>
+            <p>A SOC report is like a health inspection certificate posted in a restaurant window. It tells you an independent third party came in, examined how the kitchen operates, and confirmed the controls are working. <strong>Without a SOC report, you have to inspect the kitchen yourself</strong> — which means more work for the auditor.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4.4 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">4.4</span> Independence of the Source from Management</div>
+        <div class="assess-header">
+          <span class="assess-label">Overall Assessment:</span>
+          <span class="badge badge-partial">&#x25CF; Partial — Depends on Data Type</span>
+        </div>
+        <ul>
+          <li><strong>On-chain data queried directly from the blockchain:</strong> Fully independent of both Layer3 management and audit client management. The blockchain is maintained by a decentralized network of validators — no single party controls it.</li>
+          <li><strong>On-chain data obtained via Layer3 platform export (client-provided):</strong> Less independent — the data has passed through the client's hands before reaching the auditor. The auditor should independently re-verify against the blockchain explorer.</li>
+          <li><strong>Off-chain data provided by Layer3 to the client:</strong> Partially independent of the client, but not independent of Layer3. Layer3's data reflects Layer3's own records, which cannot be independently corroborated without direct inquiry at Layer3 or a SOC report.</li>
+        </ul>
+      </div>
+
+      <!-- 4.5 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">4.5</span> Susceptibility to Management Bias</div>
+        <div class="assess-header">
+          <span class="assess-label">On-Chain:</span>
+          <span class="badge badge-high">&#x25CF; Low Risk</span>
+          &nbsp;
+          <span class="assess-label">Off-Chain:</span>
+          <span class="badge badge-mod">&#x25CF; Moderate Risk</span>
+        </div>
+        <ul>
+          <li><strong>On-chain CUBE data:</strong> Extremely low susceptibility. Once minted on the blockchain, the record is immutable and cannot be altered by the client or Layer3.</li>
+          <li><strong>Off-chain campaign and platform data:</strong> Moderate susceptibility. Campaign parameters (which actions count as Quest completions) are configured by Layer3's clients. These parameters could theoretically be engineered to produce favorable metrics. The auditor should understand who controls campaign configuration and what segregation of duties exists.</li>
+        </ul>
+      </div>
+
+      <!-- 4.6 -->
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">4.6</span> Restrictions, Limitations, and Disclaimers</div>
+        <div class="assess-header">
+          <span class="assess-label">Assessment:</span>
+          <span class="badge badge-eval">&#x25CF; Evaluate Carefully</span>
+        </div>
+        <p>Under PCAOB AS 1105, the auditor must evaluate the impact of any restrictions, limitations, or disclaimers attached to third-party information. The engagement team should review:</p>
+        <ul>
+          <li><strong>Terms of Service / API Terms:</strong> Confirm whether Layer3's terms disclaim accuracy or completeness of the data, limit liability for errors, or restrict use for attestation purposes.</li>
+          <li><strong>Data export formats:</strong> Confirm whether data exports are provided with any caveats regarding completeness or currency.</li>
+          <li><strong>Service Level Agreements (SLAs):</strong> Review SLAs between the audit client and Layer3 to understand what data accuracy and availability guarantees, if any, Layer3 has committed to.</li>
+        </ul>
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4AC;</span>
+          <div class="callout-content">
+            <span class="callout-label">Plain English</span>
+            <p>If the fine print on Layer3's platform says "we make no guarantees about the accuracy of our data," that disclaimer directly affects how much weight the auditor can put on that data. <strong>Read the terms.</strong></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION V — RELIABILITY MATRIX
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section section-anchor" id="sec-5">
+    <div class="section-header">
+      <span class="section-num">SECTION V</span>
+      <span class="section-title">Summary Reliability Matrix</span>
+    </div>
+    <div class="section-body">
+      <div class="table-wrap">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th style="width:34%">Data Category</th>
+              <th style="width:24%">Reliability Assessment</th>
+              <th>Conditions for Reliance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>On-chain CUBE mints, token distributions — queried <strong>directly from blockchain</strong> by auditor or specialist</td>
+              <td><span class="badge badge-high">&#x25CF; High</span><br><small style="color:var(--gray-600);font-weight:400">Immutable, publicly verifiable, independently confirmable</small></td>
+              <td>Auditor or qualified specialist must directly query the blockchain explorer; document query parameters, source URL, query date, and results</td>
+            </tr>
+            <tr>
+              <td>On-chain data provided by <strong>client from Layer3 export</strong></td>
+              <td><span class="badge badge-mod">&#x25CF; Moderate</span><br><small style="color:var(--gray-600);font-weight:400">Must be independently verified</small></td>
+              <td>Re-verify against blockchain explorer; test completeness against the full population of on-chain events</td>
+            </tr>
+            <tr>
+              <td>Smart contract logic and code</td>
+              <td><span class="badge badge-mod-high">&#x25CF; Moderate–High</span><br><small style="color:var(--gray-600);font-weight:400">Open source, independently audited (ThreeSigma, July 2024)</small></td>
+              <td>Engage blockchain/IT specialist to review smart contract audit report; confirm no material post-audit changes to deployed contracts</td>
+            </tr>
+            <tr>
+              <td>Off-chain platform data (quest completions, user records, campaign metrics)</td>
+              <td><span class="badge badge-low-mod">&#x25CF; Low–Moderate</span><br><small style="color:var(--gray-600);font-weight:400">No independent attestation; no SOC report</small></td>
+              <td>Direct inquiry at Layer3; review ToS and SLAs; obtain written representations; consider substituting on-chain evidence</td>
+            </tr>
+            <tr>
+              <td>Layer3 aggregate reporting / dashboards</td>
+              <td><span class="badge badge-low">&#x25CF; Low</span><br><small style="color:var(--gray-600);font-weight:400">Internal systems, no independent verification</small></td>
+              <td>Do not use as primary evidence; corroborate against on-chain data and client records in all cases</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION VI — REQUIRED PROCEDURES
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section section-anchor" id="sec-6">
+    <div class="section-header">
+      <span class="section-num">SECTION VI</span>
+      <span class="section-title">Required Procedures to Support Reliance on Layer3 Data</span>
+    </div>
+    <div class="section-body">
+      <p>The following procedures are required (or strongly recommended) when relying on Layer3 data as audit evidence. All procedures should be documented in the engagement workpapers.</p>
+
+      <div class="proc-group-label">For All Engagements — GAAS and PCAOB</div>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <div class="proc-num">1</div>
+          <div class="proc-body">
+            <div class="proc-title">Understand the Service</div>
+            <p class="proc-desc">Document the specific services Layer3 provides to the client and how those services relate to financial statement assertions (existence, completeness, accuracy, cutoff, valuation, rights and obligations, presentation and disclosure).</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <div class="proc-num">2</div>
+          <div class="proc-body">
+            <div class="proc-title">Review Governing Documents</div>
+            <p class="proc-desc">Obtain and review the Master Service Agreement, Terms of Service, and any API agreements between the client and Layer3. Document any disclaimers or limitations that affect data reliability.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <div class="proc-num">3</div>
+          <div class="proc-body">
+            <div class="proc-title">Assess Relevance</div>
+            <p class="proc-desc">Determine which specific Layer3-sourced data fields or reports are being used to support which specific financial statement line items or disclosures.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <div class="proc-num">4</div>
+          <div class="proc-body">
+            <div class="proc-title">Obtain Written Representations</div>
+            <p class="proc-desc">If relying on off-chain Layer3 data, consider obtaining a management representation letter from the client affirming the accuracy and completeness of data obtained from Layer3. For material items, consider directly contacting Layer3 for corroboration (analogous to an external confirmation under AU-C 505).</p>
+          </div>
+        </li>
+      </ul>
+
+      <div class="proc-group-label">For On-Chain Data</div>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <div class="proc-num">5</div>
+          <div class="proc-body">
+            <div class="proc-title">Independent Blockchain Verification</div>
+            <p class="proc-desc">Directly query the relevant public blockchain (Base, Ethereum) using a blockchain explorer (Basescan, Etherscan) or blockchain analytics tool. Document the query parameters, source URL, query date, and results. This step converts the evidence from "client-provided external data" to "auditor-obtained direct evidence" — materially improving its reliability classification under both AS 1105 and SAS 142.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <div class="proc-num">6</div>
+          <div class="proc-body">
+            <div class="proc-title">Engage a Blockchain Specialist (AU-C 620 / PCAOB AS 1201)</div>
+            <p class="proc-desc">For material balances or disclosures dependent on Layer3 on-chain data, engage a specialist with blockchain expertise. Document the specialist's qualifications, the nature of the work performed, and the auditor's evaluation of the specialist's findings.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <div class="proc-num">7</div>
+          <div class="proc-body">
+            <div class="proc-title">Evaluate the Oracle Problem</div>
+            <p class="proc-desc">For each Quest type where Layer3 determines off-chain whether an action was completed before minting a CUBE on-chain, obtain an understanding of Layer3's verification logic. Document the risk that the on-chain record may not accurately reflect the real-world event it purports to capture, and design procedures to address this risk.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <div class="proc-num">8</div>
+          <div class="proc-body">
+            <div class="proc-title">Test Smart Contract Integrity</div>
+            <p class="proc-desc">Confirm that the smart contracts currently deployed match the open-source code on GitHub and the version reviewed in the ThreeSigma July 2024 audit. Note any post-audit upgrades and evaluate their significance on the reliability assessment.</p>
+          </div>
+        </li>
+      </ul>
+
+      <div class="proc-group-label">For Off-Chain Data (If Required)</div>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <div class="proc-num">9</div>
+          <div class="proc-body">
+            <div class="proc-title">SOC Report Inquiry</div>
+            <p class="proc-desc">Inquire of Layer3 whether a SOC 1 or SOC 2 report is available. If one has been issued since the date of this memo, obtain and evaluate it under AU-C 402 / AS 2601. Update this reliability assessment accordingly.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <div class="proc-num">10</div>
+          <div class="proc-body">
+            <div class="proc-title">Substitute Procedures (Absent SOC Report)</div>
+            <p class="proc-desc">In the absence of a SOC report, perform one or more of: (a) direct inquiry to Layer3 about internal controls over data accuracy, completeness, and security; (b) inspection of Layer3's system security certifications (e.g., ISO 27001); (c) testing a sample of off-chain records against corresponding on-chain data for consistency; (d) confirmation of specific data points directly with Layer3 (analogous to an external confirmation).</p>
+          </div>
+        </li>
+      </ul>
+
+      <div class="proc-group-label">PCAOB-Specific — AS 1105 Paragraph .10A</div>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <div class="proc-num">11</div>
+          <div class="proc-body">
+            <div class="proc-title">Document the Source Understanding (.10A(a))</div>
+            <p class="proc-desc">Prepare a written description of Layer3's business, data generation process, and the client's process for receiving, maintaining, and processing Layer3 data — satisfying the understanding requirement of .10A(a).</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <div class="proc-num">12</div>
+          <div class="proc-body">
+            <div class="proc-title">Test Information or Controls (.10A(b))</div>
+            <p class="proc-desc">For material items, select and execute one of: <strong>Test the information</strong> (trace a sample of Layer3 records to on-chain blockchain records; reconcile totals; test completeness against event logs) or <strong>Test the controls</strong> (test the client's controls over receipt and processing of Layer3 data: input validation, reconciliation procedures, access controls).</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <div class="proc-num">13</div>
+          <div class="proc-body">
+            <div class="proc-title">Evaluate the Remote Possibility Exception</div>
+            <p class="proc-desc">If the auditor independently obtains on-chain data directly from a public blockchain explorer (not through Layer3 or the client), document the basis for concluding there is no more than a remote possibility the data has been modified — and that separate .10A(b) testing is accordingly not required for that specific data set.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION VII — SOURCES
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section section-anchor" id="sec-7">
+    <div class="section-header">
+      <span class="section-num">SECTION VII</span>
+      <span class="section-title">Notable Sources / Reference Standards</span>
+    </div>
+    <div class="section-body">
+
+      <div class="source-group">
+        <div class="source-group-title">AICPA Standards</div>
+        <ul class="source-list">
+          <li class="source-item"><a href="https://us.aicpa.org/content/dam/aicpa/research/standards/auditattest/downloadabledocuments/sas-142.pdf" target="_blank">SAS No. 142 — Audit Evidence (AICPA)</a><div class="source-desc">Controlling standard for GAAS audit evidence; establishes accuracy, completeness, authenticity, and bias criteria</div></li>
+          <li class="source-item"><a href="https://us.aicpa.org/content/dam/aicpa/research/standards/auditattest/downloadabledocuments/au-c-00500.pdf" target="_blank">AU-C Section 500 — Audit Evidence (Original)</a><div class="source-desc">Predecessor standard; reliability framework principles remain foundational</div></li>
+          <li class="source-item"><a href="https://www.aicpa-cima.com/topic/audit-assurance/blockchain-and-digital-assets" target="_blank">AICPA — Auditing Blockchain and Digital Assets Resource Center</a><div class="source-desc">Guidance and practice aids for auditing digital assets; addresses Oracle Problem and blockchain evidence</div></li>
+          <li class="source-item"><a href="https://www.aicpa-cima.com/resources/download/soc-for-service-organizations-engagements-overview" target="_blank">AICPA — SOC for Service Organizations Overview</a><div class="source-desc">Framework for SOC 1 and SOC 2 reports; applicable when Layer3 constitutes a service organization</div></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">PCAOB Standards and Guidance</div>
+        <ul class="source-list">
+          <li class="source-item"><a href="https://pcaobus.org/oversight/standards/auditing-standards/details/AS1105" target="_blank">PCAOB AS 1105 — Audit Evidence</a><div class="source-desc">Primary PCAOB standard governing quality and reliability of audit evidence for issuer audits</div></li>
+          <li class="source-item"><a href="https://pcaobus.org/oversight/standards/auditing-standards/details/as-1105--audit-evidence-(effective-for-fiscal-years-beginning-on-or-after-12-15-2025)" target="_blank">PCAOB AS 1105 (Amended — effective FY beginning 12/15/2025)</a><div class="source-desc">Includes new paragraph .10A on external electronic information; mandatory for fiscal years beginning on or after December 15, 2025</div></li>
+          <li class="source-item"><a href="https://pcaobus.org/standards/documents/evaluating-relevance-and-reliability-of-audit-evidence-obtained-from-external-sources.pdf" target="_blank">PCAOB Staff Guidance — Evaluating Reliability of External Electronic Information</a><div class="source-desc">October 2025 implementation guidance for AS 1105 paragraph .10A; includes worked examples</div></li>
+          <li class="source-item"><a href="https://pcaobus.org/news-events/news-releases/news-release-detail/pcaob-posts-board-policy-statement-on-evaluating-the-reliability-of-external-electronic-information-provided-by-the-company" target="_blank">PCAOB Board Policy Statement — External Electronic Information (September 2025)</a><div class="source-desc">Describes the "remote possibility" exception to .10A(b) testing requirements</div></li>
+          <li class="source-item"><a href="https://pcaobus.org/oversight/standards/auditing-standards/details/AS2601" target="_blank">PCAOB AS 2601 — Consideration of an Entity's Use of a Service Organization</a><div class="source-desc">Governs auditor considerations when client uses a service organization such as Layer3</div></li>
+          <li class="source-item"><a href="https://pcaobus.org/standards/documents/staff-guidance-examples-of-evaluating-the-reliability-of-external-information-provided-by-the-company-in-electronic-form.pdf" target="_blank">PCAOB Staff Guidance — Examples for Evaluating Reliability of External Information</a><div class="source-desc">Worked examples illustrating application of .10A across different external data scenarios</div></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Layer3 Platform References</div>
+        <ul class="source-list">
+          <li class="source-item"><a href="https://layer3.xyz" target="_blank">Layer3 — Official Platform (layer3.xyz)</a><div class="source-desc">Primary platform; source for product information and terms of service</div></li>
+          <li class="source-item"><a href="https://layer3.xyz/blog/cubes-a-key-to-the-layer3-economy" target="_blank">Layer3 CUBE System — Technical Overview</a><div class="source-desc">Official description of CUBE credential architecture, ERC-721 structure, and IPFS metadata storage</div></li>
+          <li class="source-item"><a href="https://github.com/layer3xyz/cubes" target="_blank">Layer3 CUBE Smart Contracts — GitHub (Open Source)</a><div class="source-desc">Open-source code for CUBE.sol, Factory.sol, Escrow.sol; Apache 2.0 license; basis for ThreeSigma audit</div></li>
+          <li class="source-item"><a href="https://www.crunchbase.com/organization/layer3-de27" target="_blank">Layer3 — Crunchbase Profile and Funding History</a><div class="source-desc">Funding rounds, investor identities, and corporate background; supports source credibility assessment</div></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Academic and Industry Context</div>
+        <ul class="source-list">
+          <li class="source-item"><a href="https://blog.techaccountingpro.com/p/using-blockchain-information-as-audit" target="_blank">Using Blockchain Information as Audit Evidence — TechAccountingPro</a><div class="source-desc">Practitioner overview of blockchain evidence characteristics and reliability considerations</div></li>
+          <li class="source-item"><a href="https://publications.aaahq.org/jis/article-abstract/35/1/121/939/Auditing-the-Blockchain-Oracle-Problem" target="_blank">Auditing the Blockchain Oracle Problem — Journal of Information Systems (AAA)</a><div class="source-desc">Peer-reviewed academic analysis of the Oracle Problem's impact on audit evidence reliability</div></li>
+          <li class="source-item"><a href="https://www.njcpa.org/article/2025/09/02/cryptoasset-auditing-and-attestation--what's-changed-and-why-it-matters" target="_blank">Cryptoasset Auditing and Attestation — NJCPA</a><div class="source-desc">Current practice-level guidance on crypto audit procedures and updated standards</div></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION VIII — GAPS & CAVEATS
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section section-anchor" id="sec-8">
+    <div class="section-header">
+      <span class="section-num">SECTION VIII</span>
+      <span class="section-title">Gaps and Caveats</span>
+    </div>
+    <div class="section-body">
+      <ul class="gap-list">
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>No SOC 1 or SOC 2 report identified</strong> as of April 25, 2026. This is the most significant gap in Layer3's audit reliability profile. The engagement team should re-inquire prior to each engagement period in case a report has since been issued.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Oracle Problem is inherent and irreducible</strong> for off-chain Quest verification — the auditor must design specific procedures to address this risk for any material balance dependent on Layer3's off-chain determination logic.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Smart contract audit (ThreeSigma, July 2024) is now approximately 21 months old.</strong> Confirm whether the audited contracts remain unchanged and that no material upgrades have been deployed to the on-chain contracts since that audit.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Layer3 is a relatively young company</strong> with limited operating history. Assess whether the risk profile remains appropriate as the engagement evolves and as the platform's controls environment matures.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>This memo is a general framework.</strong> It must be supplemented with engagement-specific procedures tailored to the specific financial statement assertions being supported by Layer3 data, the materiality of those amounts, and the client's specific use case on the Layer3 platform.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Regulatory environment for blockchain platforms is evolving rapidly.</strong> Monitor for new AICPA, PCAOB, or SEC guidance on auditing digital asset-related service organizations that may update this analysis.</div></li>
+      </ul>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION IX — KEY TAKEAWAYS
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section section-anchor" id="sec-9">
+    <div class="section-header">
+      <span class="section-num">SECTION IX</span>
+      <span class="section-title">Key Takeaways</span>
+    </div>
+    <div class="section-body">
+      <ul class="takeaway-list">
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2714;</span><div><strong>On-chain Layer3 data can be used as audit evidence</strong> — it is immutable, publicly verifiable, and independently confirmable. The auditor must directly query the blockchain rather than relying solely on client-provided exports.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2714;</span><div><strong>Off-chain Layer3 data requires additional procedures</strong> — specifically, the procedures that would normally be satisfied by a SOC report, which does not currently exist for Layer3.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2714;</span><div><strong>PCAOB AS 1105 paragraph .10A now requires</strong> that auditors formally document their understanding of Layer3 as a source and either test the data or the controls — this is a new mandatory step for PCAOB engagements beginning after December 15, 2025.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2714;</span><div><strong>A blockchain specialist must be engaged</strong> under AU-C 620 / AS 1201 for any material balance or disclosure that depends on Layer3's smart contract or on-chain data — the technical complexity exceeds the expertise expected of a general practitioner CPA.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2714;</span><div><strong>Absence of a SOC report is the most significant known gap</strong> — the engagement team must obtain substitute assurance through direct inquiry, documentation review, and independent blockchain verification procedures.</div></li>
+      </ul>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION X — NEXT STEPS
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section section-anchor" id="sec-10">
+    <div class="section-header">
+      <span class="section-num">SECTION X</span>
+      <span class="section-title">Recommended Next Steps</span>
+    </div>
+    <div class="section-body">
+      <ul class="next-step-list">
+        <li class="next-step-item"><div class="next-step-num">1</div><div><strong>Inquire of Layer3 directly</strong> (via the client relationship or direct outreach) whether a SOC 1 or SOC 2 report is available or in process. If available, obtain it and update this memorandum accordingly.</div></li>
+        <li class="next-step-item"><div class="next-step-num">2</div><div><strong>Identify and engage a blockchain specialist</strong> for engagements where Layer3 data is material — document the specialist's qualifications and the procedures to be performed consistent with AU-C 620 / AS 1201.</div></li>
+        <li class="next-step-item"><div class="next-step-num">3</div><div><strong>For each specific engagement using Layer3 data:</strong> Complete a tailored addendum to this memo identifying (a) which specific Layer3 data is being used, (b) which financial statement assertions it supports, (c) whether the data is on-chain or off-chain, and (d) the specific procedures designed and performed to address reliability.</div></li>
+        <li class="next-step-item"><div class="next-step-num">4</div><div><strong>Establish an annual process to re-verify the ThreeSigma smart contract audit</strong> — confirm that the audited contracts remain in deployment and that no material modifications have been made to the on-chain code since July 2024.</div></li>
+        <li class="next-step-item"><div class="next-step-num">5</div><div><strong>Update this memo annually</strong> or whenever there is a material change in Layer3's operations, ownership, or control environment, or when new AICPA/PCAOB guidance is issued applicable to blockchain-based service organizations.</div></li>
+        <li class="next-step-item"><div class="next-step-num">6</div><div><strong>Review Layer3's Terms of Service and API Terms</strong> at the start of each engagement and document any disclaimers or limitations that may affect the reliability of data obtained from the platform.</div></li>
+      </ul>
+    </div>
+  </div>
+
+
+  <!-- ── Signature Block ──────────────────────────────────────── -->
+  <div class="sig-block">
+    <div class="sig-header">Authorization and Review — Engagement Workpaper Sign-Off</div>
+    <div class="sig-body">
+      <div class="sig-field">
+        <label>Prepared By</label>
+        <div class="sig-line"></div>
+        <div class="sig-note">Name / Title / Date</div>
+      </div>
+      <div class="sig-field">
+        <label>Reviewed By</label>
+        <div class="sig-line"></div>
+        <div class="sig-note">Name / Title / Date</div>
+      </div>
+      <div class="sig-field">
+        <label>Manager / Senior Manager</label>
+        <div class="sig-line"></div>
+        <div class="sig-note">Name / Title / Date</div>
+      </div>
+      <div class="sig-field">
+        <label>Partner / Engagement Lead</label>
+        <div class="sig-line"></div>
+        <div class="sig-note">Name / Title / Date</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Disclaimer ──────────────────────────────────────────── -->
+  <p style="font-size:0.75rem; color:var(--gray-400); text-align:center; margin-top:8px; line-height:1.6;">
+    This memorandum was prepared based on research conducted as of April 25, 2026. Standards citations are current as of that date.<br>
+    The preparer should confirm the effective dates of PCAOB AS 1105 amendments relative to the specific engagement's fiscal year.
+  </p>
+
+</div><!-- /page-wrapper -->
+
+
+<!-- ── Document Footer ────────────────────────────────────────── -->
+<footer class="doc-footer">
+  <div>Ref: AWP-TECH-2026-L3 &nbsp;&middot;&nbsp; Rev 1.0 &nbsp;&middot;&nbsp; April 25, 2026</div>
+  <div>Audit &amp; Assurance Practice &mdash; Digital Assets Technical Research</div>
+  <div>Confidential &mdash; Authorized Use Only</div>
+</footer>
+
+</body>
+</html>

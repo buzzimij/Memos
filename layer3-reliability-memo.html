@@ -776,6 +776,33 @@
   /* ── Anchor offset for sticky header ─────────────────────── */
   .section-anchor { scroll-margin-top: 16px; }
 
+  /* ── Tab Navigation ─────────────────────────────────────── */
+  .tab-nav {
+    background: var(--navy-mid);
+    padding: 0 56px;
+    display: flex;
+    border-bottom: 3px solid rgba(0,0,0,0.18);
+  }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    color: rgba(255,255,255,0.55);
+    padding: 15px 28px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); }
+  .tab-btn.active { color: white; border-bottom-color: #5B9BD5; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
   /* ── Print Styles ─────────────────────────────────────────── */
   @media print {
     body { background: white; font-size: 11pt; }
@@ -835,6 +862,353 @@
 <div class="confidential-bar">
   Confidential &mdash; For Authorized Engagement Team Use Only &mdash; Do Not Distribute
 </div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="tab1">&#x1F4D6;&#xFE0E;&nbsp;&nbsp;Tab 1 &mdash; Platform Overview</button>
+  <button class="tab-btn" data-tab="tab2">&#x1F50D;&#xFE0E;&nbsp;&nbsp;Tab 2 &mdash; Reliability &amp; Risk Assessment</button>
+</div>
+
+<!-- ═══════════ TAB 1: PLATFORM OVERVIEW ═══════════ -->
+<div id="tab1" class="tab-panel active">
+<div class="page-wrapper">
+
+  <div class="memo-header">
+    <div class="memo-header-title">Tab 1 &mdash; Platform Technical Overview</div>
+    <div class="memo-grid">
+      <div class="memo-label">Subject</div>
+      <div class="memo-value"><strong>Layer3 (layer3.xyz) &mdash; Platform Primer for CPAs and Audit Professionals</strong></div>
+    </div>
+    <div class="memo-grid">
+      <div class="memo-label">Purpose</div>
+      <div class="memo-value">Standalone reference explaining what Layer3 is, how it works, and why it appears in audit engagements. Read before applying the reliability analysis in Tab 2.</div>
+    </div>
+    <div class="memo-grid">
+      <div class="memo-label">Audience</div>
+      <div class="memo-value">CPAs and audit professionals familiar with blockchain basics but without prior exposure to Layer3 specifically.</div>
+    </div>
+  </div>
+
+  <div class="toc-card">
+    <div class="toc-header">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h6" stroke="#1A3461" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Contents &mdash; Platform Overview
+    </div>
+    <ul class="toc-list">
+      <li><a href="#t1-1"><span class="toc-num">I.</span> What Is Layer3 &mdash; Context for Auditors</a></li>
+      <li><a href="#t1-2"><span class="toc-num">II.</span> The Business Model: How the Platform Works</a></li>
+      <li><a href="#t1-3"><span class="toc-num">III.</span> The CUBE Credential System</a></li>
+      <li><a href="#t1-4"><span class="toc-num">IV.</span> Smart Contract Architecture</a></li>
+      <li><a href="#t1-5"><span class="toc-num">V.</span> On-Chain vs. Off-Chain: The Critical Audit Distinction</a></li>
+      <li><a href="#t1-6"><span class="toc-num">VI.</span> The Oracle Problem</a></li>
+      <li><a href="#t1-7"><span class="toc-num">VII.</span> Institutional Profile &amp; Control Environment</a></li>
+    </ul>
+  </div>
+
+  <!-- T1 SECTION I -->
+  <div id="t1-1" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">I</span>
+      <span class="section-title">What Is Layer3 &mdash; Context for Accounting Professionals</span>
+    </div>
+    <div class="section-body">
+      <p>Layer3 is a <strong>Web3 user acquisition and engagement platform</strong> — in practical terms, a digital marketing and loyalty program infrastructure provider for blockchain-based companies. Founded in 2021 and headquartered in Washington, D.C., the platform allows blockchain companies to run incentivized user campaigns called "Quests," through which users earn cryptocurrency tokens or digital credentials by interacting with the sponsoring company's product.</p>
+
+      <div class="callout callout-plain">
+        <span class="callout-icon">&#x1F4A1;</span>
+        <div class="callout-content">
+          <span class="callout-label">CPA Analogy</span>
+          <p>Think of Layer3 as a full-service loyalty program administrator — like how airlines outsource their frequent flyer programs to a third-party rewards platform. The blockchain company (like the airline) defines the earning rules. Layer3 (like the rewards platform) verifies completions and distributes the rewards. The key difference: Layer3's reward records are minted as permanent blockchain entries, not entries in a private loyalty database.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Why Auditors Encounter It</span>How Layer3 Appears in Engagements</div>
+        <p>An audit client may have used Layer3 to:</p>
+        <ul>
+          <li><strong>Distribute tokens as part of a token launch or airdrop</strong> — Layer3 manages the campaign, verifies eligibility, and records distributions on-chain. The auditor may need to verify token distribution records and agree them to the client's general ledger.</li>
+          <li><strong>Record proof of user activity on their blockchain protocol</strong> — user engagement metrics verifiable on-chain; relevant to revenue recognition or user count disclosures.</li>
+          <li><strong>Generate verifiable records of on-chain activity volumes</strong> — relevant to operational representations in financial statements or regulatory filings.</li>
+          <li><strong>Manage escrow of token rewards</strong> — Layer3's Escrow.sol contract holds client-funded token pools; relevant to custody and asset classification.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1 SECTION II -->
+  <div id="t1-2" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">II</span>
+      <span class="section-title">The Business Model: How the Platform Works</span>
+    </div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">The Quest Mechanism</span>How Campaigns Are Structured</div>
+        <p>A blockchain company that wants to grow its user base contracts with Layer3 to run a campaign. The company funds a pool of token rewards and defines the campaign parameters. Layer3 publishes "Quests" — tasks that users can complete to earn a share of the reward pool. Tasks vary widely: visiting a website, swapping tokens on a decentralized exchange, depositing into a liquidity pool, holding a specific NFT, or completing an educational module.</p>
+        <p>Layer3 is responsible for verifying that a user actually completed the required action. When Layer3 confirms completion (through its off-chain verification logic), it triggers an on-chain event: a CUBE credential is minted to the user's wallet, and token rewards are released from escrow.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Revenue Flow</span>Where the Money Goes</div>
+        <ul>
+          <li><strong>Client (blockchain company):</strong> Funds the reward token pool upfront into Layer3's Escrow.sol smart contract. Pays Layer3 a platform fee for campaign management.</li>
+          <li><strong>Layer3:</strong> Earns platform fees. Manages campaign configuration, verification logic, and reward distribution execution.</li>
+          <li><strong>Users:</strong> Earn tokens and/or CUBE credentials by completing Quests. No payment required — they receive value for engaging with the client's protocol.</li>
+        </ul>
+        <p><strong>Audit implication:</strong> token rewards funded into escrow represent a financial liability of the client until distributed. The timing of recognition, the fair value of tokens at distribution date, and the completeness of distributions are all assertions the auditor may need to address.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Notable Clients</span>Institutional Footprint</div>
+        <p>Layer3's disclosed client list includes: Coinbase Cloud, Aave, Arbitrum, Optimism, Uniswap, Base, 1inch, and Robinhood's blockchain operations. This institutional client base confirms the platform operates at commercial scale and is trusted by major, regulated entities in the digital asset space — a relevant data point for source credibility assessment under SAS 142 and AS 1105.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1 SECTION III -->
+  <div id="t1-3" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">III</span>
+      <span class="section-title">The CUBE Credential System</span>
+    </div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">What a CUBE Is</span>Definition and Technical Nature</div>
+        <p><strong>CUBE</strong> stands for Credentials to Unify Blockchain Events. A CUBE is an <strong>ERC-721 token</strong> — a standardized, non-fungible digital record permanently minted to a user's blockchain wallet address when they complete a Quest. Non-fungible means each CUBE is unique (no two are identical); it records the specific user, the specific Quest, and the specific timestamp.</p>
+
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4A1;</span>
+          <div class="callout-content">
+            <span class="callout-label">CPA Analogy</span>
+            <p>Think of a CUBE like a property deed recorded in the county recorder's office. The recording is public, permanent, and cannot be altered — but the decision to record it in the first place (the determination that the Quest was actually completed) was made by a private party (Layer3's internal verification logic). The public record is trustworthy; the triggering decision is where audit risk lives.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Data in Each CUBE</span>What Is Permanently Recorded</div>
+        <p>Each CUBE contains the following data, permanently recorded on-chain:</p>
+        <ul>
+          <li>Participating blockchain project(s) and communities involved</li>
+          <li>Quest difficulty level (beginner, intermediate, advanced)</li>
+          <li>Quest title and description</li>
+          <li><strong>Timestamp of completion</strong> — blockchain-confirmed, tamper-proof</li>
+          <li><strong>Recipient wallet address</strong> — the blockchain identity of the completing user</li>
+          <li>Rich metadata stored on IPFS (content-addressed distributed storage — the file's address is its cryptographic hash, making undetected alteration infeasible)</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">On-Chain Verification</span>How Auditors Can Independently Confirm</div>
+        <p>All CUBE minting events are publicly recorded on the relevant blockchain (Ethereum mainnet or Base Network). The auditor or a blockchain specialist can independently query a public blockchain explorer (Etherscan for Ethereum, Basescan for Base) to verify: the number of CUBEs minted, the wallet addresses to which they were minted, and the confirmed timestamps — without requesting any data from Layer3 or the audit client.</p>
+        <p>This is Layer3's most significant reliability strength: the on-chain record is independently verifiable by anyone with a browser.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1 SECTION IV -->
+  <div id="t1-4" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">IV</span>
+      <span class="section-title">Smart Contract Architecture</span>
+    </div>
+    <div class="section-body">
+      <p>Layer3's on-chain operations are governed by three primary smart contracts. Understanding these is necessary for the code review procedures described in Tab 2.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:22%">Contract</th>
+              <th style="width:38%">Function</th>
+              <th>Audit Relevance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>CUBE.sol</code></td>
+              <td>Mints and manages CUBE credentials (ERC-721 tokens). Creates the permanent on-chain record of Quest completion.</td>
+              <td>Primary source of on-chain evidence for Quest completion events. Auditor should confirm the deployed contract matches the open-source version and the ThreeSigma-audited version.</td>
+            </tr>
+            <tr>
+              <td><code>Factory.sol</code></td>
+              <td>Creates and manages individual reward campaigns for each Layer3 client. Defines campaign parameters.</td>
+              <td>Controls which actions qualify for rewards. Campaign configuration is a client-controlled variable — understand who sets the parameters and what segregation of duties exists.</td>
+            </tr>
+            <tr>
+              <td><code>Escrow.sol</code></td>
+              <td>Holds client-funded token rewards and releases them automatically when verified Quest completions are confirmed.</td>
+              <td>Token holdings in escrow represent a financial obligation of the client. Confirm balances, release timing, and whether unreleased funds are properly classified on the client's balance sheet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Control Features</span>Key Technical Safeguards</div>
+        <ul>
+          <li><strong>Open Source:</strong> All three contracts are published on GitHub under the Apache 2.0 license — available for independent review by the auditor's specialist without Layer3's involvement.</li>
+          <li><strong>ThreeSigma Audit (July 2024):</strong> An independent blockchain security firm performed a professional code audit. The auditor should confirm the currently deployed contracts match the audited version and that no material upgrades have been applied since.</li>
+          <li><strong>EIP-712 Signatures:</strong> A cryptographic signature standard that authenticates each data item before it triggers an on-chain action. If anything in the underlying data changes after signing, the signature becomes invalid — making undetected tampering between Layer3's off-chain verification and the on-chain minting infeasible.</li>
+          <li><strong>Bug Bounty Program:</strong> Layer3 maintains an active security contact and bug bounty program — consistent with a security-conscious development posture.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1 SECTION V -->
+  <div id="t1-5" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">V</span>
+      <span class="section-title">On-Chain vs. Off-Chain: The Critical Audit Distinction</span>
+    </div>
+    <div class="section-body">
+      <p>Layer3 operates across two data environments with <strong>materially different reliability characteristics</strong>. Every audit judgment about Layer3 data must begin with correctly categorizing which environment the data lives in. This distinction drives the entire reliability matrix in Tab 2.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:20%">Property</th>
+              <th>On-Chain Data</th>
+              <th>Off-Chain Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Storage</strong></td>
+              <td>Permanently recorded on a public blockchain (Ethereum, Base)</td>
+              <td>Layer3's private, centralized servers — same as any SaaS company's database</td>
+            </tr>
+            <tr>
+              <td><strong>Immutability</strong></td>
+              <td>Cannot be altered by Layer3, the client, or any party once confirmed</td>
+              <td>Can be modified, deleted, or selectively exported by Layer3 at any time</td>
+            </tr>
+            <tr>
+              <td><strong>Verifiability</strong></td>
+              <td>Independently verifiable by querying a public blockchain explorer — no cooperation from Layer3 required</td>
+              <td>Cannot be independently verified without either Layer3's cooperation or a SOC report</td>
+            </tr>
+            <tr>
+              <td><strong>Reliability Rating</strong></td>
+              <td><span class="badge badge-high">High</span> (when auditor independently queries the blockchain)</td>
+              <td><span class="badge badge-low-mod">Low&ndash;Moderate</span> (no independent attestation, no SOC report)</td>
+            </tr>
+            <tr>
+              <td><strong>Examples</strong></td>
+              <td>CUBE minting events, token distributions from Escrow.sol, wallet-to-wallet transfers</td>
+              <td>Quest completion determinations, user account records, campaign configuration, aggregate dashboard reports</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-plain">
+        <span class="callout-icon">&#x1F4A1;</span>
+        <div class="callout-content">
+          <span class="callout-label">The Practical Rule</span>
+          <p>When the client says "Layer3 distributed 1 million tokens to 50,000 wallets," the auditor can verify the on-chain component directly by querying the blockchain — like checking a public deed record rather than taking the real estate agent's word for it. But when the client says "Layer3 verified that all 50,000 users actually completed the required actions," that determination was made off-chain inside Layer3's private systems — and cannot be independently confirmed without additional procedures.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1 SECTION VI -->
+  <div id="t1-6" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">VI</span>
+      <span class="section-title">The Oracle Problem &mdash; Where On-Chain Certainty Has Limits</span>
+    </div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">The Core Issue</span>What the Oracle Problem Is</div>
+        <p>The <strong>Oracle Problem</strong> is one of the most important concepts in blockchain auditing, first formally examined in the <em>Journal of Information Systems</em> (American Accounting Association, 2021) and now embedded in AICPA digital asset practice guidance.</p>
+        <p>The problem: a blockchain is a closed system — it knows only what has been recorded on it. To record an event triggered by something that happened off-chain (in the real world, or in someone's private system), a trusted intermediary — an "oracle" — must bridge that information onto the chain. <strong>The reliability of the on-chain record is therefore bounded by the reliability of the oracle that triggered it.</strong></p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">How It Applies to Layer3</span>The Specific Mechanism</div>
+        <p>Layer3 operates as an oracle in its own platform. The sequence is:</p>
+        <ol>
+          <li>A user claims to have completed a Quest (e.g., "I swapped tokens on Protocol X")</li>
+          <li>Layer3's off-chain verification logic checks whether the on-chain action actually occurred (querying the relevant blockchain)</li>
+          <li>If Layer3's systems determine the action is complete, Layer3 triggers the minting of a CUBE on-chain and releases token rewards from escrow</li>
+        </ol>
+        <p>Steps 2 and 3 happen inside Layer3's private systems. The on-chain CUBE record (step 3) is immutable and publicly verifiable — <strong>but it only captures what Layer3 decided to record.</strong> If Layer3's verification logic is flawed, gamed by bad actors, or misconfigured, the resulting CUBE record immutably records an incorrect outcome.</p>
+
+        <div class="callout callout-warn">
+          <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">The Court Notary Analogy</span>
+            <p>A court notary certifies that a signature is authentic — but does not verify whether the underlying factual claims in the document are true. The notarization is reliable evidence that the document was signed. It is not reliable evidence that the document's contents are accurate. Similarly: the CUBE on-chain record is reliable evidence that Layer3 minted it. It is not, by itself, reliable evidence that the underlying Quest was genuinely completed — because that determination was made off-chain.</p>
+          </div>
+        </div>
+
+        <p>The Oracle Problem is <strong>inherent and irreducible</strong> for any system that bridges real-world or off-chain events onto a blockchain. It is not a flaw unique to Layer3 — it is a structural characteristic of any blockchain oracle. The auditor's job is to assess the reliability of Layer3's specific oracle mechanism for each material balance or assertion under audit.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1 SECTION VII -->
+  <div id="t1-7" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">VII</span>
+      <span class="section-title">Institutional Profile &amp; Control Environment</span>
+    </div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Company Profile</span>Background and Funding</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th style="width:28%">Item</th><th>Detail</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Founded</td><td>2021</td></tr>
+              <tr><td>Headquarters</td><td>Washington, D.C.</td></tr>
+              <tr><td>Total Funding</td><td>~$26.8 million across four rounds (most recent: $4M round, February 2025)</td></tr>
+              <tr><td>Key Investors</td><td>Electric Capital, Greenfield Capital, Amber Group, ParaFi Capital — institutional-grade investors with meaningful digital asset expertise</td></tr>
+              <tr><td>Notable Clients</td><td>Coinbase Cloud, Aave, Arbitrum, Optimism, Uniswap, Base (Coinbase L2), 1inch, Robinhood blockchain operations</td></tr>
+              <tr><td>Regulatory Status</td><td>Not registered with SEC, FINRA, or any financial regulator. Operates under general commercial law. No specific digital asset platform regulatory oversight identified.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Control Environment</span>Known Audit-Relevant Controls</div>
+        <div class="callout callout-gap">
+          <span class="callout-icon">&#x26D4;</span>
+          <div class="callout-content">
+            <span class="callout-label">Most Significant Gap: No SOC Report Identified</span>
+            <p>As of April 25, 2026, no evidence of a SOC 1 (Type 1 or Type 2) or SOC 2 report for Layer3 has been identified. A SOC 1 Type 2 report is the standard mechanism by which auditors obtain assurance over a service organization's control environment under AU-C 402 and PCAOB AS 2601. Without it, the auditor cannot rely on Layer3's own attestation of its internal controls — additional direct procedures are required. <strong>Re-inquire at the start of each engagement period</strong> in case a report has since been issued.</p>
+          </div>
+        </div>
+        <p>Known controls that do exist:</p>
+        <ul>
+          <li><strong>Smart contract code audit:</strong> ThreeSigma (blockchain security firm), July 2024 — approximately 21 months prior to this memo</li>
+          <li><strong>Open-source contracts:</strong> Available for independent specialist review on GitHub (Apache 2.0 license)</li>
+          <li><strong>EIP-712 cryptographic signatures:</strong> Authenticate each transaction before on-chain execution</li>
+          <li><strong>Bug bounty program:</strong> Active security contact</li>
+        </ul>
+        <p><strong>Controls with no independent attestation available:</strong> off-chain Quest verification logic, data segregation between clients, data accuracy and completeness of platform reporting, access controls, change management over internal systems.</p>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end tab1 page-wrapper -->
+</div><!-- end tab1 panel -->
+
+<!-- ═══════════ TAB 2: RELIABILITY & RISK ASSESSMENT ═══════════ -->
+<div id="tab2" class="tab-panel">
 
 <!-- ── Page Wrapper ───────────────────────────────────────────── -->
 <div class="page-wrapper">
@@ -1610,6 +1984,7 @@
   </p>
 
 </div><!-- /page-wrapper -->
+</div><!-- end tab2 panel -->
 
 
 <!-- ── Document Footer ────────────────────────────────────────── -->
@@ -1619,5 +1994,16 @@
   <div>Confidential &mdash; Authorized Use Only</div>
 </footer>
 
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById(this.dataset.tab).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
 </body>
 </html>

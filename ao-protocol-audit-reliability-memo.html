@@ -717,6 +717,33 @@
   /* ── Anchor offset ────────────────────────────────────────── */
   .section-anchor { scroll-margin-top: 16px; }
 
+  /* ── Tab Navigation ─────────────────────────────────────── */
+  .tab-nav {
+    background: var(--navy-mid);
+    padding: 0 56px;
+    display: flex;
+    border-bottom: 3px solid rgba(0,0,0,0.18);
+  }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    color: rgba(255,255,255,0.55);
+    padding: 15px 28px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); }
+  .tab-btn.active { color: white; border-bottom-color: #5B9BD5; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
   /* ── Print ────────────────────────────────────────────────── */
   @media print {
     body { background: white; font-size: 11pt; }
@@ -772,6 +799,377 @@
   Confidential &mdash; For Authorized Engagement Team Use Only &mdash; Do Not Distribute
 </div>
 
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="tab1">&#x1F4D6;&#xFE0E;&nbsp;&nbsp;Tab 1 &mdash; Protocol Overview</button>
+  <button class="tab-btn" data-tab="tab2">&#x1F50D;&#xFE0E;&nbsp;&nbsp;Tab 2 &mdash; Reliability &amp; Risk Assessment</button>
+</div>
+
+<!-- ═══════════ TAB 1: PROTOCOL OVERVIEW ═══════════ -->
+<div id="tab1" class="tab-panel active">
+<div class="page-wrapper">
+
+  <div class="memo-header">
+    <div class="memo-header-title">Tab 1 &mdash; Protocol Technical Overview</div>
+    <div class="memo-grid">
+      <div class="memo-label">Subject</div>
+      <div class="memo-value"><strong>AO Protocol (Arweave Actor-Oriented) &mdash; Technical Primer for CPAs and Audit Professionals</strong></div>
+    </div>
+    <div class="memo-grid">
+      <div class="memo-label">Purpose</div>
+      <div class="memo-value">Standalone technical reference for engagement team members unfamiliar with AO's architecture. Read this tab before applying the reliability analysis in Tab 2.</div>
+    </div>
+    <div class="memo-grid">
+      <div class="memo-label">Audience</div>
+      <div class="memo-value">CPAs and audit professionals with general blockchain familiarity but no prior exposure to AO Protocol specifically.</div>
+    </div>
+  </div>
+
+  <div class="toc-card">
+    <div class="toc-header">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h6" stroke="#1A3461" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Contents &mdash; Protocol Overview
+    </div>
+    <ul class="toc-list">
+      <li><a href="#t1-1"><span class="toc-num">I.</span> What Is AO Protocol</a></li>
+      <li><a href="#t1-2"><span class="toc-num">II.</span> The Foundation: Arweave &amp; Permanent Storage</a></li>
+      <li><a href="#t1-3"><span class="toc-num">III.</span> Core Architecture: Processes &amp; Messages</a></li>
+      <li><a href="#t1-4"><span class="toc-num">IV.</span> The Three Network Node Types</a></li>
+      <li><a href="#t1-5"><span class="toc-num">V.</span> The Holographic State</a></li>
+      <li><a href="#t1-6"><span class="toc-num">VI.</span> AO vs. Ethereum &mdash; A Reference Frame</a></li>
+      <li><a href="#t1-7"><span class="toc-num">VII.</span> The AO Token: Economics &amp; Accounting</a></li>
+    </ul>
+  </div>
+
+  <!-- T1 SECTION I -->
+  <div id="t1-1" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">I</span>
+      <span class="section-title">What Is AO Protocol &mdash; Context for Accounting Professionals</span>
+    </div>
+    <div class="section-body">
+      <p>AO (Actor-Oriented) is a <strong>decentralized computing platform</strong> built on top of the Arweave blockchain. Its mainnet launched February 8, 2025. AO is not simply another blockchain — it is a computing environment that uses a blockchain (Arweave) as its permanent storage and audit trail layer. The combination means every computation is both executed and permanently recorded.</p>
+      <p>This distinction matters for how you frame it professionally: Arweave stores data; AO runs programs. Together they create a system where programs can execute at scale and every instruction those programs ever received is preserved forever in a publicly accessible, tamper-proof ledger.</p>
+
+      <div class="callout callout-plain">
+        <span class="callout-icon">&#x1F4CC;</span>
+        <div class="callout-content">
+          <span class="callout-label">CPA Bottom Line</span>
+          <p>AO is a decentralized cloud computing environment with a built-in, permanent, tamper-proof audit trail. Every instruction the system ever receives is stored on Arweave's blockchain before execution and is publicly accessible forever — without needing the client's cooperation to retrieve it.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Why Auditors Encounter AO</span>Why Clients Are Using It</div>
+        <p>An audit client may have exposure to AO in several ways:</p>
+        <ul>
+          <li><strong>Token holdings:</strong> The client holds AO tokens on its balance sheet (subject to FASB ASC 350-60 for fiscal years beginning after December 15, 2024).</li>
+          <li><strong>Financial applications:</strong> The client operates decentralized finance applications (lending protocols, token vaults, treasury systems) deployed as AO "processes" (smart contracts).</li>
+          <li><strong>Contractual obligations on-chain:</strong> Contractual rights, distributions, or obligations are recorded and executed on the AO network.</li>
+          <li><strong>Revenue/expense streams:</strong> The client earns yield, pays fees, or distributes tokens through AO-based protocols — all generating accounting events.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1 SECTION II -->
+  <div id="t1-2" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">II</span>
+      <span class="section-title">The Foundation: Arweave and Permanent Decentralized Storage</span>
+    </div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">What It Is</span>The Arweave Network</div>
+        <p>Arweave is a blockchain with one specific mission: <strong>store data permanently</strong>. Its native token is <strong>AR</strong>. When you pay to store data on Arweave, you pay a one-time fee and the data is stored for an estimated 200+ years. This is enforced by the protocol's economics, not a contractual promise from any single company.</p>
+        <p>The fee is paid into a <strong>storage endowment</strong> — similar in concept to an endowment trust. The endowment earns a return on declining storage costs over time, and miners (storage providers) are paid out of it continuously. The mathematics are designed so the endowment outlasts the storage cost.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Key Technology</span>The Blockweave and How Mining Creates Permanence</div>
+        <p>A standard blockchain links each new block only to the immediately preceding block — a linear chain. Arweave uses a <strong>blockweave</strong>: each new block links to the previous block <em>and</em> a randomly selected historical block (the "recall block") from anywhere in the network's history.</p>
+        <p>To mine a new block and earn the reward, a miner must prove they can quickly retrieve that randomly chosen recall block. If they don't have it stored, they cannot mine. This creates a direct economic incentive to store as much historical data as possible — the more you store, the more recall blocks you can answer, the more you earn.</p>
+
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4A1;</span>
+          <div class="callout-content">
+            <span class="callout-label">Accounting Analogy</span>
+            <p>Think of it like a filing system where your ability to add new records depends on proving you still have access to old records. The mining system economically rewards archivists who never delete anything — because the completeness of your archive directly determines your income.</p>
+          </div>
+        </div>
+
+        <p>The consensus mechanism is called <strong>SPoRA (Succinct Proofs of Random Access)</strong>. Unlike Bitcoin, where you earn more by buying more graphics cards (computing power), on Arweave you earn more by storing more data. Mining is bottlenecked by <em>storage capacity</em>, not computing speed. This is deliberate: the entire point is to incentivize data preservation, not energy-intensive computation.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Audit Relevance</span>Why Permanent Storage Matters for Evidence</div>
+        <p>Data written to Arweave is essentially permanent. Altering a historical record would require re-mining every subsequent block — computationally infeasible given the network's scale and its Verifiable Delay Function (VDF) speed limit. This is the foundation on which AO's audit trail sits. The reliability of the AO message history (discussed in Tab 2) depends entirely on Arweave's permanence guarantees.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1 SECTION III -->
+  <div id="t1-3" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">III</span>
+      <span class="section-title">Core Architecture: Processes and Messages</span>
+    </div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Processes</span>AO's Term for Smart Contracts</div>
+        <p>A <strong>process</strong> is AO's term for what Ethereum calls a "smart contract" — a self-executing program deployed on the network that automatically performs predefined logic when it receives an instruction. Once deployed, no counterparty can override it.</p>
+
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4A1;</span>
+          <div class="callout-content">
+            <span class="callout-label">CPA Analogy</span>
+            <p>Think of a process as a self-enforcing contractual obligation embedded in software. The terms are written into code, not prose. The outcome is automatic, deterministic, and cannot be altered by either party after deployment — similar to an irrevocable trust where the trustee's discretion has been entirely replaced by a predetermined ruleset.</p>
+          </div>
+        </div>
+
+        <p>Financial applications that clients may operate as AO processes include: decentralized exchanges, token minting and distribution programs, lending and borrowing protocols, yield vaults, and treasury management systems. Each process maintains its own independent state — there is no shared global ledger between processes.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Messages</span>How Every Transaction is Initiated</div>
+        <p>Every interaction with an AO process is transmitted as a <strong>message</strong> — a digitally signed, structured data packet. Think of a message as an authenticated instruction sent to a program. Every message is:</p>
+        <ul>
+          <li><strong>Cryptographically signed</strong> by the sender's private key (non-repudiation — the sender cannot deny authorship)</li>
+          <li><strong>Assigned a permanent sequence number</strong> by the network before execution</li>
+          <li><strong>Stored permanently on Arweave</strong> before the process logic runs on it</li>
+        </ul>
+        <p>This last point is the critical one for auditors: <strong>the input to every computation exists permanently and publicly before any output is produced.</strong> The input record cannot be altered after the fact. The raw data — not a derived summary — is what lives on the blockchain.</p>
+
+        <div class="callout callout-note">
+          <span class="callout-icon">&#x2139;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">Why Isolation Enables Scale</span>
+            <p>Processes are completely isolated from each other — they never share memory, and can only communicate by sending messages. This isolation is what allows thousands of processes to run in parallel with no bottleneck. Ethereum's single global state (where every contract shares one ledger) is what makes it slow; AO's architecture sidesteps this entirely.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1 SECTION IV -->
+  <div id="t1-4" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">IV</span>
+      <span class="section-title">The Three Network Node Types</span>
+    </div>
+    <div class="section-body">
+      <p>When a message is sent to an AO process, it travels through three specialized node types. Understanding these is essential for understanding where reliability strengths and weaknesses exist — which drives the risk matrix in Tab 2.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:18%">Node Type</th>
+              <th style="width:22%">Function</th>
+              <th style="width:28%">Accounting / Audit Analogy</th>
+              <th>Key Audit Point</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>MU</strong><br><em>Messenger Unit</em></td>
+              <td>Receives your message, verifies the digital signature, routes to the correct scheduler</td>
+              <td>A compliance intake desk that verifies your identity and signature before accepting any document into the system</td>
+              <td>First point of cryptographic authentication — prevents unsigned or forged instructions from entering. Authentication is mathematical, not discretionary.</td>
+            </tr>
+            <tr>
+              <td><strong>SU</strong><br><em>Scheduler Unit</em></td>
+              <td>Assigns each message a permanent, atomically incrementing sequence number (nonce) and uploads it to Arweave</td>
+              <td>A court filing clerk who stamps your document with an official case number and files it permanently in the public record. Once filed, the sequence cannot be changed.</td>
+              <td><strong>This is the moment the data becomes permanent audit evidence.</strong> The SU's Arweave upload establishes an immutable, ordered record of all events. Critical for chronological ordering of transactions.</td>
+            </tr>
+            <tr>
+              <td><strong>CU</strong><br><em>Compute Unit</em></td>
+              <td>Fetches the complete ordered message history from Arweave, runs the process logic, computes the resulting state, returns a cryptographically signed proof of the computation</td>
+              <td>An accountant who takes a complete transaction ledger, runs the calculations, and returns a signed trial balance — with the full work papers available for anyone to review</td>
+              <td>Source of financial state outputs (balances, transfers). Multiple independent CUs can compute the same state — determinism means honest CUs always agree. For material balances, query multiple CUs and compare signed proofs.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-note">
+        <span class="callout-icon">&#x2139;&#xFE0F;</span>
+        <div class="callout-content">
+          <span class="callout-label">Permissionless Node Operation</span>
+          <p>Anyone can run any of these node types — the network is permissionless. There is no single company or operator that controls the MU/SU/CU infrastructure. This decentralization is a reliability strength: no single operator can selectively withhold, alter, or manipulate the data flow.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1 SECTION V -->
+  <div id="t1-5" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">V</span>
+      <span class="section-title">The Holographic State &mdash; AO's Most Audit-Relevant Feature</span>
+    </div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">The Concept</span>What It Means and Why It Is Different</div>
+        <p>In most accounting systems — and most blockchains — you store the <em>current state</em>. A ledger shows your current balance; the underlying journal entries may or may not be preserved in a tamper-proof way. AO does something structurally different.</p>
+        <p><strong>Every single message ever sent to every AO process is stored permanently on Arweave, in sequence, forever.</strong> AO does not just store the current state of a program — it stores the complete, ordered history of every input that produced that state. This is the holographic state.</p>
+        <p>Because the inputs are permanent and the program logic is deterministic (same inputs always produce same outputs), <strong>any party can independently reconstruct the exact state of any process at any point in its history</strong> — by replaying the message log — without asking anyone for permission, and without the cooperation of the process owner, the client, or any node operator.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">CPA Illustration</span>What This Looks Like in Practice</div>
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x1F4A1;</span>
+          <div class="callout-content">
+            <span class="callout-label">Practitioner Illustration</span>
+            <p>Suppose a client reports a 50,000 AO token balance in Process XYZ as of year-end. On a traditional blockchain, you would query the current balance and accept that output — like calling a bank for a balance confirmation. On AO, you can instead obtain the complete ordered message log for Process XYZ directly from Arweave — a public, tamper-proof, permanently stored record — replay every input through the same process logic, and independently arrive at the same balance. <strong>This is closer to a bank confirmation that does not require the bank's cooperation.</strong> The math reconstructs the answer from first principles.</p>
+          </div>
+        </div>
+        <p>This capability has specific implications for audit procedures: completeness assertions can be tested against the full message log (no records can be hidden from a complete log replay); existence assertions can be independently confirmed without third-party cooperation; chronological ordering is enforced by the SU's nonce sequence, making cutoff testing more tractable.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Important Limitation</span>What the Holographic State Does NOT Guarantee</div>
+        <div class="callout callout-warn">
+          <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">Data Integrity vs. Logic Correctness — Two Separate Questions</span>
+            <p>The holographic state guarantees that the message log is complete, ordered, and unaltered. It does <em>not</em> guarantee that the process code (the logic that runs on those messages) is correct, free of bugs, or behaves as the parties intended. A smart contract with a coding error executes that error immutably and permanently. Auditors must assess both: (1) data integrity — addressed by AO's architecture — and (2) code correctness — which requires a separate specialist review. These are independent questions requiring different procedures.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1 SECTION VI -->
+  <div id="t1-6" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">VI</span>
+      <span class="section-title">AO vs. Ethereum &mdash; A Reference Frame for CPAs</span>
+    </div>
+    <div class="section-body">
+      <p>Most CPAs who have encountered blockchain in an audit context have encountered Ethereum. This comparison helps frame AO's differences precisely — without implying AO is simply "better" (each has trade-offs appropriate to different use cases).</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Ethereum</th>
+              <th>AO Protocol</th>
+              <th>Audit Implication</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Execution Model</td>
+              <td>Sequential — one transaction at a time in a global queue</td>
+              <td>Fully parallel — unlimited simultaneous processes, no shared queue</td>
+              <td>AO processes do not bottleneck each other; scalability risk lower</td>
+            </tr>
+            <tr>
+              <td>Compute Limits</td>
+              <td>Hard gas limit per block — complex programs get cut off or split</td>
+              <td>No practical compute limit — processes can load and use any amount of data</td>
+              <td>AO can run full AI models, complex financial algorithms; ETH cannot</td>
+            </tr>
+            <tr>
+              <td>Historical State</td>
+              <td>Current state stored; historical state can be pruned by nodes</td>
+              <td>Complete ordered message history stored permanently on Arweave</td>
+              <td><strong>AO's message log is the superior audit trail</strong> — complete history preserved regardless of node behavior</td>
+            </tr>
+            <tr>
+              <td>Independent Verification</td>
+              <td>Requires running a full node or trusting an RPC provider's output</td>
+              <td>Anyone can independently replay message logs from Arweave public storage</td>
+              <td>AO offers auditor-independent verification; ETH requires trusting a third-party node</td>
+            </tr>
+            <tr>
+              <td>Token Launch</td>
+              <td>Pre-mine to founders and VCs (ETH: pre-sale in 2014)</td>
+              <td>100% fair launch — zero insider allocation, zero pre-mine</td>
+              <td>Affects related-party and concentration risk assessments for AO token holdings</td>
+            </tr>
+            <tr>
+              <td>Ecosystem Maturity</td>
+              <td>Launched 2015; 10+ years of production; very large developer ecosystem</td>
+              <td>Mainnet February 2025; &lt;2 years of production; growing ecosystem</td>
+              <td><strong>AO carries higher protocol immaturity risk</strong> — re-evaluate annually as track record develops</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-note">
+        <span class="callout-icon">&#x2139;&#xFE0F;</span>
+        <div class="callout-content">
+          <span class="callout-label">Important Framing</span>
+          <p>AO is not competing with Ethereum in the same design space. AO occupies a different category: extreme parallelism, permanent computation history, and the ability to run large programs (including AI models) that are not feasible on Ethereum. The tradeoff is a shorter production track record and smaller ecosystem. Both properties are relevant to the reliability assessment in Tab 2.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1 SECTION VII -->
+  <div id="t1-7" class="section section-anchor">
+    <div class="section-header">
+      <span class="section-num">VII</span>
+      <span class="section-title">The AO Token: Economics and Accounting Implications</span>
+    </div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Token Structure</span>Key Parameters</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th style="width:28%">Parameter</th><th style="width:40%">Detail</th><th>Accounting / Audit Note</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Maximum Supply</td><td>21,000,000 AO — same hard cap as Bitcoin. Four-year halving cycle (smooth, not stepped).</td><td>Fixed supply cap reduces hyperinflationary dilution risk; supports valuation assertions and completeness testing of total tokens minted</td></tr>
+              <tr><td>Fair Launch</td><td>0% pre-sale. 0% insider / team / VC allocation. Zero tokens were pre-mined or reserved. Every AO token was earned by market participants.</td><td>No founder concentration or undisclosed insider holdings to identify in related-party analysis. Token supply is fully traceable from genesis.</td></tr>
+              <tr><td>Distribution Model</td><td>36% to AR token holders (distributed continuously to wallets holding AR, proportional to holdings). 64% ecosystem incentives (earned by users bridging assets into AO protocols).</td><td>AR holders accrue AO passively — a client holding AR may also have AO accruing, requiring disclosure assessment even if not actively acquired</td></tr>
+              <tr><td>Emission Schedule</td><td>Distributed every 5 minutes at ~1.425% of remaining supply per month — deterministic, on-chain schedule</td><td>Auditor can independently calculate total AO minted as of any date from the public emission formula — supports completeness assertions</td></tr>
+              <tr><td>Transferability</td><td>AO tokens became transferable February 8, 2025, concurrent with mainnet launch</td><td>Pre-mainnet AO holdings had no transfer rights; relevant to valuation and rights/obligations classification for clients who earned AO on testnet prior to February 2025</td></tr>
+              <tr><td>AO vs. AR</td><td>Two separate tokens: AR pays for Arweave storage; AO pays for AO network computation. Different economics, different markets, different risk profiles.</td><td>Separate assessment required for each token. A client may hold both; do not aggregate or conflate in the balance sheet without separate fair value determinations.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Accounting Framework</span>Applicable Standards for AO Token Holdings</div>
+        <div class="callout callout-warn">
+          <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">FASB ASC 350-60 &mdash; Digital Assets (Effective for FY Beginning After December 15, 2024)</span>
+            <p>AO tokens meeting the ASC 350-60 definition (fungible, on a distributed ledger, secured through cryptography, do not provide the holder with enforceable rights to or claims on underlying goods/services) must be measured at <strong>fair value through net income</strong>. AO tokens almost certainly fall within scope. Confirm the client has identified all AO holdings (including passively accrued AO from AR holdings) and applied an appropriate valuation methodology given the asset's trading history and market depth.</p>
+          </div>
+        </div>
+        <div class="callout callout-warn">
+          <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">Securities Law Classification</span>
+            <p>AO's 100% fair launch was deliberately designed to reduce Howey test exposure. However, no formal SEC no-action letter or explicit regulatory guidance covers AO tokens specifically. Clients holding material AO token positions should obtain qualified securities law counsel regarding regulatory classification before financial statement issuance.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end tab1 page-wrapper -->
+</div><!-- end tab1 panel -->
+
+<!-- ═══════════ TAB 2: RELIABILITY & RISK ASSESSMENT ═══════════ -->
+<div id="tab2" class="tab-panel">
 <div class="page-wrapper">
 
   <!-- MEMO HEADER -->
@@ -1477,11 +1875,23 @@
   </div>
 
 </div><!-- end page-wrapper -->
+</div><!-- end tab2 panel -->
 
 <footer class="doc-footer">
   <div>Ref: AWP-TECH-2026-AO &nbsp;&bull;&nbsp; Rev 1.0 &nbsp;&bull;&nbsp; April 27, 2026 &nbsp;&bull;&nbsp; Privileged &amp; Confidential — Attorney-Client / Work Product</div>
   <div>Audit &amp; Assurance Practice &nbsp;&bull;&nbsp; Digital Assets Group &nbsp;&bull;&nbsp; For Authorized Engagement Team Use Only</div>
 </footer>
 
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById(this.dataset.tab).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
 </body>
 </html>

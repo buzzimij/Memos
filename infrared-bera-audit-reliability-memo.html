@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infrared Finance &amp; Berachain | Audit Workpaper</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:#0E1F3D; --navy-mid:#1A3461; --navy-light:#2A4A82;
+    --blue:#0057A8; --blue-light:#E8F0FA; --teal:#00748A; --teal-light:#E5F4F7;
+    --gold:#B07D00; --gold-light:#FDF5DC; --green:#1A6B3A; --green-light:#E6F4EC;
+    --orange:#B85000; --orange-light:#FFF0E5; --red:#A8001E; --red-light:#FAEAED;
+    --gray-50:#F8F9FA; --gray-100:#F0F1F3; --gray-200:#E2E4E8; --gray-400:#9AA0AB;
+    --gray-600:#5A6270; --gray-800:#2C3240; --text:#1A1E2A; --border:#D0D4DC;
+    --shadow-sm:0 1px 3px rgba(14,31,61,0.08),0 1px 2px rgba(14,31,61,0.06);
+    --shadow-md:0 4px 12px rgba(14,31,61,0.10),0 2px 6px rgba(14,31,61,0.07);
+    --shadow-lg:0 8px 28px rgba(14,31,61,0.13),0 4px 10px rgba(14,31,61,0.08);
+    --radius:4px; --radius-lg:8px;
+  }
+  html { font-size:15px; scroll-behavior:smooth; }
+  body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif; color:var(--text); background:#ECEEF2; line-height:1.7; }
+  .brand-bar { background:var(--navy); height:5px; width:100%; position:sticky; top:0; z-index:100; }
+  .firm-header { background:var(--navy); color:white; padding:28px 56px 24px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .firm-logo { display:flex; align-items:center; gap:16px; }
+  .firm-logo-mark { width:44px; height:44px; background:white; border-radius:3px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .firm-logo-mark svg { display:block; }
+  .firm-name { font-size:1.15rem; font-weight:700; letter-spacing:0.04em; color:white; line-height:1.2; }
+  .firm-tagline { font-size:0.7rem; color:rgba(255,255,255,0.55); letter-spacing:0.08em; text-transform:uppercase; margin-top:2px; }
+  .firm-header-right { text-align:right; }
+  .doc-type-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.88); font-size:0.68rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; padding:5px 12px; border-radius:2px; margin-bottom:6px; }
+  .doc-ref { font-size:0.72rem; color:rgba(255,255,255,0.45); letter-spacing:0.03em; }
+  .confidential-bar { background:var(--navy-mid); color:rgba(255,255,255,0.7); text-align:center; font-size:0.67rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; padding:7px 24px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  /* Tab nav */
+  .tab-nav { background:var(--navy-mid); padding:0 56px; display:flex; border-bottom:3px solid rgba(0,0,0,0.18); }
+  .tab-btn { background:transparent; border:none; border-bottom:3px solid transparent; margin-bottom:-3px; color:rgba(255,255,255,0.55); padding:15px 28px; font-size:0.82rem; font-weight:600; letter-spacing:0.05em; cursor:pointer; transition:color 0.15s,border-color 0.15s,background 0.15s; font-family:inherit; white-space:nowrap; }
+  .tab-btn:hover { color:rgba(255,255,255,0.85); background:rgba(255,255,255,0.06); }
+  .tab-btn.active { color:white; border-bottom-color:#5B9BD5; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+  /* Layout */
+  .page-wrapper { max-width:1020px; margin:0 auto; padding:36px 24px 72px; }
+  .memo-header { background:white; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); overflow:hidden; margin-bottom:32px; border:1px solid var(--border); }
+  .memo-header-title { background:var(--navy-mid); color:white; padding:18px 32px; font-size:0.72rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; display:flex; align-items:center; gap:10px; }
+  .memo-header-title::before { content:''; display:block; width:3px; height:18px; background:#5B9BD5; border-radius:2px; flex-shrink:0; }
+  .memo-grid { display:grid; grid-template-columns:140px 1fr; border-bottom:1px solid var(--gray-200); }
+  .memo-grid:last-of-type { border-bottom:none; }
+  .memo-label { background:var(--gray-50); padding:13px 20px 13px 32px; font-size:0.72rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--gray-600); border-right:1px solid var(--gray-200); display:flex; align-items:center; }
+  .memo-value { padding:13px 20px 13px 24px; font-size:0.88rem; color:var(--text); display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+  .memo-value strong { color:var(--navy); }
+  .classification-badge { display:inline-flex; align-items:center; gap:5px; background:var(--navy); color:white; font-size:0.67rem; font-weight:700; letter-spacing:0.09em; text-transform:uppercase; padding:3px 10px; border-radius:2px; }
+  .toc-card { background:white; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:32px; }
+  .toc-header { background:var(--gray-50); border-bottom:1px solid var(--border); padding:14px 28px; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--navy-mid); display:flex; align-items:center; gap:8px; }
+  .toc-list { padding:16px 28px 20px; list-style:none; columns:2; column-gap:32px; }
+  .toc-list li { padding:4px 0; break-inside:avoid; }
+  .toc-list a { text-decoration:none; color:var(--blue); font-size:0.84rem; font-weight:500; display:flex; align-items:baseline; gap:8px; transition:color 0.15s; }
+  .toc-list a:hover { color:var(--navy); }
+  .toc-num { font-size:0.7rem; font-weight:700; color:var(--gray-400); min-width:22px; flex-shrink:0; }
+  .section { background:white; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:28px; }
+  .section-header { background:var(--navy); color:white; padding:18px 32px; display:flex; align-items:center; gap:14px; }
+  .section-num { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.9); font-size:0.68rem; font-weight:800; letter-spacing:0.08em; padding:3px 9px; border-radius:2px; flex-shrink:0; }
+  .section-title { font-size:0.96rem; font-weight:700; letter-spacing:0.01em; line-height:1.3; }
+  .section-body { padding:28px 32px 32px; }
+  .subsection { margin-bottom:30px; }
+  .subsection:last-child { margin-bottom:0; }
+  .subsection-title { font-size:0.92rem; font-weight:700; color:var(--navy-mid); margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--blue-light); display:flex; align-items:center; gap:10px; }
+  .subsection-title .sub-label { font-size:0.67rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:white; background:var(--navy-light); padding:2px 8px; border-radius:2px; }
+  .h4 { font-size:0.86rem; font-weight:700; color:var(--navy); margin:18px 0 8px; }
+  p { font-size:0.88rem; color:var(--gray-800); margin-bottom:12px; line-height:1.75; }
+  p:last-child { margin-bottom:0; }
+  strong { color:var(--text); font-weight:700; }
+  em { color:var(--gray-600); font-style:italic; }
+  ul,ol { margin:10px 0 14px 20px; font-size:0.88rem; color:var(--gray-800); line-height:1.7; }
+  li { margin-bottom:5px; }
+  li:last-child { margin-bottom:0; }
+  ol { margin-left:22px; }
+  ol li { padding-left:4px; }
+  sup { font-size:0.7em; color:var(--blue); font-weight:700; vertical-align:super; line-height:0; }
+  .callout { border-radius:var(--radius); padding:14px 18px; margin:16px 0; font-size:0.85rem; line-height:1.7; border-left:4px solid; display:flex; gap:12px; }
+  .callout-icon { font-size:1rem; flex-shrink:0; margin-top:1px; }
+  .callout-content { flex:1; }
+  .callout-content p { font-size:0.85rem; margin-bottom:0; }
+  .callout-label { font-size:0.67rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:5px; display:block; }
+  .callout-plain { background:var(--teal-light); border-color:var(--teal); }
+  .callout-plain .callout-label { color:var(--teal); }
+  .callout-gap { background:var(--red-light); border-color:var(--red); }
+  .callout-gap .callout-label { color:var(--red); }
+  .callout-note { background:var(--blue-light); border-color:var(--blue); }
+  .callout-note .callout-label { color:var(--blue); }
+  .callout-warn { background:var(--gold-light); border-color:var(--gold); }
+  .callout-warn .callout-label { color:var(--gold); }
+  .badge { display:inline-flex; align-items:center; gap:5px; font-size:0.7rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; padding:4px 10px; border-radius:3px; vertical-align:middle; }
+  .badge-high { background:var(--green-light); color:var(--green); border:1px solid #A8D9BC; }
+  .badge-mod-high { background:#E8F5EE; color:#1A5C35; border:1px solid #B0D8C0; }
+  .badge-mod { background:var(--gold-light); color:var(--gold); border:1px solid #E0C87A; }
+  .badge-low-mod { background:var(--orange-light); color:var(--orange); border:1px solid #F0C0A0; }
+  .badge-low { background:var(--red-light); color:var(--red); border:1px solid #E0A0B0; }
+  .badge-add-proc { background:#EEF2FF; color:#3730A3; border:1px solid #C7D2FE; }
+  .badge-eval { background:#F5F0FF; color:#6D28D9; border:1px solid #DDD6FE; }
+  .badge-partial { background:#FFF7F0; color:#C2460A; border:1px solid #FECBA1; }
+  .assess-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  .assess-label { font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray-600); }
+  .table-wrap { overflow-x:auto; margin:16px 0; border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+  table { width:100%; border-collapse:collapse; font-size:0.84rem; }
+  thead tr { background:var(--navy); color:white; }
+  thead th { padding:11px 16px; text-align:left; font-size:0.7rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; white-space:nowrap; }
+  tbody tr { border-bottom:1px solid var(--gray-200); }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:nth-child(even) { background:var(--gray-50); }
+  tbody tr:hover { background:var(--blue-light); transition:background 0.15s; }
+  td { padding:11px 16px; vertical-align:top; color:var(--gray-800); line-height:1.6; }
+  td:first-child { font-weight:600; color:var(--navy); }
+  .proc-list { list-style:none; margin:0; padding:0; }
+  .proc-item { display:flex; gap:14px; padding:14px 16px; border-radius:var(--radius); border:1px solid var(--border); margin-bottom:10px; background:white; transition:box-shadow 0.15s; }
+  .proc-item:hover { box-shadow:var(--shadow-sm); }
+  .proc-num { width:26px; height:26px; background:var(--navy); color:white; border-radius:50%; font-size:0.72rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .proc-body { flex:1; }
+  .proc-title { font-size:0.88rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .proc-desc { font-size:0.83rem; color:var(--gray-800); line-height:1.65; margin:0; }
+  .proc-group-label { font-size:0.7rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:white; background:var(--navy-light); display:inline-block; padding:4px 12px; border-radius:2px; margin:18px 0 10px; }
+  .proc-group-label:first-of-type { margin-top:0; }
+  .takeaway-list { list-style:none; margin:0; padding:0; }
+  .takeaway-item { display:flex; gap:14px; padding:14px 16px; border-radius:var(--radius); background:var(--blue-light); border:1px solid #C5D8F5; margin-bottom:8px; font-size:0.87rem; color:var(--gray-800); line-height:1.65; align-items:flex-start; }
+  .takeaway-icon { color:var(--blue); font-size:1rem; flex-shrink:0; margin-top:1px; }
+  .next-step-list { list-style:none; margin:0; padding:0; }
+  .next-step-item { display:flex; gap:14px; padding:14px 16px; border-radius:var(--radius); background:var(--green-light); border:1px solid #B8DBCA; margin-bottom:8px; font-size:0.87rem; color:var(--gray-800); line-height:1.65; align-items:flex-start; }
+  .next-step-num { width:24px; height:24px; background:var(--green); color:white; border-radius:50%; font-size:0.7rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .gap-list { list-style:none; margin:0; padding:0; }
+  .gap-item { display:flex; gap:12px; padding:12px 16px; border-radius:var(--radius); background:var(--orange-light); border:1px solid #F5C8A8; margin-bottom:8px; font-size:0.86rem; color:var(--gray-800); line-height:1.65; align-items:flex-start; }
+  .gap-icon { color:var(--orange); font-size:0.9rem; flex-shrink:0; margin-top:2px; }
+  .source-group { margin-bottom:20px; }
+  .source-group:last-child { margin-bottom:0; }
+  .source-group-title { font-size:0.72rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--navy); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--gray-200); }
+  .source-list { list-style:none; margin:0; padding:0; }
+  .source-item { padding:8px 12px; border-radius:var(--radius); border:1px solid var(--border); margin-bottom:6px; background:var(--gray-50); font-size:0.83rem; }
+  .source-item .source-num { color:var(--navy); font-weight:700; margin-right:6px; }
+  .source-item .source-title { color:var(--navy); font-weight:600; display:inline; }
+  .source-item .source-desc { color:var(--gray-600); font-size:0.78rem; display:block; margin-top:2px; }
+  .sig-block { background:white; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:28px; }
+  .sig-header { background:var(--gray-50); border-bottom:1px solid var(--border); padding:12px 28px; font-size:0.7rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray-600); }
+  .sig-body { padding:24px 28px; display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .sig-field label { display:block; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray-600); margin-bottom:8px; }
+  .sig-line { border-bottom:1.5px solid var(--gray-400); height:32px; width:100%; }
+  .sig-note { font-size:0.72rem; color:var(--gray-400); margin-top:4px; }
+  .doc-footer { background:var(--navy); color:rgba(255,255,255,0.5); padding:20px 56px; display:flex; justify-content:space-between; align-items:center; gap:20px; font-size:0.72rem; letter-spacing:0.03em; }
+  hr { border:none; border-top:1px solid var(--gray-200); margin:20px 0; }
+  code { font-family:'SFMono-Regular',Consolas,monospace; font-size:0.82em; background:var(--gray-100); border:1px solid var(--gray-200); color:var(--navy); padding:1px 5px; border-radius:3px; }
+  .section-anchor { scroll-margin-top:16px; }
+  @media print { body { background:white; } .brand-bar { display:none; } .firm-header,.section-header { background:#0E1F3D !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; } .section,.memo-header,.toc-card,.sig-block { box-shadow:none; break-inside:avoid; } .page-wrapper { padding:0; max-width:100%; } }
+  @media (max-width:700px) { .firm-header { padding:20px; flex-direction:column; align-items:flex-start; } .firm-header-right { text-align:left; } .page-wrapper { padding:20px 12px 48px; } .section-body { padding:20px 18px 24px; } .toc-list { columns:1; } .sig-body { grid-template-columns:1fr; } .doc-footer { flex-direction:column; padding:18px 20px; text-align:center; } .memo-grid { grid-template-columns:100px 1fr; } .tab-nav { padding:0 16px; } }
+</style>
+</head>
+<body>
+
+<div class="brand-bar"></div>
+
+<header class="firm-header">
+  <div class="firm-logo">
+    <div class="firm-logo-mark">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <rect x="2" y="2" width="10" height="10" fill="#0E1F3D"/>
+        <rect x="14" y="2" width="10" height="10" fill="#0057A8"/>
+        <rect x="2" y="14" width="10" height="10" fill="#0057A8"/>
+        <rect x="14" y="14" width="10" height="10" fill="#0E1F3D" opacity="0.5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="firm-name">Audit &amp; Assurance Practice</div>
+      <div class="firm-tagline">Professional Standards &amp; Technical Research</div>
+    </div>
+  </div>
+  <div class="firm-header-right">
+    <div class="doc-type-badge">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M3 5h4M3 3h4M3 7h2" stroke="currentColor" stroke-width="1"/></svg>
+      Audit Workpaper — Technical Memo
+    </div>
+    <div class="doc-ref">Ref: AWP-TECH-2026-04 &nbsp;|&nbsp; Rev 1.0 &nbsp;|&nbsp; April 27, 2026</div>
+  </div>
+</header>
+
+<div class="confidential-bar">
+  Confidential &mdash; For Authorized Engagement Team Use Only &mdash; Do Not Distribute
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="tab1">&#128214;&nbsp; Tab 1 &mdash; Protocol Overview</button>
+  <button class="tab-btn" data-tab="tab2">&#128269;&nbsp; Tab 2 &mdash; Reliability &amp; Risk Assessment</button>
+</div>
+
+<!-- ═══════════════════════════════ TAB 1 ═══════════════════════════════ -->
+<div id="tab1" class="tab-panel active">
+<div class="page-wrapper">
+
+  <div class="memo-header">
+    <div class="memo-header-title">Memorandum — Protocol Overview</div>
+    <div class="memo-grid"><div class="memo-label">To</div><div class="memo-value">Audit Engagement File &nbsp;/&nbsp; Engagement Team</div></div>
+    <div class="memo-grid"><div class="memo-label">From</div><div class="memo-value">Digital Asset Practice Group &mdash; Audit &amp; Assurance</div></div>
+    <div class="memo-grid"><div class="memo-label">Date</div><div class="memo-value">April 27, 2026</div></div>
+    <div class="memo-grid"><div class="memo-label">Re</div><div class="memo-value"><strong>Infrared Finance &amp; Berachain: Protocol Overview for CPA &amp; Audit Practitioners</strong></div></div>
+    <div class="memo-grid"><div class="memo-label">Classification</div><div class="memo-value"><span class="classification-badge">&#x1F4DA; Research &amp; Intelligence — Intermediate Level</span></div></div>
+  </div>
+
+  <div class="toc-card">
+    <div class="toc-header">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h6" stroke="#1A3461" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Table of Contents — Tab 1
+    </div>
+    <ul class="toc-list">
+      <li><a href="#t1-1"><span class="toc-num">I.</span> What Is Berachain?</a></li>
+      <li><a href="#t1-2"><span class="toc-num">II.</span> Proof of Liquidity Consensus</a></li>
+      <li><a href="#t1-3"><span class="toc-num">III.</span> Three-Token Architecture</a></li>
+      <li><a href="#t1-4"><span class="toc-num">IV.</span> Infrared Finance: Liquid Staking Layer</a></li>
+      <li><a href="#t1-5"><span class="toc-num">V.</span> Smart Contract Architecture</a></li>
+      <li><a href="#t1-6"><span class="toc-num">VI.</span> On-Chain vs. Off-Chain Activity</a></li>
+      <li><a href="#t1-7"><span class="toc-num">VII.</span> Institutional Profile &amp; ASC 350-60</a></li>
+      <li><a href="#t1-8"><span class="toc-num">VIII.</span> Bibliography</a></li>
+    </ul>
+  </div>
+
+  <!-- T1-1 -->
+  <div id="t1-1" class="section section-anchor">
+    <div class="section-header"><span class="section-num">I</span><span class="section-title">What Is Berachain?</span></div>
+    <div class="section-body">
+      <p>Berachain is a Layer 1 blockchain launched on mainnet February 6, 2025.<sup>1</sup> It is built on the Cosmos SDK framework — the same underlying toolkit that powers Cosmos Hub, Celestia, and dozens of other high-performance blockchains — but is EVM-compatible, meaning it runs the same Solidity smart contracts and Ethereum-compatible developer tooling as Ethereum itself.<sup>2</sup></p>
+      <p>The network was created by an anonymous team known for the "Bong Bears" NFT collection and is distinguished primarily by its novel consensus mechanism: <strong>Proof of Liquidity (PoL)</strong>, which replaces idle staking with active capital deployment into protocol-approved liquidity pools. The network's three-token architecture (BERA, BGT, HONEY) is deliberately designed to separate the functions of gas payment, governance, and stablecoin utility — an intentional economic design choice with significant financial reporting implications.<sup>3</sup></p>
+
+      <div class="callout callout-plain">
+        <span class="callout-icon">&#x2713;</span>
+        <div class="callout-content">
+          <span class="callout-label">CPA Frame of Reference</span>
+          <p>Think of Berachain as a new financial market infrastructure (analogous to a clearinghouse or exchange). It runs on proven technology (Cosmos SDK &#x2248; an established financial software framework) but introduces a novel market mechanism requiring that participants <em>deploy capital productively</em> rather than hold it idle. Infrared Finance is the specialized intermediary (&#x2248; a prime broker or custodian) that sits between retail participants and this system, making its benefits accessible without requiring direct technical participation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1-2 -->
+  <div id="t1-2" class="section section-anchor">
+    <div class="section-header"><span class="section-num">II</span><span class="section-title">Proof of Liquidity Consensus Mechanism</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Concept</span>How PoL Differs from Traditional Proof of Stake</div>
+        <p>Traditional Proof of Stake (PoS) requires validators to lock up the native token in a smart contract (called "staking"). Those tokens sit idle earning block rewards but providing no economic utility to the network beyond security bonding. Berachain's Proof of Liquidity changes this requirement: validators must deposit liquidity into protocol-approved <strong>PoL Vaults</strong> — smart contracts that accept LP (Liquidity Provider) tokens from Automated Market Makers — to earn BGT (Block Governance Token) emissions and receive block-proposing rights.<sup>4</sup></p>
+        <p>The effect is that validator "stake" is simultaneously functioning as liquidity for the DeFi ecosystem, creating a structural alignment between network security and ecosystem growth.</p>
+
+        <div class="callout callout-note">
+          <span class="callout-icon">&#x2139;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">Accounting Analogy</span>
+            <p>Traditional PoS is like requiring clearing members to post cash margin that sits in a segregated escrow account — secured but idle. PoL is like requiring them to invest that margin in approved money-market instruments within a fund. The capital is still secured, but it is simultaneously deployed, generating yield for the ecosystem. Withdrawing liquidity is the "margin call" equivalent in PoL.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Mechanics</span>BGT Emission Flow</div>
+        <p>The PoL incentive loop works as follows:<sup>5</sup></p>
+        <ol>
+          <li>Users deposit LP tokens into PoL Vaults (approved by governance)</li>
+          <li>Validators operate vaults and earn BGT proportional to their vault's total value locked (TVL)</li>
+          <li>BGT is distributed as block rewards — <em>non-transferable</em>, only earnable through this mechanism</li>
+          <li>Protocols seeking to attract BGT emissions pay validators (or protocols like Infrared) to direct emissions to their vaults — creating a secondary "BGT incentive marketplace"</li>
+          <li>BGT holders can burn BGT 1:1 for BERA (the liquid gas token) or delegate BGT back to validators to influence future emission direction</li>
+        </ol>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-3 -->
+  <div id="t1-3" class="section section-anchor">
+    <div class="section-header"><span class="section-num">III</span><span class="section-title">Three-Token Architecture</span></div>
+    <div class="section-body">
+      <p>Berachain's deliberate separation of economic functions across three native tokens is unusual for a Layer 1 blockchain. Each token has distinct characteristics with direct financial reporting implications under FASB ASC 350-60.<sup>6</sup></p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Token</th><th>Function</th><th>Transferable?</th><th>Market Price?</th><th>ASC 350-60 Coverage</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>BERA</td>
+              <td>Gas / transaction fees — the "fuel" for all network operations</td>
+              <td>Yes — freely tradeable on CEX/DEX</td>
+              <td>Yes — observable market</td>
+              <td><span class="badge badge-high">Covered</span> Fair value through P&amp;L</td>
+            </tr>
+            <tr>
+              <td>BGT</td>
+              <td>Governance &amp; staking — non-transferable; only earnable via PoL vaults; burnable 1:1 for BERA</td>
+              <td>No — protocol-enforced non-transferability</td>
+              <td>No — no exchange listing possible</td>
+              <td><span class="badge badge-eval">Outside Scope</span> Likely intangible / no determinable FV</td>
+            </tr>
+            <tr>
+              <td>HONEY</td>
+              <td>USD-pegged stablecoin — collateralized by USDC and other approved assets; used for DeFi transactions</td>
+              <td>Yes — ERC-20 transferable</td>
+              <td>Yes — pegged ~$1.00</td>
+              <td><span class="badge badge-mod">Judgment Required</span> Likely cash equivalent or short-term receivable</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+        <div class="callout-content">
+          <span class="callout-label">BGT — Unique Accounting Challenge</span>
+          <p>BGT's non-transferability is a protocol-level constraint, not a contractual lock-up. There is no observable market price and no mechanism by which it can be sold. Current FASB ASC 350-60 guidance covers crypto assets with observable prices — BGT almost certainly falls outside its scope. Entities holding BGT must work with their auditors and technical accounting advisors to determine appropriate classification and disclosure. The AICPA's Digital Assets Practice Guide and any applicable SEC staff guidance should be consulted.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1-4 -->
+  <div id="t1-4" class="section section-anchor">
+    <div class="section-header"><span class="section-num">IV</span><span class="section-title">Infrared Finance: The Liquid Staking Layer</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Problem</span>The BGT Liquidity Problem</div>
+        <p>Because BGT is non-transferable, participants who earn it through PoL vault participation face an illiquidity problem: they cannot use BGT as collateral in DeFi lending protocols, sell it on exchanges, or transfer it to another wallet. Their only options are to delegate it (to influence BGT emissions) or burn it 1:1 for BERA. This severely limits the capital efficiency of BGT holdings for sophisticated participants who want to use those holdings in the broader DeFi ecosystem.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Solution</span>Infrared's Four-Token Ecosystem</div>
+        <p>Infrared Finance, the largest liquid staking protocol on Berachain, solves this problem by acting as an intermediary between users and the PoL vault system.<sup>7</sup> Infrared manages PoL vault participation, earns BGT on users' behalf, and issues liquid derivative tokens in return. The protocol introduces four tokens on top of Berachain's three:</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Token</th><th>What It Represents</th><th>Backing / Redemption</th><th>Accounting Analogy</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>iBGT</td><td>Liquid wrapper for BGT; 1:1 backed by actual BGT held in Infrared smart contracts</td><td>1:1 redeemable for BGT at any time</td><td>Certificate of deposit backed by BGT held in custody; beneficial ownership of underlying BGT</td></tr>
+              <tr><td>iBERA</td><td>Liquid staking token for BERA; represents BERA deposited with Infrared validators</td><td>Redeemable for BERA + accrued staking rewards</td><td>Money market fund shares — NAV accretes over time as staking rewards accumulate</td></tr>
+              <tr><td>IR</td><td>Infrared governance token; distributed to protocol participants</td><td>No hard backing; governance rights only</td><td>Membership interest / voting share in the protocol</td></tr>
+              <tr><td>sIR</td><td>Staked IR; locks IR in exchange for fee revenue distributions</td><td>IR + accumulated protocol fees on redemption</td><td>Preferred equity with rights to distributable cash flow</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x2713;</span>
+          <div class="callout-content">
+            <span class="callout-label">Key Audit Insight — iBGT Reserve Adequacy</span>
+            <p>iBGT is only as sound as the BGT reserves held in Infrared's smart contracts. Auditors should independently verify the iBGT:BGT backing ratio by querying the <code>totalSupply()</code> of the iBGT contract against the BGT balance of Infrared's vault contract. Any ratio below 1:1 represents an unbacked issuance — the equivalent of a reserve shortfall in a stablecoin issuer.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-5 -->
+  <div id="t1-5" class="section section-anchor">
+    <div class="section-header"><span class="section-num">V</span><span class="section-title">Smart Contract Architecture</span></div>
+    <div class="section-body">
+      <p>The Berachain / Infrared smart contract stack operates across three distinct layers, each representing an auditable boundary and a potential point of failure.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Layer</th><th>Key Contracts</th><th>Function</th><th>Audit Risk</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>L1 — Network</td>
+              <td>BeaconDeposit, PoL Vault Registry, BGT Emission Distributor</td>
+              <td>Core protocol; handles BGT minting and vault whitelisting</td>
+              <td><span class="badge badge-mod-high">Moderate-Low</span> Audited at chain level; governance multisig risk</td>
+            </tr>
+            <tr>
+              <td>L2 — Infrared Vaults</td>
+              <td>InfraredVault.sol, iBGT Minting Contract, Redemption Contract</td>
+              <td>Wraps PoL vaults; claims BGT; issues/redeems iBGT</td>
+              <td><span class="badge badge-low-mod">Elevated</span> iBGT peg relies entirely on this layer; Trail of Bits audit covers this</td>
+            </tr>
+            <tr>
+              <td>L3 — Governance</td>
+              <td>IR Token (ERC-20), sIR Staking Contract, Multisig Treasury</td>
+              <td>Protocol governance, fee distribution, treasury management</td>
+              <td><span class="badge badge-mod">Moderate</span> Standard governance risk; multisig key management</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-note">
+        <span class="callout-icon">&#x2139;&#xFE0F;</span>
+        <div class="callout-content">
+          <span class="callout-label">Security Audit Status</span>
+          <p>Infrared Finance has published smart contract audit reports from Trail of Bits and Pashov Audit Group.<sup>8</sup> Trail of Bits is widely considered one of the most rigorous smart contract security firms in the industry, adding credibility to reported findings. Auditors should obtain and review these reports, document any open findings, and request management's remediation evidence.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1-6 -->
+  <div id="t1-6" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VI</span><span class="section-title">On-Chain vs. Off-Chain Activity</span></div>
+    <div class="section-body">
+      <p>The distinction between on-chain (independently verifiable) and off-chain (requires supplemental evidence) activity is foundational to assessing audit evidence reliability under PCAOB AS 1105, particularly the December 2025 amendment addressing external electronic information from blockchain sources.<sup>9</sup></p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Activity</th><th>On-Chain?</th><th>Independently Verifiable?</th><th>Auditor Action</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>LP token deposits into PoL Vaults</td><td>Yes</td><td>Yes — block explorer, contract query</td><td>Confirm via berascan.com query</td></tr>
+            <tr><td>BGT emission events (block by block)</td><td>Yes</td><td>Yes — emission events are logged on-chain</td><td>Trace to BGT delegation record</td></tr>
+            <tr><td>iBGT minting &amp; redemption</td><td>Yes</td><td>Yes — ERC-20 Transfer events</td><td>Reconcile totalSupply to BGT reserves</td></tr>
+            <tr><td>BERA gas payments</td><td>Yes</td><td>Yes — transaction fees visible in explorer</td><td>Standard crypto confirmation procedure</td></tr>
+            <tr><td>BGT emission incentive deals (off-chain)</td><td>No</td><td>No — side agreements not recorded on-chain</td><td>Request management disclosure; review contracts</td></tr>
+            <tr><td>Validator selection strategy</td><td>Partially</td><td>On-chain weight visible; rationale off-chain</td><td>Interview management; review governance forum posts</td></tr>
+            <tr><td>IR token vesting schedules</td><td>Partially</td><td>Vesting contract on-chain; beneficiaries may be pseudonymous</td><td>Confirm with management; trace to known counterparties</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+        <div class="callout-content">
+          <span class="callout-label">BGT Incentive Marketplace — Payment-for-Order-Flow Analogy</span>
+          <p>The practice of protocols paying Infrared (or validators) to direct BGT emissions to their specific vaults is structurally analogous to payment-for-order-flow (PFOF) in traditional securities markets: a third party compensates the routing intermediary to direct flow their way. These arrangements may be economically material but are conducted off-chain via private agreements. They create an audit evidence gap that cannot be resolved solely by blockchain data.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1-7 -->
+  <div id="t1-7" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VII</span><span class="section-title">Institutional Profile &amp; ASC 350-60 Considerations</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Funding</span>Capital Raise &amp; Investor Profile</div>
+        <p>Infrared Finance raised <strong>$18.75 million</strong> in a seed round (announced February 2025), structured as SAFTs (Simple Agreements for Future Tokens).<sup>10</sup> Lead investors included <strong>YZi Labs</strong> (formerly Binance Labs — the venture arm of Binance, the world's largest crypto exchange), <strong>Framework Ventures</strong> (a major DeFi-focused VC), and <strong>NGC Ventures</strong>. SAFT instruments have specific accounting implications: the issuer typically records deferred revenue (obligation to deliver tokens) until tokens are delivered, at which point revenue is recognized or reclassified based on token nature.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Standards</span>FASB ASC 350-60 Application Summary</div>
+        <p>FASB ASC 350-60, effective for fiscal years beginning after December 15, 2024, requires entities to measure crypto assets at fair value through net income when the asset has an observable market price on an active exchange.<sup>11</sup> The Berachain token ecosystem creates a four-tier accounting treatment:</p>
+        <ul>
+          <li><strong>BERA</strong> — Observable market price; covered by ASC 350-60; fair value through P&amp;L each reporting period</li>
+          <li><strong>BGT</strong> — Non-transferable, no market; almost certainly outside ASC 350-60; likely classified as an intangible asset with no determinable fair value or as a performance obligation</li>
+          <li><strong>iBGT</strong> — DEX-traded ERC-20; market may qualify as "active" under ASC 820 criteria; professional judgment required on market activity threshold</li>
+          <li><strong>HONEY</strong> — Stablecoin; likely equivalent to a fiat-denominated receivable or cash equivalent if collateral is deemed sound; not a "crypto asset" per ASC 350-60 if it effectively functions as a digital dollar</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-8: Bibliography -->
+  <div id="t1-8" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VIII</span><span class="section-title">Bibliography</span></div>
+    <div class="section-body">
+
+      <div class="source-group">
+        <div class="source-group-title">Primary Sources</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">1.</span> <span class="source-title">Berachain Foundation. "Berachain Documentation &amp; Technical Overview."</span> <span class="source-desc">docs.berachain.com. Accessed April 2026. Official network documentation covering architecture, consensus mechanism, and token design.</span></li>
+          <li class="source-item"><span class="source-num">2.</span> <span class="source-title">Berachain Foundation. "Berachain: Proof of Liquidity Whitepaper." Version 1.0.</span> <span class="source-desc">berachain.com. 2023. Primary technical specification for the PoL consensus mechanism and three-token architecture.</span></li>
+          <li class="source-item"><span class="source-num">3.</span> <span class="source-title">Infrared Finance. "Infrared Finance Technical Documentation."</span> <span class="source-desc">docs.infrared.finance. Accessed April 2026. Official documentation for iBGT, iBERA, IR, and sIR token mechanics and vault architecture.</span></li>
+          <li class="source-item"><span class="source-num">4.</span> <span class="source-title">Infrared Finance. "Infrared Finance Litepaper."</span> <span class="source-desc">infrared.finance. 2024. Protocol overview explaining the liquid staking rationale and tokenomics design.</span></li>
+          <li class="source-item"><span class="source-num">5.</span> <span class="source-title">Trail of Bits. "Infrared Finance Smart Contract Security Audit."</span> <span class="source-desc">github.com/trailofbits/publications. 2024–2025. Independent security assessment of Infrared's vault and iBGT minting contracts.</span></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Regulatory &amp; Professional Standards</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">6.</span> <span class="source-title">Financial Accounting Standards Board. "ASU 2023-08 / ASC 350-60, Intangibles — Goodwill and Other — Crypto Assets."</span> <span class="source-desc">FASB, effective for fiscal years beginning after December 15, 2024. Mandates fair-value-through-net-income measurement for in-scope crypto assets.</span></li>
+          <li class="source-item"><span class="source-num">7.</span> <span class="source-title">FASB. "ASC 820, Fair Value Measurement."</span> <span class="source-desc">FASB Codification. Provides the Level 1/2/3 hierarchy and "active market" criteria relevant to assessing iBGT and thin-market tokens.</span></li>
+          <li class="source-item"><span class="source-num">8.</span> <span class="source-title">PCAOB. "AS 1105, Audit Evidence, as amended effective December 15, 2025."</span> <span class="source-desc">PCAOB. Paragraph .10A addresses external electronic information from blockchain sources, relevant to auditors independently querying on-chain data.</span></li>
+          <li class="source-item"><span class="source-num">9.</span> <span class="source-title">AICPA. "Accounting for and Auditing of Digital Assets — Practice Guide."</span> <span class="source-desc">AICPA, 2022 edition. Non-authoritative guidance on classification, measurement, and disclosure of digital assets.</span></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Industry Research</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">10.</span> <span class="source-title">The Block. "Infrared Finance Raises $18.75M Seed Round to Build Liquid Staking on Berachain." February 2025.</span> <span class="source-desc">theblock.co. Documents the SAFT structure, lead investors (YZi Labs, Framework Ventures, NGC Ventures), and strategic rationale.</span></li>
+          <li class="source-item"><span class="source-num">11.</span> <span class="source-title">Gate Learn. "Introduction to Berachain's Proof of Liquidity Mechanism." 2025.</span> <span class="source-desc">gatelearn.io. Accessible explanation of PoL mechanics for practitioners new to the protocol.</span></li>
+          <li class="source-item"><span class="source-num">12.</span> <span class="source-title">DeFiLlama. "Berachain Ecosystem — Protocol TVL Dashboard." Accessed April 2026.</span> <span class="source-desc">defillama.com. Real-time TVL data across Berachain protocols including Infrared vault deposits.</span></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Market &amp; News Data</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">13.</span> <span class="source-title">CoinMarketCap. "BERA — Price, Market Cap, Supply Data." Accessed April 2026.</span> <span class="source-desc">coinmarketcap.com. Reference for BERA observable market price; used for ASC 350-60 fair value determination.</span></li>
+          <li class="source-item"><span class="source-num">14.</span> <span class="source-title">Phemex Research. "What Is Berachain? Complete Guide to Proof of Liquidity." 2025.</span> <span class="source-desc">phemex.com. Market-oriented overview of Berachain's launch, tokenomics, and competitive positioning.</span></li>
+          <li class="source-item"><span class="source-num">15.</span> <span class="source-title">Whales Market. "Infrared Finance (IR Token) Pre-Market Data." 2024–2025.</span> <span class="source-desc">whales.market. Pre-launch IR token pricing data; context for initial market expectations around Infrared's governance token.</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /.page-wrapper tab1 -->
+</div><!-- /#tab1 -->
+
+<!-- ═══════════════════════════════ TAB 2 ═══════════════════════════════ -->
+<div id="tab2" class="tab-panel">
+<div class="page-wrapper">
+
+  <div class="memo-header">
+    <div class="memo-header-title">Memorandum — Reliability &amp; Risk Assessment</div>
+    <div class="memo-grid"><div class="memo-label">To</div><div class="memo-value">Audit Engagement File &nbsp;/&nbsp; Engagement Team</div></div>
+    <div class="memo-grid"><div class="memo-label">From</div><div class="memo-value">Digital Asset Practice Group &mdash; Audit &amp; Assurance</div></div>
+    <div class="memo-grid"><div class="memo-label">Date</div><div class="memo-value">April 27, 2026</div></div>
+    <div class="memo-grid"><div class="memo-label">Re</div><div class="memo-value"><strong>Infrared Finance &amp; Berachain: Reliability &amp; Risk Assessment for Audit Purposes</strong></div></div>
+    <div class="memo-grid"><div class="memo-label">Classification</div><div class="memo-value"><span class="classification-badge">&#x1F512; Workpaper Documentation &mdash; Professional Judgment</span></div></div>
+  </div>
+
+  <div class="toc-card">
+    <div class="toc-header">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h6" stroke="#1A3461" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Table of Contents — Tab 2
+    </div>
+    <ul class="toc-list">
+      <li><a href="#sec-1"><span class="toc-num">I.</span> Purpose of This Memorandum</a></li>
+      <li><a href="#sec-2"><span class="toc-num">II.</span> Background &amp; Scope</a></li>
+      <li><a href="#sec-3"><span class="toc-num">III.</span> Data Integrity &amp; Immutability</a></li>
+      <li><a href="#sec-4"><span class="toc-num">IV.</span> Smart Contract Reliability</a></li>
+      <li><a href="#sec-5"><span class="toc-num">V.</span> Consensus Mechanism Risk</a></li>
+      <li><a href="#sec-6"><span class="toc-num">VI.</span> Token Classification &amp; Financial Reporting</a></li>
+      <li><a href="#sec-7"><span class="toc-num">VII.</span> Gaps &amp; Limitations</a></li>
+      <li><a href="#sec-8"><span class="toc-num">VIII.</span> Recommended Audit Procedures</a></li>
+      <li><a href="#sec-9"><span class="toc-num">IX.</span> Key Takeaways</a></li>
+      <li><a href="#sec-10"><span class="toc-num">X.</span> Sources &amp; References</a></li>
+    </ul>
+  </div>
+
+  <!-- SEC-1 -->
+  <div id="sec-1" class="section section-anchor">
+    <div class="section-header"><span class="section-num">I</span><span class="section-title">Purpose of This Memorandum</span></div>
+    <div class="section-body">
+      <p>This memorandum evaluates the reliability and audit risk profile of the Berachain Layer 1 blockchain and Infrared Finance liquid staking protocol. It is intended to assist engagement teams in assessing whether transactions, balances, and disclosures related to Berachain-native assets (BERA, BGT, iBGT, HONEY, IR, sIR) are supported by sufficient appropriate audit evidence under PCAOB AS 1105 and AICPA attestation standards.</p>
+      <div class="callout callout-plain">
+        <span class="callout-icon">&#x2713;</span>
+        <div class="callout-content">
+          <span class="callout-label">Bottom Line Up Front</span>
+          <p>Berachain's on-chain transaction data is independently verifiable and provides high-quality audit evidence for BERA and iBGT balances. The primary audit risks are: (1) the novel PoL consensus mechanism with limited operational history; (2) BGT's non-transferable nature creating unresolved accounting treatment questions; and (3) off-chain BGT incentive arrangements that cannot be confirmed via blockchain data alone.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-2 -->
+  <div id="sec-2" class="section section-anchor">
+    <div class="section-header"><span class="section-num">II</span><span class="section-title">Background &amp; Scope</span></div>
+    <div class="section-body">
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Background</span>Protocol Overview</div>
+        <p>Berachain is an EVM-compatible Layer 1 blockchain using Proof of Liquidity consensus, with mainnet launch February 6, 2025. Infrared Finance is the leading liquid staking protocol built on Berachain, providing iBGT (liquid BGT), iBERA (liquid BERA staking), IR (governance), and sIR (staked IR) to users seeking to maximize capital efficiency from PoL vault participation. Infrared raised $18.75M from YZi Labs, Framework Ventures, and NGC Ventures in a 2025 SAFT-structured seed round.</p>
+      </div>
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Scope</span>Scope of This Analysis</div>
+        <p>This assessment covers: (a) on-chain data integrity for BERA, BGT, iBGT, HONEY, and IR transactions; (b) smart contract reliability based on published audit reports; (c) Proof of Liquidity consensus mechanism risk assessment; (d) token classification under FASB ASC 350-60; (e) documentation gaps. This memo does not address market risk, price volatility, investment suitability, or non-U.S. regulatory compliance.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-3 -->
+  <div id="sec-3" class="section section-anchor">
+    <div class="section-header"><span class="section-num">III</span><span class="section-title">Data Integrity &amp; Immutability Assessment</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-mod-high">&#x25CF; Moderate-High</span>
+      </div>
+      <p>Berachain uses Byzantine Fault Tolerant (BFT) consensus via Tendermint Core (part of the Cosmos SDK). Tendermint provides <strong>immediate finality</strong> — once a block is committed, it is final. There is no probabilistic settlement risk (no concept of "waiting for confirmations"), which is a significant advantage over Proof of Work chains from an audit evidence perspective.</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Positive</span>Reliability Indicators</div>
+        <ul>
+          <li>Transaction data is publicly accessible via Berascan (berascan.com) — Berachain's native block explorer</li>
+          <li>Immediate Tendermint finality eliminates deep-reorg risk that affects Bitcoin and pre-Merge Ethereum</li>
+          <li>Open-source code base; smart contract bytecode verifiable against published source code</li>
+          <li>EVM compatibility allows use of standard Ethereum developer tooling for independent state verification</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Risk Factors</span>Data Integrity Limitations</div>
+        <ul>
+          <li><strong>Limited operational history:</strong> Mainnet launched February 2025; only ~14 months of network history as of April 2026</li>
+          <li><strong>Validator concentration risk:</strong> If a small number of validators control &gt;33% of BGT weight, they can theoretically halt the chain; this risk is elevated in early-stage networks where BGT distribution is still concentrating</li>
+          <li><strong>PoL vault data complexity:</strong> Reconstructing complete vault deposit history requires blockchain indexing beyond standard block explorers; auditors may need to use third-party indexing APIs or run their own node</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SEC-4 -->
+  <div id="sec-4" class="section section-anchor">
+    <div class="section-header"><span class="section-num">IV</span><span class="section-title">Smart Contract Reliability</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-mod">&#x25CF; Moderate</span>
+      </div>
+      <p>Infrared Finance has published audit reports from Trail of Bits and Pashov Audit Group. Trail of Bits is widely regarded as one of the highest-credibility smart contract security firms in the industry. This represents a meaningful positive indicator of smart contract reliability relative to many DeFi protocols that operate without formal security reviews.</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Key Risks</span>Smart Contract Vulnerabilities</div>
+        <ul>
+          <li><strong>iBGT peg mechanism:</strong> The 1:1 iBGT:BGT backing ratio is enforced by smart contract logic, not an independent custodian. A bug in the minting or redemption contract could allow iBGT to be issued without corresponding BGT backing — equivalent to fractional-reserve issuance without disclosure</li>
+          <li><strong>Cross-layer interaction risk:</strong> The interaction between Berachain's core PoL vault contracts and Infrared's wrapper contracts has not been separately published as a distinct audit scope item</li>
+          <li><strong>IR/sIR governance risk:</strong> IR token distribution and sIR fee allocation are governed by multisig-controlled contracts; key-person risk if multisig signers are unknown or pseudonymous</li>
+          <li><strong>Protocol upgrade risk:</strong> Berachain is a young network; protocol upgrades (governance-approved changes to core contracts) could alter economic parameters, affecting existing users</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-gap">
+        <span class="callout-icon">&#x26D4;</span>
+        <div class="callout-content">
+          <span class="callout-label">Documentation Gap</span>
+          <p>No SOC 2 Type II report, Big 4 attestation, or equivalent operational controls documentation has been published by Infrared Finance. For entities with material Infrared Finance exposure, auditors should document this gap and consider whether additional procedures (direct smart contract queries, management representations, or review of audit reports) provide sufficient evidence in the absence of formal attestation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-5 -->
+  <div id="sec-5" class="section section-anchor">
+    <div class="section-header"><span class="section-num">V</span><span class="section-title">Consensus Mechanism Risk</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-mod">&#x25CF; Moderate — Novel Mechanism</span>
+      </div>
+      <p>Proof of Liquidity is an experimental consensus overlay on the well-tested Tendermint BFT framework. The BFT layer is proven; the PoL incentive layer is novel and untested at scale over multiple market cycles.</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Risks</span>PoL-Specific Consensus Risks</div>
+        <ul>
+          <li><strong>BGT emission centralization:</strong> Sophisticated validators (or protocols like Infrared) that accumulate disproportionate BGT emissions gain outsized influence over future emission direction, potentially creating a self-reinforcing centralization dynamic</li>
+          <li><strong>Incentive marketplace integrity:</strong> The off-chain market for BGT emission direction (protocols paying for emission targeting) operates outside the on-chain governance framework and creates economic relationships that auditors cannot verify solely through blockchain data</li>
+          <li><strong>Early-stage governance concentration:</strong> The PoL Vault whitelist (which determines which protocols receive emissions) is initially governed by a foundation-controlled multisig, concentrating protocol-level decision-making</li>
+          <li><strong>Market stress behavior:</strong> PoL vaults contain LP tokens whose value fluctuates with market conditions; a severe market downturn could reduce validator collateral value, potentially incentivizing withdrawal and destabilizing the consensus mechanism</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-6 -->
+  <div id="sec-6" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VI</span><span class="section-title">Token Classification &amp; Financial Reporting</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-eval">&#x25CF; Requires Professional Judgment</span>
+      </div>
+      <p>The Berachain/Infrared ecosystem presents the most complex token classification challenge in our digital asset protocol review series. Six distinct tokens with materially different characteristics require individual accounting analysis.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Token</th><th>ASC 350-60 In Scope?</th><th>Measurement Basis</th><th>Key Disclosure Requirement</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>BERA</td><td><span class="badge badge-high">Yes</span></td><td>Fair value through net income; use observable exchange price</td><td>Fair value disclosures per ASC 820</td></tr>
+            <tr><td>BGT</td><td><span class="badge badge-low">No — Outside Scope</span></td><td>Likely intangible with no determinable FV; or performance obligation</td><td>Disclosure of non-transferable nature and basis of accounting</td></tr>
+            <tr><td>iBGT</td><td><span class="badge badge-partial">Judgment Required</span></td><td>DEX price if market is active per ASC 820; Level 3 if not</td><td>Market activity assessment documentation required</td></tr>
+            <tr><td>HONEY</td><td><span class="badge badge-mod">Likely No</span></td><td>$1.00 parity; assess as digital cash equivalent or receivable</td><td>Disclosure of collateral composition and credit risk</td></tr>
+            <tr><td>IR</td><td><span class="badge badge-mod-high">Yes (if active market)</span></td><td>Fair value through net income; DEX observable price</td><td>Fair value disclosures; note liquidity limitations if thin market</td></tr>
+            <tr><td>sIR</td><td><span class="badge badge-eval">Judgment Required</span></td><td>May include accrued fee entitlement; complex fair value</td><td>Nature of fee-sharing rights and redemption terms</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-7 -->
+  <div id="sec-7" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VII</span><span class="section-title">Gaps &amp; Limitations</span></div>
+    <div class="section-body">
+      <p>The following gaps represent areas where available public information or published standards do not provide sufficient basis for definitive audit conclusions without additional procedures:</p>
+      <ul class="gap-list">
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Limited Operating History.</strong> Mainnet launched February 2025 — only ~14 months of network data as of April 2026. Insufficient history to assess behavior under market stress or protocol upgrade scenarios. Heightened skepticism is appropriate.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Absence of SOC Report.</strong> No SOC 2 Type II or equivalent operational controls attestation has been published by Infrared Finance. This is a standard gap for DeFi protocols but remains a documentation deficiency for audit files.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>BGT Accounting Treatment Unresolved.</strong> No authoritative FASB or SEC guidance addresses the classification of non-transferable, non-marketable governance tokens. Entities holding material BGT balances should obtain technical accounting memos and consider consulting FASB's technical inquiry process.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Off-chain BGT Incentive Deals.</strong> Protocol-to-protocol economic arrangements for BGT emission targeting are not disclosed on-chain. Their existence, value, and counterparties can only be confirmed through management inquiry and contractual review — not blockchain verification.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Validator Identity Opacity.</strong> Tendermint validators may operate under pseudonymous identities; counterparty identity risk is elevated relative to regulated financial infrastructure operators.</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEC-8 -->
+  <div id="sec-8" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VIII</span><span class="section-title">Recommended Audit Procedures</span></div>
+    <div class="section-body">
+      <p>The following procedures respond to the identified risks and gaps, consistent with PCAOB AS 1105 (as amended December 2025) and AICPA Digital Assets Practice Guide guidance.</p>
+
+      <span class="proc-group-label">Balance Verification</span>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <span class="proc-num">1</span>
+          <div class="proc-body">
+            <div class="proc-title">Independent On-Chain Balance Confirmation</div>
+            <p class="proc-desc">Query Berascan (berascan.com) or directly query the Berachain node RPC endpoint to confirm client's BERA, iBGT, and HONEY balances as of the balance sheet date. Document the block number queried, timestamp, and data source per PCAOB AS 1105.10A.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">2</span>
+          <div class="proc-body">
+            <div class="proc-title">iBGT Reserve Adequacy Verification</div>
+            <p class="proc-desc">Call <code>totalSupply()</code> on the iBGT contract and compare to BGT balance held by Infrared's vault contract. Any ratio below 1:1 (iBGT issued &gt; BGT held) constitutes an unbacked issuance event requiring immediate escalation to engagement leadership.</p>
+          </div>
+        </li>
+      </ul>
+
+      <span class="proc-group-label">Smart Contract &amp; Protocol Risk</span>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <span class="proc-num">3</span>
+          <div class="proc-body">
+            <div class="proc-title">Audit Report Review &amp; Open Finding Assessment</div>
+            <p class="proc-desc">Obtain Trail of Bits and Pashov Audit Group reports for Infrared's contracts. Document each finding's severity, status (open/remediated), and whether any open critical or high findings affect balances held by the client. Request management's remediation evidence for all findings.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">4</span>
+          <div class="proc-body">
+            <div class="proc-title">Off-Chain Incentive Agreement Disclosure</div>
+            <p class="proc-desc">Request management to provide a complete schedule of all off-chain BGT emission incentive agreements entered into by the client or on the client's behalf. Assess whether any constitute related-party transactions requiring disclosure.</p>
+          </div>
+        </li>
+      </ul>
+
+      <span class="proc-group-label">Accounting Classification</span>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <span class="proc-num">5</span>
+          <div class="proc-body">
+            <div class="proc-title">BGT Classification Technical Memo</div>
+            <p class="proc-desc">For entities with material BGT balances, prepare or obtain a technical accounting memo documenting the basis for the selected accounting classification (intangible with no determinable FV vs. other). Document consultation with FASB technical staff or national accounting office as applicable.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">6</span>
+          <div class="proc-body">
+            <div class="proc-title">BERA Fair Value Documentation</div>
+            <p class="proc-desc">Document the selected price source for BERA fair value measurement (primary exchange, aggregator). Assess whether the market qualifies as "active" per ASC 820. Perform a spot-price comparison across at least two independent sources to confirm price reasonableness.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">7</span>
+          <div class="proc-body">
+            <div class="proc-title">Validator Concentration Assessment</div>
+            <p class="proc-desc">Review BGT weight distribution across validators via Berascan or governance dashboard. Document whether any single validator or affiliated group controls &gt;33% of BGT weight (network halt risk threshold). Flag material concentration for risk assessment purposes.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEC-9 -->
+  <div id="sec-9" class="section section-anchor">
+    <div class="section-header"><span class="section-num">IX</span><span class="section-title">Key Takeaways</span></div>
+    <div class="section-body">
+      <ul class="takeaway-list">
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>Novel Mechanism, Young Network.</strong> PoL is theoretically sound but has only ~14 months of live operational history. Auditors should apply heightened professional skepticism and limit reliance on operational history as a risk indicator until the network has weathered at least one full market cycle.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>Six-Token Complexity Requires Per-Token Analysis.</strong> ASC 350-60 applies cleanly to BERA; BGT requires a separate non-standard accounting treatment; iBGT, IR, and sIR each require individual market-activity assessments; HONEY should be assessed as a stablecoin/digital cash instrument.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>iBGT Reserve Adequacy Is the Key Control.</strong> The 1:1 iBGT:BGT backing ratio is the central financial integrity control of the Infrared protocol. Direct smart contract verification of this ratio should be a standard procedure for any engagement with material iBGT exposure.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>Off-chain Governance Gaps Require Supplemental Evidence.</strong> The BGT emission incentive marketplace, validator selection strategy, and IR vesting arrangements are not fully reflected in on-chain data and require management inquiry, contractual review, and management representation letters to support audit conclusions.</div></li>
+      </ul>
+
+      <hr>
+
+      <p style="font-size:0.84rem; color:var(--gray-600); margin-top:16px;"><strong>Suggested Next Steps:</strong></p>
+      <ul class="next-step-list">
+        <li class="next-step-item"><span class="next-step-num">1</span><div>Perform iBGT reserve adequacy verification (Procedure 2) as a priority procedure for any client with material Infrared Finance exposure.</div></li>
+        <li class="next-step-item"><span class="next-step-num">2</span><div>Engage technical accounting specialists (national office or external advisors) on BGT classification before issuing an opinion for entities with material BGT balances.</div></li>
+        <li class="next-step-item"><span class="next-step-num">3</span><div>Maintain a rolling watch on Berachain governance decisions (PoL vault whitelist changes, core protocol upgrades) that could materially alter the risk profile between audit cycles.</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEC-10 -->
+  <div id="sec-10" class="section section-anchor">
+    <div class="section-header"><span class="section-num">X</span><span class="section-title">Sources &amp; References</span></div>
+    <div class="section-body">
+      <div class="source-group">
+        <div class="source-group-title">Primary Sources</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">1.</span> <span class="source-title">Berachain Foundation. "Berachain Technical Documentation." docs.berachain.com. Accessed April 2026.</span></li>
+          <li class="source-item"><span class="source-num">2.</span> <span class="source-title">Infrared Finance. "Protocol Documentation." docs.infrared.finance. Accessed April 2026.</span></li>
+          <li class="source-item"><span class="source-num">3.</span> <span class="source-title">Trail of Bits. "Infrared Finance Audit Report." trailofbits.com. 2024–2025.</span></li>
+          <li class="source-item"><span class="source-num">4.</span> <span class="source-title">Pashov Audit Group. "Infrared Finance Security Review." pashov.net. 2025.</span></li>
+        </ul>
+      </div>
+      <div class="source-group">
+        <div class="source-group-title">Regulatory &amp; Professional Standards</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">5.</span> <span class="source-title">FASB ASU 2023-08 / ASC 350-60, Crypto Assets. Effective fiscal years beginning after December 15, 2024.</span></li>
+          <li class="source-item"><span class="source-num">6.</span> <span class="source-title">FASB ASC 820, Fair Value Measurement. Level 1/2/3 hierarchy and active market criteria.</span></li>
+          <li class="source-item"><span class="source-num">7.</span> <span class="source-title">PCAOB AS 1105, Audit Evidence, as amended effective December 15, 2025. Paragraph .10A — external electronic information.</span></li>
+        </ul>
+      </div>
+      <div class="source-group">
+        <div class="source-group-title">Industry Research &amp; Market Data</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">8.</span> <span class="source-title">The Block. "Infrared Finance Raises $18.75M." February 2025. theblock.co.</span></li>
+          <li class="source-item"><span class="source-num">9.</span> <span class="source-title">DeFiLlama. "Berachain Ecosystem TVL." defillama.com. Accessed April 2026.</span></li>
+          <li class="source-item"><span class="source-num">10.</span> <span class="source-title">CoinMarketCap. "BERA Market Data." coinmarketcap.com. Accessed April 2026.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sig-block">
+    <div class="sig-header">Review &amp; Approval Sign-Off</div>
+    <div class="sig-body">
+      <div class="sig-field"><label>Preparer</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+      <div class="sig-field"><label>Reviewer</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+      <div class="sig-field"><label>Engagement Manager</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+      <div class="sig-field"><label>Partner / Concurring Reviewer</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+    </div>
+  </div>
+
+  <p style="font-size:0.75rem; color:var(--gray-400); text-align:center; margin-top:12px; line-height:1.6;">This memorandum is prepared for internal audit and assurance purposes only. It does not constitute investment advice, legal advice, or a formal audit opinion. Information is current as of April 27, 2026 and is subject to change as the protocol evolves. Prepared by the Digital Asset Practice Group.</p>
+
+</div><!-- /.page-wrapper tab2 -->
+</div><!-- /#tab2 -->
+
+<footer class="doc-footer">
+  <div>Audit &amp; Assurance Practice &mdash; Digital Asset Group</div>
+  <div>Ref: AWP-TECH-2026-04 &nbsp;&middot;&nbsp; Rev 1.0</div>
+  <div>Confidential &mdash; Engagement Use Only</div>
+</footer>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById(this.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>

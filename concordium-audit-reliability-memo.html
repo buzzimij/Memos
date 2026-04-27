@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concordium | Audit Workpaper</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:#0E1F3D; --navy-mid:#1A3461; --navy-light:#2A4A82;
+    --blue:#0057A8; --blue-light:#E8F0FA; --teal:#00748A; --teal-light:#E5F4F7;
+    --gold:#B07D00; --gold-light:#FDF5DC; --green:#1A6B3A; --green-light:#E6F4EC;
+    --orange:#B85000; --orange-light:#FFF0E5; --red:#A8001E; --red-light:#FAEAED;
+    --gray-50:#F8F9FA; --gray-100:#F0F1F3; --gray-200:#E2E4E8; --gray-400:#9AA0AB;
+    --gray-600:#5A6270; --gray-800:#2C3240; --text:#1A1E2A; --border:#D0D4DC;
+    --shadow-sm:0 1px 3px rgba(14,31,61,0.08),0 1px 2px rgba(14,31,61,0.06);
+    --shadow-md:0 4px 12px rgba(14,31,61,0.10),0 2px 6px rgba(14,31,61,0.07);
+    --shadow-lg:0 8px 28px rgba(14,31,61,0.13),0 4px 10px rgba(14,31,61,0.08);
+    --radius:4px; --radius-lg:8px;
+  }
+  html { font-size:15px; scroll-behavior:smooth; }
+  body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif; color:var(--text); background:#ECEEF2; line-height:1.7; }
+  .brand-bar { background:var(--navy); height:5px; width:100%; position:sticky; top:0; z-index:100; }
+  .firm-header { background:var(--navy); color:white; padding:28px 56px 24px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .firm-logo { display:flex; align-items:center; gap:16px; }
+  .firm-logo-mark { width:44px; height:44px; background:white; border-radius:3px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .firm-logo-mark svg { display:block; }
+  .firm-name { font-size:1.15rem; font-weight:700; letter-spacing:0.04em; color:white; line-height:1.2; }
+  .firm-tagline { font-size:0.7rem; color:rgba(255,255,255,0.55); letter-spacing:0.08em; text-transform:uppercase; margin-top:2px; }
+  .firm-header-right { text-align:right; }
+  .doc-type-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.88); font-size:0.68rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; padding:5px 12px; border-radius:2px; margin-bottom:6px; }
+  .doc-ref { font-size:0.72rem; color:rgba(255,255,255,0.45); letter-spacing:0.03em; }
+  .confidential-bar { background:var(--navy-mid); color:rgba(255,255,255,0.7); text-align:center; font-size:0.67rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; padding:7px 24px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .tab-nav { background:var(--navy-mid); padding:0 56px; display:flex; border-bottom:3px solid rgba(0,0,0,0.18); }
+  .tab-btn { background:transparent; border:none; border-bottom:3px solid transparent; margin-bottom:-3px; color:rgba(255,255,255,0.55); padding:15px 28px; font-size:0.82rem; font-weight:600; letter-spacing:0.05em; cursor:pointer; transition:color 0.15s,border-color 0.15s,background 0.15s; font-family:inherit; white-space:nowrap; }
+  .tab-btn:hover { color:rgba(255,255,255,0.85); background:rgba(255,255,255,0.06); }
+  .tab-btn.active { color:white; border-bottom-color:#5B9BD5; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+  .page-wrapper { max-width:1020px; margin:0 auto; padding:36px 24px 72px; }
+  .memo-header { background:white; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); overflow:hidden; margin-bottom:32px; border:1px solid var(--border); }
+  .memo-header-title { background:var(--navy-mid); color:white; padding:18px 32px; font-size:0.72rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; display:flex; align-items:center; gap:10px; }
+  .memo-header-title::before { content:''; display:block; width:3px; height:18px; background:#5B9BD5; border-radius:2px; flex-shrink:0; }
+  .memo-grid { display:grid; grid-template-columns:140px 1fr; border-bottom:1px solid var(--gray-200); }
+  .memo-grid:last-of-type { border-bottom:none; }
+  .memo-label { background:var(--gray-50); padding:13px 20px 13px 32px; font-size:0.72rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--gray-600); border-right:1px solid var(--gray-200); display:flex; align-items:center; }
+  .memo-value { padding:13px 20px 13px 24px; font-size:0.88rem; color:var(--text); display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+  .memo-value strong { color:var(--navy); }
+  .classification-badge { display:inline-flex; align-items:center; gap:5px; background:var(--navy); color:white; font-size:0.67rem; font-weight:700; letter-spacing:0.09em; text-transform:uppercase; padding:3px 10px; border-radius:2px; }
+  .toc-card { background:white; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:32px; }
+  .toc-header { background:var(--gray-50); border-bottom:1px solid var(--border); padding:14px 28px; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--navy-mid); display:flex; align-items:center; gap:8px; }
+  .toc-list { padding:16px 28px 20px; list-style:none; columns:2; column-gap:32px; }
+  .toc-list li { padding:4px 0; break-inside:avoid; }
+  .toc-list a { text-decoration:none; color:var(--blue); font-size:0.84rem; font-weight:500; display:flex; align-items:baseline; gap:8px; transition:color 0.15s; }
+  .toc-list a:hover { color:var(--navy); }
+  .toc-num { font-size:0.7rem; font-weight:700; color:var(--gray-400); min-width:22px; flex-shrink:0; }
+  .section { background:white; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:28px; }
+  .section-header { background:var(--navy); color:white; padding:18px 32px; display:flex; align-items:center; gap:14px; }
+  .section-num { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.9); font-size:0.68rem; font-weight:800; letter-spacing:0.08em; padding:3px 9px; border-radius:2px; flex-shrink:0; }
+  .section-title { font-size:0.96rem; font-weight:700; letter-spacing:0.01em; line-height:1.3; }
+  .section-body { padding:28px 32px 32px; }
+  .subsection { margin-bottom:30px; }
+  .subsection:last-child { margin-bottom:0; }
+  .subsection-title { font-size:0.92rem; font-weight:700; color:var(--navy-mid); margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--blue-light); display:flex; align-items:center; gap:10px; }
+  .subsection-title .sub-label { font-size:0.67rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:white; background:var(--navy-light); padding:2px 8px; border-radius:2px; }
+  p { font-size:0.88rem; color:var(--gray-800); margin-bottom:12px; line-height:1.75; }
+  p:last-child { margin-bottom:0; }
+  strong { color:var(--text); font-weight:700; }
+  em { color:var(--gray-600); font-style:italic; }
+  ul,ol { margin:10px 0 14px 20px; font-size:0.88rem; color:var(--gray-800); line-height:1.7; }
+  li { margin-bottom:5px; }
+  li:last-child { margin-bottom:0; }
+  ol { margin-left:22px; }
+  ol li { padding-left:4px; }
+  sup { font-size:0.7em; color:var(--blue); font-weight:700; vertical-align:super; line-height:0; }
+  .callout { border-radius:var(--radius); padding:14px 18px; margin:16px 0; font-size:0.85rem; line-height:1.7; border-left:4px solid; display:flex; gap:12px; }
+  .callout-icon { font-size:1rem; flex-shrink:0; margin-top:1px; }
+  .callout-content { flex:1; }
+  .callout-content p { font-size:0.85rem; margin-bottom:0; }
+  .callout-label { font-size:0.67rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:5px; display:block; }
+  .callout-plain { background:var(--teal-light); border-color:var(--teal); }
+  .callout-plain .callout-label { color:var(--teal); }
+  .callout-gap { background:var(--red-light); border-color:var(--red); }
+  .callout-gap .callout-label { color:var(--red); }
+  .callout-note { background:var(--blue-light); border-color:var(--blue); }
+  .callout-note .callout-label { color:var(--blue); }
+  .callout-warn { background:var(--gold-light); border-color:var(--gold); }
+  .callout-warn .callout-label { color:var(--gold); }
+  .badge { display:inline-flex; align-items:center; gap:5px; font-size:0.7rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; padding:4px 10px; border-radius:3px; vertical-align:middle; }
+  .badge-high { background:var(--green-light); color:var(--green); border:1px solid #A8D9BC; }
+  .badge-mod-high { background:#E8F5EE; color:#1A5C35; border:1px solid #B0D8C0; }
+  .badge-mod { background:var(--gold-light); color:var(--gold); border:1px solid #E0C87A; }
+  .badge-low-mod { background:var(--orange-light); color:var(--orange); border:1px solid #F0C0A0; }
+  .badge-low { background:var(--red-light); color:var(--red); border:1px solid #E0A0B0; }
+  .badge-add-proc { background:#EEF2FF; color:#3730A3; border:1px solid #C7D2FE; }
+  .badge-eval { background:#F5F0FF; color:#6D28D9; border:1px solid #DDD6FE; }
+  .badge-partial { background:#FFF7F0; color:#C2460A; border:1px solid #FECBA1; }
+  .assess-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  .assess-label { font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray-600); }
+  .table-wrap { overflow-x:auto; margin:16px 0; border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+  table { width:100%; border-collapse:collapse; font-size:0.84rem; }
+  thead tr { background:var(--navy); color:white; }
+  thead th { padding:11px 16px; text-align:left; font-size:0.7rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; white-space:nowrap; }
+  tbody tr { border-bottom:1px solid var(--gray-200); }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:nth-child(even) { background:var(--gray-50); }
+  tbody tr:hover { background:var(--blue-light); transition:background 0.15s; }
+  td { padding:11px 16px; vertical-align:top; color:var(--gray-800); line-height:1.6; }
+  td:first-child { font-weight:600; color:var(--navy); }
+  .proc-list { list-style:none; margin:0; padding:0; }
+  .proc-item { display:flex; gap:14px; padding:14px 16px; border-radius:var(--radius); border:1px solid var(--border); margin-bottom:10px; background:white; transition:box-shadow 0.15s; }
+  .proc-item:hover { box-shadow:var(--shadow-sm); }
+  .proc-num { width:26px; height:26px; background:var(--navy); color:white; border-radius:50%; font-size:0.72rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .proc-body { flex:1; }
+  .proc-title { font-size:0.88rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .proc-desc { font-size:0.83rem; color:var(--gray-800); line-height:1.65; margin:0; }
+  .proc-group-label { font-size:0.7rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:white; background:var(--navy-light); display:inline-block; padding:4px 12px; border-radius:2px; margin:18px 0 10px; }
+  .proc-group-label:first-of-type { margin-top:0; }
+  .takeaway-list { list-style:none; margin:0; padding:0; }
+  .takeaway-item { display:flex; gap:14px; padding:14px 16px; border-radius:var(--radius); background:var(--blue-light); border:1px solid #C5D8F5; margin-bottom:8px; font-size:0.87rem; color:var(--gray-800); line-height:1.65; align-items:flex-start; }
+  .takeaway-icon { color:var(--blue); font-size:1rem; flex-shrink:0; margin-top:1px; }
+  .next-step-list { list-style:none; margin:0; padding:0; }
+  .next-step-item { display:flex; gap:14px; padding:14px 16px; border-radius:var(--radius); background:var(--green-light); border:1px solid #B8DBCA; margin-bottom:8px; font-size:0.87rem; color:var(--gray-800); line-height:1.65; align-items:flex-start; }
+  .next-step-num { width:24px; height:24px; background:var(--green); color:white; border-radius:50%; font-size:0.7rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .gap-list { list-style:none; margin:0; padding:0; }
+  .gap-item { display:flex; gap:12px; padding:12px 16px; border-radius:var(--radius); background:var(--orange-light); border:1px solid #F5C8A8; margin-bottom:8px; font-size:0.86rem; color:var(--gray-800); line-height:1.65; align-items:flex-start; }
+  .gap-icon { color:var(--orange); font-size:0.9rem; flex-shrink:0; margin-top:2px; }
+  .source-group { margin-bottom:20px; }
+  .source-group:last-child { margin-bottom:0; }
+  .source-group-title { font-size:0.72rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--navy); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--gray-200); }
+  .source-list { list-style:none; margin:0; padding:0; }
+  .source-item { padding:8px 12px; border-radius:var(--radius); border:1px solid var(--border); margin-bottom:6px; background:var(--gray-50); font-size:0.83rem; }
+  .source-item .source-num { color:var(--navy); font-weight:700; margin-right:6px; }
+  .source-item .source-title { color:var(--navy); font-weight:600; display:inline; }
+  .source-item .source-desc { color:var(--gray-600); font-size:0.78rem; display:block; margin-top:2px; }
+  .sig-block { background:white; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:28px; }
+  .sig-header { background:var(--gray-50); border-bottom:1px solid var(--border); padding:12px 28px; font-size:0.7rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray-600); }
+  .sig-body { padding:24px 28px; display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .sig-field label { display:block; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray-600); margin-bottom:8px; }
+  .sig-line { border-bottom:1.5px solid var(--gray-400); height:32px; width:100%; }
+  .sig-note { font-size:0.72rem; color:var(--gray-400); margin-top:4px; }
+  .doc-footer { background:var(--navy); color:rgba(255,255,255,0.5); padding:20px 56px; display:flex; justify-content:space-between; align-items:center; gap:20px; font-size:0.72rem; letter-spacing:0.03em; }
+  hr { border:none; border-top:1px solid var(--gray-200); margin:20px 0; }
+  code { font-family:'SFMono-Regular',Consolas,monospace; font-size:0.82em; background:var(--gray-100); border:1px solid var(--gray-200); color:var(--navy); padding:1px 5px; border-radius:3px; }
+  .section-anchor { scroll-margin-top:16px; }
+  @media print { body { background:white; } .brand-bar { display:none; } .firm-header,.section-header { background:#0E1F3D !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; } .section,.memo-header,.toc-card,.sig-block { box-shadow:none; break-inside:avoid; } .page-wrapper { padding:0; max-width:100%; } }
+  @media (max-width:700px) { .firm-header { padding:20px; flex-direction:column; align-items:flex-start; } .page-wrapper { padding:20px 12px 48px; } .section-body { padding:20px 18px 24px; } .toc-list { columns:1; } .sig-body { grid-template-columns:1fr; } .doc-footer { flex-direction:column; padding:18px 20px; text-align:center; } .tab-nav { padding:0 16px; } }
+</style>
+</head>
+<body>
+
+<div class="brand-bar"></div>
+
+<header class="firm-header">
+  <div class="firm-logo">
+    <div class="firm-logo-mark">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <rect x="2" y="2" width="10" height="10" fill="#0E1F3D"/>
+        <rect x="14" y="2" width="10" height="10" fill="#0057A8"/>
+        <rect x="2" y="14" width="10" height="10" fill="#0057A8"/>
+        <rect x="14" y="14" width="10" height="10" fill="#0E1F3D" opacity="0.5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="firm-name">Audit &amp; Assurance Practice</div>
+      <div class="firm-tagline">Professional Standards &amp; Technical Research</div>
+    </div>
+  </div>
+  <div class="firm-header-right">
+    <div class="doc-type-badge">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M3 5h4M3 3h4M3 7h2" stroke="currentColor" stroke-width="1"/></svg>
+      Audit Workpaper — Technical Memo
+    </div>
+    <div class="doc-ref">Ref: AWP-TECH-2026-06 &nbsp;|&nbsp; Rev 1.0 &nbsp;|&nbsp; April 27, 2026</div>
+  </div>
+</header>
+
+<div class="confidential-bar">
+  Confidential &mdash; For Authorized Engagement Team Use Only &mdash; Do Not Distribute
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="tab1">&#128214;&nbsp; Tab 1 &mdash; Protocol Overview</button>
+  <button class="tab-btn" data-tab="tab2">&#128269;&nbsp; Tab 2 &mdash; Reliability &amp; Risk Assessment</button>
+</div>
+
+<!-- ═══════════════════════════════ TAB 1 ═══════════════════════════════ -->
+<div id="tab1" class="tab-panel active">
+<div class="page-wrapper">
+
+  <div class="memo-header">
+    <div class="memo-header-title">Memorandum — Protocol Overview</div>
+    <div class="memo-grid"><div class="memo-label">To</div><div class="memo-value">Audit Engagement File &nbsp;/&nbsp; Engagement Team</div></div>
+    <div class="memo-grid"><div class="memo-label">From</div><div class="memo-value">Digital Asset Practice Group &mdash; Audit &amp; Assurance</div></div>
+    <div class="memo-grid"><div class="memo-label">Date</div><div class="memo-value">April 27, 2026</div></div>
+    <div class="memo-grid"><div class="memo-label">Re</div><div class="memo-value"><strong>Concordium: Protocol Overview for CPA &amp; Audit Practitioners</strong></div></div>
+    <div class="memo-grid"><div class="memo-label">Classification</div><div class="memo-value"><span class="classification-badge">&#x1F4DA; Research &amp; Intelligence — Intermediate Level</span></div></div>
+  </div>
+
+  <div class="toc-card">
+    <div class="toc-header">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h6" stroke="#1A3461" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Table of Contents — Tab 1
+    </div>
+    <ul class="toc-list">
+      <li><a href="#t1-1"><span class="toc-num">I.</span> What Is Concordium?</a></li>
+      <li><a href="#t1-2"><span class="toc-num">II.</span> The Identity Layer: Protocol-Level KYC</a></li>
+      <li><a href="#t1-3"><span class="toc-num">III.</span> Zero-Knowledge Proofs in Practice</a></li>
+      <li><a href="#t1-4"><span class="toc-num">IV.</span> Smart Contracts &amp; Ecosystem</a></li>
+      <li><a href="#t1-5"><span class="toc-num">V.</span> CCD Token &amp; Regulatory Classification</a></li>
+      <li><a href="#t1-6"><span class="toc-num">VI.</span> Stablecoin Ecosystem &amp; Ledger Integration</a></li>
+      <li><a href="#t1-7"><span class="toc-num">VII.</span> Institutional Profile &amp; ASC 350-60</a></li>
+      <li><a href="#t1-8"><span class="toc-num">VIII.</span> Bibliography</a></li>
+    </ul>
+  </div>
+
+  <!-- T1-1 -->
+  <div id="t1-1" class="section section-anchor">
+    <div class="section-header"><span class="section-num">I</span><span class="section-title">What Is Concordium?</span></div>
+    <div class="section-body">
+      <p>Concordium is a Layer 1 blockchain designed from inception around a single central thesis: <strong>regulatory compliance and real-world identity must be embedded at the protocol level</strong>, not bolted on as an optional application layer.<sup>1</sup> Every Concordium account is cryptographically linked to a real-world identity through a network of independent <strong>Identity Providers (IPs)</strong> — the blockchain equivalent of a KYC/AML gateway. However, in normal operations, transactions remain pseudonymous to all observers. Only when a regulator presents a legally valid disclosure request to an Identity Provider can the real-world identity behind an address be revealed.</p>
+      <p>Concordium's native token is <strong>CCD</strong>, used for gas fees and validator staking. Smart contracts are written in <strong>Rust</strong>. The network uses Proof of Stake consensus with Byzantine Fault Tolerance (BFT).<sup>2</sup></p>
+
+      <div class="callout callout-plain">
+        <span class="callout-icon">&#x2713;</span>
+        <div class="callout-content">
+          <span class="callout-label">CPA Frame of Reference</span>
+          <p>Concordium is the only public Layer 1 blockchain that is architecturally equivalent to a regulated financial institution's customer database — it knows who its users are, but keeps that information private under normal circumstances and reveals it only to regulators with lawful authority. This is structurally similar to a Swiss bank's "numbered account" model: the bank knows the account owner's identity (verified by KYC), but transactions appear pseudonymous to outside observers; a court order or regulatory demand unlocks the identity link. This makes Concordium the only public blockchain that natively satisfies the identity-verification requirements that regulators impose on traditional financial intermediaries.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1-2 -->
+  <div id="t1-2" class="section section-anchor">
+    <div class="section-header"><span class="section-num">II</span><span class="section-title">The Identity Layer: Protocol-Level KYC/AML</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Architecture</span>How the Identity System Works</div>
+        <p>Every Concordium account creation requires a two-step process that embeds real-world identity at the cryptographic level:<sup>3</sup></p>
+        <ol>
+          <li><strong>Identity Object Request:</strong> A user submits identity documents (passport, national ID) to a Concordium Identity Provider (IP). The IP verifies the documents (equivalent to KYC) and issues a signed <strong>Identity Object</strong> — a cryptographic credential that certifies the user's real-world identity without recording that identity on the blockchain.</li>
+          <li><strong>Account Credential Generation:</strong> The user uses their Identity Object to generate an <strong>Account Credential</strong> — a zero-knowledge proof that demonstrates to the blockchain: "This account was issued by a verified Identity Provider" without revealing which IP or what the underlying identity is. The account credential is recorded on-chain.</li>
+        </ol>
+        <p>The result: every on-chain account is provably linked to a real-world identity (because it was issued by a verified IP), but the identity itself is not visible on-chain. The IP holds the link — and only reveals it on lawful regulatory demand.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Disclosure</span>Regulatory Identity Disclosure Mechanism</div>
+        <p>If a regulator (SEC, FinCEN, FCA, etc.) presents a legally valid order to the Identity Provider that issued an account's credential, the IP can provide the real-world identity of that account's holder. Concordium's design ensures that:</p>
+        <ul>
+          <li>No single party can unilaterally deanonymize an account — the IP holds one half of the disclosure link; the blockchain holds the cryptographic commitment</li>
+          <li>The disclosure mechanism requires at least one valid lawful authority order — purely voluntary deanonymization is not possible by the protocol design</li>
+          <li>Concordium has designed a multi-IP redundancy where recovery of identity requires cooperation of multiple IPs in future versions, preventing single-IP failure from enabling unauthorized disclosure</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-3 -->
+  <div id="t1-3" class="section section-anchor">
+    <div class="section-header"><span class="section-num">III</span><span class="section-title">Zero-Knowledge Proofs in Practice</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Concept</span>What Is a Zero-Knowledge Proof (ZKP)?</div>
+        <p>A Zero-Knowledge Proof (ZKP) is a cryptographic technique that allows one party (the prover) to convince another party (the verifier) that a statement is true without revealing any information beyond the truth of the statement itself.<sup>4</sup></p>
+
+        <div class="callout callout-note">
+          <span class="callout-icon">&#x2139;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">Audit Analogy</span>
+            <p>Imagine a client who wants to prove to their bank that they are over 18 years old to open an account — without showing their actual date of birth. In traditional banking, you hand over your passport (full identity disclosure). With a ZKP, you hand over a cryptographic proof that says: "I have a valid government-issued ID that confirms I am over 18" — and the bank can mathematically verify that statement is true without ever seeing your date of birth, address, or full name. Concordium uses this technology at the protocol level so that accounts can prove "I passed KYC with a licensed IP" without revealing which IP or who they are.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Application</span>ZKPs on Concordium</div>
+        <p>Concordium uses ZKPs at two levels in its identity architecture:<sup>5</sup></p>
+        <ul>
+          <li><strong>Account Credential ZKP:</strong> Proves that an account holder passed KYC with a verified IP, without revealing which IP or the underlying identity — recorded on-chain at account creation</li>
+          <li><strong>Attribute Proofs:</strong> Users can generate ZKPs of specific attributes from their identity (e.g., "I am a resident of the EU," "I am over 18," "I am an accredited investor") and present these to smart contracts that require such attributes — enabling compliance checks without full identity disclosure</li>
+        </ul>
+        <p>The attribute proof capability is particularly relevant for regulated financial applications: a DeFi protocol on Concordium could require that users prove they are accredited investors before trading a security token, without any party (the protocol, other users, or even the regulator in routine operations) learning the user's full identity.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-4 -->
+  <div id="t1-4" class="section section-anchor">
+    <div class="section-header"><span class="section-num">IV</span><span class="section-title">Smart Contracts &amp; Ecosystem</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Technology</span>Rust Smart Contracts</div>
+        <p>Concordium smart contracts are written in <strong>Rust</strong>, one of the most memory-safe programming languages available.<sup>6</sup> Rust's compile-time memory safety checks eliminate entire categories of vulnerabilities (buffer overflows, use-after-free errors, race conditions) that have caused hundreds of millions of dollars in losses in smart contracts written in other languages (notably Solidity). Concordium compiles Rust smart contracts to WebAssembly (Wasm) for execution on-chain.</p>
+        <p>For auditors: the use of Rust significantly reduces smart contract security risk relative to Solidity-based chains, but requires Rust expertise for independent code review. Most existing smart contract audit firms have Rust capability (it is also the language of Solana smart contracts), but teams should confirm this before engaging external reviewers for Concordium engagements.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Ecosystem</span>Protocol-Level Tokens (PLTs) &amp; Use Cases</div>
+        <p>Concordium's token standard, <strong>Protocol-Level Tokens (PLTs)</strong>, allows the issuance of fungible tokens on Concordium that inherit the network's identity layer — meaning every PLT transaction is automatically subject to the same KYC/AML framework as CCD transactions.<sup>7</sup> This is structurally distinct from Ethereum ERC-20 tokens, where identity requirements are optionally implemented at the application layer (or not at all).</p>
+        <p>By mid-2025, approximately 10 stablecoin projects had issued PLTs on Concordium. These stablecoins use CCD for gas fees, creating demand for CCD as network activity grows. The compliance-first PLT framework makes Concordium a natural fit for regulated stablecoin issuers seeking a blockchain that satisfies travel rule requirements, AML screening, and identity verification by design rather than by additional engineering.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-5 -->
+  <div id="t1-5" class="section section-anchor">
+    <div class="section-header"><span class="section-num">V</span><span class="section-title">CCD Token &amp; Regulatory Classification</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Token</span>CCD Characteristics</div>
+        <p>CCD is Concordium's native token, used for gas fees on all transactions and for validator staking in Concordium's PoS consensus.<sup>8</sup> CCD is traded on several centralized and decentralized exchanges, though its liquidity and trading volume are significantly lower than top-tier chains (Ethereum, Solana, TON). This has implications for the "active market" determination under FASB ASC 820 — auditors must assess whether CCD's market qualifies as Level 1 or requires a Level 2/3 valuation approach.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Milestone</span>SEC/CFTC "Project Crypto" — March 17, 2026</div>
+        <p>On March 17, 2026, the SEC and CFTC jointly published "Project Crypto," a regulatory framework providing definitive asset classification for major digital assets.<sup>9</sup> Under Project Crypto, CCD was jointly classified as a <strong>"digital commodity"</strong> — explicitly placing it under CFTC jurisdiction as a commodity (not a security under SEC jurisdiction). This is the highest-clarity regulatory outcome available for a digital asset in the U.S. regulatory framework as of April 2026:</p>
+        <ul>
+          <li>CCD is not a security — no Howey test concerns; no SEC registration requirement for holders</li>
+          <li>CCD is a commodity — subject to CFTC jurisdiction for derivatives markets; cash market transactions are largely unregulated at the federal level</li>
+          <li>This classification reduces the single largest regulatory risk that has historically impaired crypto asset valuations</li>
+        </ul>
+
+        <div class="callout callout-plain">
+          <span class="callout-icon">&#x2713;</span>
+          <div class="callout-content">
+            <span class="callout-label">Significant Regulatory Clarity — Positive for Audit</span>
+            <p>CCD's "digital commodity" classification under Project Crypto is among the most definitive U.S. regulatory outcomes available for any digital asset as of April 2026. For ASC 350-60 purposes, this confirms that CCD is an in-scope crypto asset (not a security requiring separate classification) and eliminates the regulatory uncertainty that previously required extensive disclosure around potential security status.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-6 -->
+  <div id="t1-6" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VI</span><span class="section-title">Stablecoin Ecosystem &amp; Ledger Integration</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Ecosystem</span>Stablecoin Issuers on Concordium</div>
+        <p>By mid-2025, ten stablecoin projects had issued Protocol-Level Tokens on Concordium.<sup>10</sup> The compliance-first architecture is the primary draw: stablecoin issuers subject to FinCEN travel rule requirements, OFAC screening obligations, or EU MiCA licensing requirements can satisfy those requirements by building on Concordium's native identity layer, rather than building custom KYC infrastructure on top of a permissionless chain.</p>
+        <p>Accounting implication for stablecoin holders: stablecoins issued as PLTs on Concordium are likely treated identically to USD-pegged stablecoins on other chains — as digital cash equivalents or short-term receivables, depending on collateral structure. The Concordium identity layer does not change the economic substance of the stablecoin instrument. Auditors should assess the specific collateral mechanism and issuer creditworthiness of each PLT stablecoin held by the client.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Integration</span>Ledger "1-Click Verify &amp; Pay" — October 8, 2025</div>
+        <p>On October 8, 2025, Concordium and Ledger (the hardware wallet manufacturer) announced a joint integration called <strong>"1-Click Verify &amp; Pay."</strong><sup>11</sup> This feature allows Ledger hardware wallet users to verify their Concordium identity credentials directly on the hardware device and approve Concordium transactions — combining hardware security (the private key never leaves the Ledger device) with Concordium's identity verification layer in a single user flow.</p>
+        <p>Audit relevance: entities using Ledger hardware wallets for Concordium asset custody now have a hardware-security-backed evidence trail. The Ledger device provides a chain of custody for transaction approvals (each transaction requires physical confirmation on the device), which may be relevant to establishing custody procedures and internal controls documentation.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-7 -->
+  <div id="t1-7" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VII</span><span class="section-title">Institutional Profile &amp; ASC 350-60 Considerations</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Profile</span>Institutional Standing</div>
+        <p>Concordium was founded in 2018 by Lars Seier Christensen, co-founder of Saxo Bank. The institutional financial background of its founding is a distinctive characteristic — Concordium was designed by someone with direct experience in regulated financial markets and built specifically to address the pain points that regulated financial institutions face when engaging with public blockchains.<sup>12</sup> The Concordium Foundation is headquartered in Zug, Switzerland, within the "Crypto Valley" regulatory environment.</p>
+        <p>As of April 2026, Concordium does not rank in the top 50 blockchains by market capitalization, reflecting its niche compliance-focused positioning rather than broad retail adoption. Its strategic value is its regulatory architecture, not transaction volume.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Accounting</span>FASB ASC 350-60 Application</div>
+        <p>CCD's accounting treatment under FASB ASC 350-60 requires individual assessment due to its thinner market liquidity relative to top-tier chains:</p>
+        <ul>
+          <li><strong>Classification:</strong> CCD is a digital commodity under Project Crypto (March 2026) — in scope for ASC 350-60 as a crypto asset</li>
+          <li><strong>Fair Value Measurement:</strong> CCD trades on centralized exchanges but with lower daily volume than Ethereum or Toncoin. Auditors must determine whether CCD's market qualifies as "active" per ASC 820 to use Level 1 pricing, or whether a Level 2 (observable inputs from comparable assets) or Level 3 (unobservable inputs) approach is required</li>
+          <li><strong>Staking income:</strong> CCD earned through validator staking is income at fair value on date received; subsequently measured under ASC 350-60</li>
+          <li><strong>PLT stablecoins:</strong> Assessed based on their individual economic substance (collateral, redemption mechanism) — not as CCD; likely cash equivalents if properly collateralized</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-8: Bibliography -->
+  <div id="t1-8" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VIII</span><span class="section-title">Bibliography</span></div>
+    <div class="section-body">
+
+      <div class="source-group">
+        <div class="source-group-title">Primary Sources</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">1.</span> <span class="source-title">Concordium Foundation. "Concordium Whitepaper." concordium.com. 2021.</span><span class="source-desc">Primary technical specification for Concordium's identity layer architecture, consensus mechanism, and smart contract framework.</span></li>
+          <li class="source-item"><span class="source-num">2.</span> <span class="source-title">Concordium Foundation. "Concordium Developer Documentation." docs.concordium.com. Accessed April 2026.</span><span class="source-desc">Official developer reference covering identity credentials, ZKP attribute proofs, Protocol-Level Tokens, and Rust smart contract SDK.</span></li>
+          <li class="source-item"><span class="source-num">3.</span> <span class="source-title">Concordium Foundation. "Identity Providers — Technical Architecture." docs.concordium.com/identity. Accessed April 2026.</span><span class="source-desc">Detailed specification of the Identity Provider role, Identity Object issuance, Account Credential generation, and regulatory disclosure mechanism.</span></li>
+          <li class="source-item"><span class="source-num">4.</span> <span class="source-title">Concordium Foundation. "Ledger '1-Click Verify &amp; Pay' Integration Announcement." concordium.com. October 8, 2025.</span><span class="source-desc">Official press release announcing the Ledger hardware wallet integration for identity-verified transaction signing on Concordium.</span></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Regulatory &amp; Professional Standards</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">5.</span> <span class="source-title">SEC and CFTC. "Project Crypto — Joint Digital Asset Classification Framework." March 17, 2026.</span><span class="source-desc">Joint SEC/CFTC framework classifying major digital assets; CCD classified as "digital commodity" under CFTC jurisdiction. Most significant U.S. regulatory clarity event for CCD.</span></li>
+          <li class="source-item"><span class="source-num">6.</span> <span class="source-title">FASB. "ASU 2023-08 / ASC 350-60, Intangibles — Goodwill and Other — Crypto Assets." FASB. Effective December 15, 2024.</span><span class="source-desc">Governing measurement and disclosure standard for CCD and PLT stablecoins. Active-market determination under ASC 820 is the key threshold for CCD given lower trading volume.</span></li>
+          <li class="source-item"><span class="source-num">7.</span> <span class="source-title">FASB. "ASC 820, Fair Value Measurement." FASB Codification.</span><span class="source-desc">Level 1/2/3 fair value hierarchy; "active market" definition central to CCD fair value measurement approach.</span></li>
+          <li class="source-item"><span class="source-num">8.</span> <span class="source-title">PCAOB. "AS 1105, Audit Evidence." PCAOB, as amended effective December 15, 2025. Paragraph .10A.</span><span class="source-desc">Framework for blockchain-sourced electronic information as audit evidence; relevant to on-chain CCD balance confirmation.</span></li>
+          <li class="source-item"><span class="source-num">9.</span> <span class="source-title">FinCEN. "Bank Secrecy Act Travel Rule — Virtual Asset Service Providers." FinCEN. 2022.</span><span class="source-desc">Travel rule requirements for VASP-to-VASP transfers; Concordium's identity layer provides a technical pathway to satisfy these requirements at the protocol level.</span></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Industry Research</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">10.</span> <span class="source-title">Atomic Wallet Research. "Concordium (CCD) — Protocol Overview and Ecosystem Analysis." atomicwallet.io. 2025.</span><span class="source-desc">Third-party overview of Concordium's identity mechanism, staking economics, and ecosystem positioning relative to compliance-focused competitors.</span></li>
+          <li class="source-item"><span class="source-num">11.</span> <span class="source-title">Crypto News Navigator. "Concordium Stablecoin Ecosystem Update — 10 PLT Projects by Mid-2025." cryptonewsnavigator.com. 2025.</span><span class="source-desc">Industry coverage of stablecoin projects choosing Concordium's PLT framework for its compliance-native architecture.</span></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Market &amp; News Data</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">12.</span> <span class="source-title">CoinMarketCap. "CCD — Concordium Price, Market Cap, Supply Data." coinmarketcap.com. Accessed April 2026.</span><span class="source-desc">Reference market data for CCD; used for ASC 820 active-market assessment and ASC 350-60 fair value determination.</span></li>
+          <li class="source-item"><span class="source-num">13.</span> <span class="source-title">Ledger. "Ledger and Concordium Announce 1-Click Verify &amp; Pay." ledger.com. October 8, 2025.</span><span class="source-desc">Hardware wallet manufacturer's announcement of the Concordium identity-verification integration, relevant to custody control documentation.</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /.page-wrapper tab1 -->
+</div><!-- /#tab1 -->
+
+<!-- ═══════════════════════════════ TAB 2 ═══════════════════════════════ -->
+<div id="tab2" class="tab-panel">
+<div class="page-wrapper">
+
+  <div class="memo-header">
+    <div class="memo-header-title">Memorandum — Reliability &amp; Risk Assessment</div>
+    <div class="memo-grid"><div class="memo-label">To</div><div class="memo-value">Audit Engagement File &nbsp;/&nbsp; Engagement Team</div></div>
+    <div class="memo-grid"><div class="memo-label">From</div><div class="memo-value">Digital Asset Practice Group &mdash; Audit &amp; Assurance</div></div>
+    <div class="memo-grid"><div class="memo-label">Date</div><div class="memo-value">April 27, 2026</div></div>
+    <div class="memo-grid"><div class="memo-label">Re</div><div class="memo-value"><strong>Concordium: Reliability &amp; Risk Assessment for Audit Purposes</strong></div></div>
+    <div class="memo-grid"><div class="memo-label">Classification</div><div class="memo-value"><span class="classification-badge">&#x1F512; Workpaper Documentation &mdash; Professional Judgment</span></div></div>
+  </div>
+
+  <div class="toc-card">
+    <div class="toc-header">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h6" stroke="#1A3461" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Table of Contents — Tab 2
+    </div>
+    <ul class="toc-list">
+      <li><a href="#sec-1"><span class="toc-num">I.</span> Purpose of This Memorandum</a></li>
+      <li><a href="#sec-2"><span class="toc-num">II.</span> Background &amp; Scope</a></li>
+      <li><a href="#sec-3"><span class="toc-num">III.</span> Identity Layer Reliability Assessment</a></li>
+      <li><a href="#sec-4"><span class="toc-num">IV.</span> Data Integrity &amp; Consensus Analysis</a></li>
+      <li><a href="#sec-5"><span class="toc-num">V.</span> Smart Contract &amp; ZKP Reliability</a></li>
+      <li><a href="#sec-6"><span class="toc-num">VI.</span> Token Classification &amp; Financial Reporting</a></li>
+      <li><a href="#sec-7"><span class="toc-num">VII.</span> Gaps &amp; Limitations</a></li>
+      <li><a href="#sec-8"><span class="toc-num">VIII.</span> Recommended Audit Procedures</a></li>
+      <li><a href="#sec-9"><span class="toc-num">IX.</span> Key Takeaways</a></li>
+      <li><a href="#sec-10"><span class="toc-num">X.</span> Sources &amp; References</a></li>
+    </ul>
+  </div>
+
+  <!-- SEC-1 -->
+  <div id="sec-1" class="section section-anchor">
+    <div class="section-header"><span class="section-num">I</span><span class="section-title">Purpose of This Memorandum</span></div>
+    <div class="section-body">
+      <p>This memorandum evaluates the reliability and audit risk profile of the Concordium blockchain and its native CCD token. It assists engagement teams in assessing whether CCD balances, transaction histories, and on-chain stablecoin positions are supported by sufficient appropriate audit evidence, and evaluates Concordium's unique identity layer from both a reliability and audit-use perspective — including its potential to serve as corroborating evidence for counterparty identity verification.</p>
+      <div class="callout callout-plain">
+        <span class="callout-icon">&#x2713;</span>
+        <div class="callout-content">
+          <span class="callout-label">Bottom Line Up Front</span>
+          <p>Concordium's compliance-first architecture makes it the most audit-friendly public blockchain in our review series from a counterparty-identity standpoint. The primary audit risks are: (1) CCD's thinner market liquidity requiring careful ASC 820 active-market assessment; (2) the Identity Provider system introduces a centralized trust dependency not present in fully permissionless blockchains; and (3) ZKP attribute proofs, while cryptographically robust, require specialized expertise to audit effectively. The March 2026 Project Crypto "digital commodity" classification significantly reduces regulatory uncertainty.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-2 -->
+  <div id="sec-2" class="section section-anchor">
+    <div class="section-header"><span class="section-num">II</span><span class="section-title">Background &amp; Scope</span></div>
+    <div class="section-body">
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Background</span>Protocol Overview</div>
+        <p>Concordium is a compliance-first Layer 1 blockchain founded in 2018 by Lars Seier Christensen (Saxo Bank co-founder), headquartered in Zug, Switzerland. Every Concordium account is cryptographically linked to a real-world identity verified by licensed Identity Providers (IPs), using zero-knowledge proofs (ZKPs) to maintain transaction pseudonymity in normal operations while enabling lawful regulatory disclosure on demand. CCD is the native token. Smart contracts are written in Rust. By mid-2025, ten stablecoin projects had issued Protocol-Level Tokens (PLTs) on Concordium. CCD was classified as a "digital commodity" by the SEC/CFTC under Project Crypto on March 17, 2026.</p>
+      </div>
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Scope</span>Scope of This Analysis</div>
+        <p>This assessment covers: (a) reliability of Concordium's identity layer for audit evidence purposes; (b) on-chain data integrity and consensus mechanism; (c) smart contract and ZKP reliability; (d) CCD classification and fair value measurement under FASB ASC 350-60; (e) identified documentation gaps. Market risk, investment suitability, and non-U.S. regulatory compliance are excluded.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-3 -->
+  <div id="sec-3" class="section section-anchor">
+    <div class="section-header"><span class="section-num">III</span><span class="section-title">Identity Layer Reliability Assessment</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-mod-high">&#x25CF; Moderate-High — Strongest in Class for KYC Assurance</span>
+      </div>
+      <p>Concordium's identity layer is the most robust protocol-level KYC/AML system deployed at scale on a public blockchain. For auditors seeking to verify the identity of counterparties in on-chain transactions, Concordium provides a fundamentally stronger basis for counterparty verification than any other public blockchain reviewed.</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Strengths</span>Identity Layer Positive Indicators</div>
+        <ul>
+          <li>Every on-chain account is provably associated with a verified Identity Provider credential — there are no anonymous accounts on Concordium (unlike Ethereum, Solana, Bitcoin, etc.)</li>
+          <li>ZKP attribute proofs are mathematically sound and externally verifiable — cryptographic soundness does not depend on trust in any single party</li>
+          <li>Lawful regulatory disclosure mechanism is baked into the protocol design — fulfills travel rule requirements and AML counterparty identification requirements by design</li>
+          <li>Ledger hardware wallet integration (October 2025) adds hardware-level custody security to identity-verified transactions</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Limitations</span>Identity Layer Risks</div>
+        <ul>
+          <li><strong>Identity Provider centralization:</strong> The IP system introduces a centralized trust anchor — if an IP is compromised, issues fraudulent credentials, or fails as a business, its associated accounts' identity link could be unreliable or irrecoverable</li>
+          <li><strong>IP KYC quality variance:</strong> Not all Identity Providers apply identical KYC standards. An IP with lower KYC diligence could issue identity credentials to accounts whose real-world identity link is weaker than expected</li>
+          <li><strong>On-chain pseudonymity persists:</strong> The identity link is held by the IP off-chain; on-chain, addresses remain pseudonymous to all observers including auditors. Auditors cannot independently determine the identity of a Concordium address without engaging the IP or obtaining a management disclosure</li>
+          <li><strong>Jurisdictional disclosure limitations:</strong> Regulatory disclosure requires a lawful order in the IP's jurisdiction; a Concordium IP domiciled in a jurisdiction with limited regulatory cooperation may not respond to U.S. regulator requests</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SEC-4 -->
+  <div id="sec-4" class="section section-anchor">
+    <div class="section-header"><span class="section-num">IV</span><span class="section-title">Data Integrity &amp; Consensus Analysis</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-mod-high">&#x25CF; Moderate-High</span>
+      </div>
+      <p>Concordium uses a Proof of Stake BFT consensus mechanism that provides deterministic block finality — once a block is committed, it cannot be reversed. This is a favorable characteristic for audit evidence purposes. The network has operated since mainnet launch in June 2021 without a protocol-level security incident.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Attribute</th><th>Concordium</th><th>Audit Implication</th><th>Assessment</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Block Finality</td><td>Deterministic BFT — final after one block (~10 second block time)</td><td>No probabilistic reorg risk; on-chain confirmation is final</td><td><span class="badge badge-high">High</span></td></tr>
+            <tr><td>Block Explorer</td><td>CCDscan (ccdscan.io) — official explorer with identity credential visibility</td><td>Single primary explorer; less redundancy than chains with multiple independent explorers</td><td><span class="badge badge-mod">Moderate</span></td></tr>
+            <tr><td>Network Age</td><td>Mainnet June 2021 — ~5 years of operational history</td><td>Meaningful operational history; more mature than Berachain</td><td><span class="badge badge-mod-high">Mod-High</span></td></tr>
+            <tr><td>Validator Count</td><td>~180 active bakers (validators); requires minimum 500,000 CCD stake</td><td>Small validator set; higher centralization risk than Ethereum</td><td><span class="badge badge-mod">Moderate</span></td></tr>
+            <tr><td>Smart Contract Language</td><td>Rust → Wasm; memory-safe, auditable, externally reviewed</td><td>Rust's safety properties reduce certain vulnerability classes; Rust audit expertise required</td><td><span class="badge badge-mod-high">Mod-High</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-5 -->
+  <div id="sec-5" class="section section-anchor">
+    <div class="section-header"><span class="section-num">V</span><span class="section-title">Smart Contract &amp; ZKP Reliability</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-mod">&#x25CF; Moderate — ZKP Expertise Required</span>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Smart Contracts</span>Rust/Wasm Contract Reliability</div>
+        <p>Concordium's use of Rust for smart contracts provides meaningful security advantages. Rust's ownership and borrowing system eliminates memory safety vulnerabilities at compile time, reducing the attack surface for common smart contract exploits. Concordium publishes a Rust SDK for smart contract development, and the Concordium Foundation has commissioned internal and third-party security reviews.</p>
+        <p>However: Rust smart contracts on Concordium are less battle-tested by volume than Ethereum Solidity contracts (which have processed trillions of dollars in cumulative transactions). Lower transaction volume means fewer adversarial conditions have been observed, which is a meaningful limitation on the historical reliability evidence available.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">ZKPs</span>Zero-Knowledge Proof Audit Considerations</div>
+        <p>Concordium uses established ZKP constructions (based on Pedersen commitments and sigma protocols) for its account credential and attribute proof systems. These are well-studied cryptographic primitives with peer-reviewed academic foundations.</p>
+
+        <div class="callout callout-warn">
+          <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">ZKP Verification Requires Specialized Expertise</span>
+            <p>Independently verifying that a ZKP attribute proof is cryptographically valid — and not a falsified proof — requires knowledge of the specific ZKP construction used (Concordium's variant of sigma protocols and Pedersen commitments). Most audit teams do not have this expertise in-house. For engagements where clients are relying on ZKP attribute proofs as evidence of counterparty compliance (e.g., accredited investor status), engagement leadership should determine whether a cryptography specialist is required for procedures related to ZKP validity.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SEC-6 -->
+  <div id="sec-6" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VI</span><span class="section-title">Token Classification &amp; Financial Reporting</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-mod">&#x25CF; Moderate — Active Market Determination Required</span>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">CCD</span>ASC 350-60 Application</div>
+        <p>CCD is classified as a "digital commodity" under the SEC/CFTC's Project Crypto framework (March 17, 2026) — the most definitive U.S. regulatory classification currently available. For ASC 350-60 purposes:</p>
+        <ul>
+          <li><strong>In scope:</strong> CCD is a digital commodity; it satisfies ASC 350-60's criteria (fungible, not a security, not a financial instrument representing a claim on the issuer)</li>
+          <li><strong>Measurement:</strong> Fair value through net income per ASC 350-60; but the <em>level</em> of fair value input (Level 1 vs. Level 2/3 per ASC 820) requires active-market assessment</li>
+          <li><strong>Active market concern:</strong> CCD's trading volumes are materially lower than top-tier chains; auditors must assess whether CCD's exchange markets qualify as "active" per ASC 820 criteria or whether a Level 2/3 input is more appropriate</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">PLT Stablecoins</span>Protocol-Level Token Accounting</div>
+        <p>Stablecoins issued as PLTs on Concordium are assessed based on their individual economic substance, not the blockchain they run on:</p>
+        <ul>
+          <li>A USD-pegged PLT stablecoin backed by USDC collateral is treated identically to holding USDC — likely a cash equivalent or short-term digital receivable</li>
+          <li>The Concordium identity layer does not change the instrument's economic substance, but it does affect risk profile (lower counterparty anonymity risk) which may be relevant to disclosure</li>
+          <li>Auditors should obtain the stablecoin's attestation or audit report (if available) from the PLT issuer, independent of the Concordium blockchain audit</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SEC-7 -->
+  <div id="sec-7" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VII</span><span class="section-title">Gaps &amp; Limitations</span></div>
+    <div class="section-body">
+      <p>The following gaps represent areas where available information does not provide sufficient basis for definitive audit conclusions without additional procedures:</p>
+      <ul class="gap-list">
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>CCD Active-Market Determination Required.</strong> CCD's lower trading volume relative to top-tier chains means the ASC 820 active-market threshold is a genuine analytical question, not a rote confirmation. Auditors must perform a documented assessment of exchange trading volumes, bid-ask spreads, and market depth before defaulting to Level 1 fair value.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Identity Provider Quality Unverified by Auditor.</strong> Auditors cannot independently assess the KYC standards applied by individual Identity Providers. The quality of the identity link behind any given account is only as reliable as the IP's KYC procedures — which are not independently audited as part of standard Concordium engagement procedures.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>ZKP Verification Requires Specialist.</strong> Auditors without cryptography expertise cannot independently verify the mathematical validity of ZKP attribute proofs. Engagements relying on ZKP proofs as compliance evidence require specialist involvement.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Limited Block Explorer Redundancy.</strong> CCDscan is the primary block explorer for Concordium. Unlike chains with multiple independent explorers, single-source blockchain data confirmation is a potential audit evidence limitation.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>PLT Stablecoin Issuer Attestations.</strong> While Concordium provides the infrastructure, individual PLT stablecoin issuers are responsible for their own reserve attestations and audit documentation. Auditors must obtain these separately from each issuer; they are not covered by standard Concordium engagement procedures.</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEC-8 -->
+  <div id="sec-8" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VIII</span><span class="section-title">Recommended Audit Procedures</span></div>
+    <div class="section-body">
+      <p>The following procedures respond to identified risks, consistent with PCAOB AS 1105 (as amended December 2025) and AICPA Digital Assets Practice Guide guidance.</p>
+
+      <span class="proc-group-label">Balance &amp; Transaction Verification</span>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <span class="proc-num">1</span>
+          <div class="proc-body">
+            <div class="proc-title">On-Chain CCD Balance Confirmation</div>
+            <p class="proc-desc">Query CCDscan (ccdscan.io) for client's CCD wallet balance as of the balance sheet date. Record the block number queried and block timestamp. Given single-explorer reliance, cross-reference by querying the Concordium node RPC endpoint directly (or via Concordium's Rosetta API) to confirm balance independently from CCDscan's database.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">2</span>
+          <div class="proc-body">
+            <div class="proc-title">Staking Income Verification</div>
+            <p class="proc-desc">Obtain client's baker (validator) address and query Concordium's payday (reward distribution) events on-chain. Verify that staking rewards are recorded at CCD fair value on the date each reward was received. Reconcile total on-chain rewards per block explorer to the income statement staking income line.</p>
+          </div>
+        </li>
+      </ul>
+
+      <span class="proc-group-label">CCD Fair Value Assessment</span>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <span class="proc-num">3</span>
+          <div class="proc-body">
+            <div class="proc-title">ASC 820 Active-Market Determination</div>
+            <p class="proc-desc">Obtain CCD daily trading volume data from at least two sources (CoinMarketCap and CoinGecko) for the 30 days preceding the balance sheet date. Calculate average daily volume, bid-ask spread as a percentage of midpoint price, and market depth (order book width). Document the active-market determination conclusion (Level 1 vs. Level 2/3) with specific reference to these metrics. If Level 2/3 is concluded, obtain a valuation specialist's fair value analysis.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">4</span>
+          <div class="proc-body">
+            <div class="proc-title">Project Crypto Classification Documentation</div>
+            <p class="proc-desc">Include in the workpaper file a copy of the SEC/CFTC Project Crypto release (March 17, 2026) confirming CCD's "digital commodity" classification. Document that this classification confirms CCD is in scope for ASC 350-60 and eliminates the security-classification uncertainty that would otherwise require additional legal analysis.</p>
+          </div>
+        </li>
+      </ul>
+
+      <span class="proc-group-label">Identity &amp; Counterparty Procedures</span>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <span class="proc-num">5</span>
+          <div class="proc-body">
+            <div class="proc-title">Identity Provider Assessment</div>
+            <p class="proc-desc">For engagements where counterparty identity is material (e.g., regulated financial entities transacting CCD), obtain the name and jurisdiction of the Identity Provider(s) associated with material counterparty addresses. Assess whether the IP's KYC standards and jurisdictional disclosure obligations satisfy the engagement's counterparty verification requirements.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">6</span>
+          <div class="proc-body">
+            <div class="proc-title">ZKP Attribute Proof Review (If Applicable)</div>
+            <p class="proc-desc">If the client is relying on ZKP attribute proofs as compliance evidence (e.g., proof of accredited investor status for counterparties), engage a qualified cryptography specialist to review the ZKP construction used and confirm that the specific proofs presented are mathematically valid and not fabricated. Document the specialist's qualifications and conclusions.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">7</span>
+          <div class="proc-body">
+            <div class="proc-title">PLT Stablecoin Reserve Attestation</div>
+            <p class="proc-desc">For any PLT stablecoin balances held by the client, obtain the stablecoin issuer's most recent reserve attestation or audit report. Confirm that the total PLT stablecoin outstanding does not exceed the issuer's reported reserve assets. Assess whether the reserve attestation was performed by an independent qualified firm.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEC-9 -->
+  <div id="sec-9" class="section section-anchor">
+    <div class="section-header"><span class="section-num">IX</span><span class="section-title">Key Takeaways</span></div>
+    <div class="section-body">
+      <ul class="takeaway-list">
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>Concordium Is the Most Compliance-Native Public Blockchain Available.</strong> No other public Layer 1 blockchain provides protocol-level identity verification, lawful regulatory disclosure, and ZKP attribute proofs as native features. For clients operating in regulated financial industries, Concordium's architecture may satisfy counterparty identity and AML requirements by design rather than by supplemental engineering.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>Project Crypto Classification Provides Maximum Regulatory Clarity for CCD.</strong> The March 2026 SEC/CFTC "digital commodity" classification is the clearest regulatory outcome currently available for any digital asset. This eliminates the security-classification uncertainty that historically required extensive legal analysis and disclosure for other crypto assets.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>CCD Fair Value Requires Careful Active-Market Assessment.</strong> Unlike Ethereum or Toncoin with deep exchange liquidity, CCD's thinner market means the Level 1 vs. Level 2/3 determination under ASC 820 is a genuine analytical question. This is the primary financial reporting complexity for CCD engagements.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>ZKPs and IP System Require Specialized Expertise to Audit.</strong> The cryptographic underpinnings of Concordium's identity layer — ZKP attribute proofs and IP credential chains — are auditable but require expertise that most engagement teams will need to source externally. Plan for specialist involvement in engagements where these features are material to the audit conclusion.</div></li>
+      </ul>
+
+      <hr>
+      <p style="font-size:0.84rem; color:var(--gray-600); margin-top:16px;"><strong>Suggested Next Steps:</strong></p>
+      <ul class="next-step-list">
+        <li class="next-step-item"><span class="next-step-num">1</span><div>Perform the ASC 820 active-market determination for CCD (Procedure 3) early in the engagement — the outcome determines whether a valuation specialist is needed, which affects engagement resource planning.</div></li>
+        <li class="next-step-item"><span class="next-step-num">2</span><div>Include the Project Crypto March 2026 classification document in the permanent file to support CCD's in-scope status under ASC 350-60 without requiring repeated legal analysis in future periods.</div></li>
+        <li class="next-step-item"><span class="next-step-num">3</span><div>For regulated financial institution clients, assess whether Concordium's identity layer enables the institution to rely on on-chain transaction evidence for AML counterparty verification — potentially reducing KYC verification costs versus permissionless chain alternatives.</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEC-10 -->
+  <div id="sec-10" class="section section-anchor">
+    <div class="section-header"><span class="section-num">X</span><span class="section-title">Sources &amp; References</span></div>
+    <div class="section-body">
+      <div class="source-group">
+        <div class="source-group-title">Primary Sources</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">1.</span> <span class="source-title">Concordium Foundation. "Concordium Whitepaper." concordium.com. 2021.</span></li>
+          <li class="source-item"><span class="source-num">2.</span> <span class="source-title">Concordium Foundation. "Developer Documentation." docs.concordium.com. Accessed April 2026.</span></li>
+          <li class="source-item"><span class="source-num">3.</span> <span class="source-title">Concordium Foundation. "Ledger 1-Click Verify &amp; Pay Announcement." concordium.com. October 8, 2025.</span></li>
+        </ul>
+      </div>
+      <div class="source-group">
+        <div class="source-group-title">Regulatory &amp; Professional Standards</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">4.</span> <span class="source-title">SEC and CFTC. "Project Crypto — Joint Digital Asset Classification Framework." March 17, 2026. CCD classified as "digital commodity."</span></li>
+          <li class="source-item"><span class="source-num">5.</span> <span class="source-title">FASB ASU 2023-08 / ASC 350-60, Crypto Assets. Effective fiscal years beginning after December 15, 2024.</span></li>
+          <li class="source-item"><span class="source-num">6.</span> <span class="source-title">FASB ASC 820, Fair Value Measurement. Level 1/2/3 hierarchy; active-market definition.</span></li>
+          <li class="source-item"><span class="source-num">7.</span> <span class="source-title">PCAOB AS 1105, Audit Evidence. As amended effective December 15, 2025. Paragraph .10A.</span></li>
+          <li class="source-item"><span class="source-num">8.</span> <span class="source-title">FinCEN. "Travel Rule — Virtual Asset Service Providers." FinCEN. 2022.</span></li>
+        </ul>
+      </div>
+      <div class="source-group">
+        <div class="source-group-title">Industry Research &amp; Market Data</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">9.</span> <span class="source-title">Atomic Wallet. "Concordium (CCD) Protocol Review." atomicwallet.io. 2025.</span></li>
+          <li class="source-item"><span class="source-num">10.</span> <span class="source-title">Crypto News Navigator. "10 Stablecoin Projects on Concordium by Mid-2025." cryptonewsnavigator.com. 2025.</span></li>
+          <li class="source-item"><span class="source-num">11.</span> <span class="source-title">CoinMarketCap. "CCD — Concordium Market Data." coinmarketcap.com. Accessed April 2026.</span></li>
+          <li class="source-item"><span class="source-num">12.</span> <span class="source-title">Ledger. "Ledger and Concordium 1-Click Verify &amp; Pay." ledger.com. October 8, 2025.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sig-block">
+    <div class="sig-header">Review &amp; Approval Sign-Off</div>
+    <div class="sig-body">
+      <div class="sig-field"><label>Preparer</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+      <div class="sig-field"><label>Reviewer</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+      <div class="sig-field"><label>Engagement Manager</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+      <div class="sig-field"><label>Partner / Concurring Reviewer</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+    </div>
+  </div>
+
+  <p style="font-size:0.75rem; color:var(--gray-400); text-align:center; margin-top:12px; line-height:1.6;">This memorandum is prepared for internal audit and assurance purposes only. It does not constitute investment advice, legal advice, or a formal audit opinion. Information is current as of April 27, 2026. Prepared by the Digital Asset Practice Group.</p>
+
+</div><!-- /.page-wrapper tab2 -->
+</div><!-- /#tab2 -->
+
+<footer class="doc-footer">
+  <div>Audit &amp; Assurance Practice &mdash; Digital Asset Group</div>
+  <div>Ref: AWP-TECH-2026-06 &nbsp;&middot;&nbsp; Rev 1.0</div>
+  <div>Confidential &mdash; Engagement Use Only</div>
+</footer>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById(this.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>

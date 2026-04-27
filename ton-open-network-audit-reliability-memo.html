@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Open Network (TON) | Audit Workpaper</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:#0E1F3D; --navy-mid:#1A3461; --navy-light:#2A4A82;
+    --blue:#0057A8; --blue-light:#E8F0FA; --teal:#00748A; --teal-light:#E5F4F7;
+    --gold:#B07D00; --gold-light:#FDF5DC; --green:#1A6B3A; --green-light:#E6F4EC;
+    --orange:#B85000; --orange-light:#FFF0E5; --red:#A8001E; --red-light:#FAEAED;
+    --gray-50:#F8F9FA; --gray-100:#F0F1F3; --gray-200:#E2E4E8; --gray-400:#9AA0AB;
+    --gray-600:#5A6270; --gray-800:#2C3240; --text:#1A1E2A; --border:#D0D4DC;
+    --shadow-sm:0 1px 3px rgba(14,31,61,0.08),0 1px 2px rgba(14,31,61,0.06);
+    --shadow-md:0 4px 12px rgba(14,31,61,0.10),0 2px 6px rgba(14,31,61,0.07);
+    --shadow-lg:0 8px 28px rgba(14,31,61,0.13),0 4px 10px rgba(14,31,61,0.08);
+    --radius:4px; --radius-lg:8px;
+  }
+  html { font-size:15px; scroll-behavior:smooth; }
+  body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif; color:var(--text); background:#ECEEF2; line-height:1.7; }
+  .brand-bar { background:var(--navy); height:5px; width:100%; position:sticky; top:0; z-index:100; }
+  .firm-header { background:var(--navy); color:white; padding:28px 56px 24px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .firm-logo { display:flex; align-items:center; gap:16px; }
+  .firm-logo-mark { width:44px; height:44px; background:white; border-radius:3px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .firm-logo-mark svg { display:block; }
+  .firm-name { font-size:1.15rem; font-weight:700; letter-spacing:0.04em; color:white; line-height:1.2; }
+  .firm-tagline { font-size:0.7rem; color:rgba(255,255,255,0.55); letter-spacing:0.08em; text-transform:uppercase; margin-top:2px; }
+  .firm-header-right { text-align:right; }
+  .doc-type-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.88); font-size:0.68rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; padding:5px 12px; border-radius:2px; margin-bottom:6px; }
+  .doc-ref { font-size:0.72rem; color:rgba(255,255,255,0.45); letter-spacing:0.03em; }
+  .confidential-bar { background:var(--navy-mid); color:rgba(255,255,255,0.7); text-align:center; font-size:0.67rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; padding:7px 24px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .tab-nav { background:var(--navy-mid); padding:0 56px; display:flex; border-bottom:3px solid rgba(0,0,0,0.18); }
+  .tab-btn { background:transparent; border:none; border-bottom:3px solid transparent; margin-bottom:-3px; color:rgba(255,255,255,0.55); padding:15px 28px; font-size:0.82rem; font-weight:600; letter-spacing:0.05em; cursor:pointer; transition:color 0.15s,border-color 0.15s,background 0.15s; font-family:inherit; white-space:nowrap; }
+  .tab-btn:hover { color:rgba(255,255,255,0.85); background:rgba(255,255,255,0.06); }
+  .tab-btn.active { color:white; border-bottom-color:#5B9BD5; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+  .page-wrapper { max-width:1020px; margin:0 auto; padding:36px 24px 72px; }
+  .memo-header { background:white; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); overflow:hidden; margin-bottom:32px; border:1px solid var(--border); }
+  .memo-header-title { background:var(--navy-mid); color:white; padding:18px 32px; font-size:0.72rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; display:flex; align-items:center; gap:10px; }
+  .memo-header-title::before { content:''; display:block; width:3px; height:18px; background:#5B9BD5; border-radius:2px; flex-shrink:0; }
+  .memo-grid { display:grid; grid-template-columns:140px 1fr; border-bottom:1px solid var(--gray-200); }
+  .memo-grid:last-of-type { border-bottom:none; }
+  .memo-label { background:var(--gray-50); padding:13px 20px 13px 32px; font-size:0.72rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--gray-600); border-right:1px solid var(--gray-200); display:flex; align-items:center; }
+  .memo-value { padding:13px 20px 13px 24px; font-size:0.88rem; color:var(--text); display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+  .memo-value strong { color:var(--navy); }
+  .classification-badge { display:inline-flex; align-items:center; gap:5px; background:var(--navy); color:white; font-size:0.67rem; font-weight:700; letter-spacing:0.09em; text-transform:uppercase; padding:3px 10px; border-radius:2px; }
+  .toc-card { background:white; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:32px; }
+  .toc-header { background:var(--gray-50); border-bottom:1px solid var(--border); padding:14px 28px; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--navy-mid); display:flex; align-items:center; gap:8px; }
+  .toc-list { padding:16px 28px 20px; list-style:none; columns:2; column-gap:32px; }
+  .toc-list li { padding:4px 0; break-inside:avoid; }
+  .toc-list a { text-decoration:none; color:var(--blue); font-size:0.84rem; font-weight:500; display:flex; align-items:baseline; gap:8px; transition:color 0.15s; }
+  .toc-list a:hover { color:var(--navy); }
+  .toc-num { font-size:0.7rem; font-weight:700; color:var(--gray-400); min-width:22px; flex-shrink:0; }
+  .section { background:white; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:28px; }
+  .section-header { background:var(--navy); color:white; padding:18px 32px; display:flex; align-items:center; gap:14px; }
+  .section-num { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.9); font-size:0.68rem; font-weight:800; letter-spacing:0.08em; padding:3px 9px; border-radius:2px; flex-shrink:0; }
+  .section-title { font-size:0.96rem; font-weight:700; letter-spacing:0.01em; line-height:1.3; }
+  .section-body { padding:28px 32px 32px; }
+  .subsection { margin-bottom:30px; }
+  .subsection:last-child { margin-bottom:0; }
+  .subsection-title { font-size:0.92rem; font-weight:700; color:var(--navy-mid); margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--blue-light); display:flex; align-items:center; gap:10px; }
+  .subsection-title .sub-label { font-size:0.67rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:white; background:var(--navy-light); padding:2px 8px; border-radius:2px; }
+  p { font-size:0.88rem; color:var(--gray-800); margin-bottom:12px; line-height:1.75; }
+  p:last-child { margin-bottom:0; }
+  strong { color:var(--text); font-weight:700; }
+  em { color:var(--gray-600); font-style:italic; }
+  ul,ol { margin:10px 0 14px 20px; font-size:0.88rem; color:var(--gray-800); line-height:1.7; }
+  li { margin-bottom:5px; }
+  li:last-child { margin-bottom:0; }
+  ol { margin-left:22px; }
+  ol li { padding-left:4px; }
+  sup { font-size:0.7em; color:var(--blue); font-weight:700; vertical-align:super; line-height:0; }
+  .callout { border-radius:var(--radius); padding:14px 18px; margin:16px 0; font-size:0.85rem; line-height:1.7; border-left:4px solid; display:flex; gap:12px; }
+  .callout-icon { font-size:1rem; flex-shrink:0; margin-top:1px; }
+  .callout-content { flex:1; }
+  .callout-content p { font-size:0.85rem; margin-bottom:0; }
+  .callout-label { font-size:0.67rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:5px; display:block; }
+  .callout-plain { background:var(--teal-light); border-color:var(--teal); }
+  .callout-plain .callout-label { color:var(--teal); }
+  .callout-gap { background:var(--red-light); border-color:var(--red); }
+  .callout-gap .callout-label { color:var(--red); }
+  .callout-note { background:var(--blue-light); border-color:var(--blue); }
+  .callout-note .callout-label { color:var(--blue); }
+  .callout-warn { background:var(--gold-light); border-color:var(--gold); }
+  .callout-warn .callout-label { color:var(--gold); }
+  .badge { display:inline-flex; align-items:center; gap:5px; font-size:0.7rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; padding:4px 10px; border-radius:3px; vertical-align:middle; }
+  .badge-high { background:var(--green-light); color:var(--green); border:1px solid #A8D9BC; }
+  .badge-mod-high { background:#E8F5EE; color:#1A5C35; border:1px solid #B0D8C0; }
+  .badge-mod { background:var(--gold-light); color:var(--gold); border:1px solid #E0C87A; }
+  .badge-low-mod { background:var(--orange-light); color:var(--orange); border:1px solid #F0C0A0; }
+  .badge-low { background:var(--red-light); color:var(--red); border:1px solid #E0A0B0; }
+  .badge-add-proc { background:#EEF2FF; color:#3730A3; border:1px solid #C7D2FE; }
+  .badge-eval { background:#F5F0FF; color:#6D28D9; border:1px solid #DDD6FE; }
+  .badge-partial { background:#FFF7F0; color:#C2460A; border:1px solid #FECBA1; }
+  .assess-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  .assess-label { font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray-600); }
+  .table-wrap { overflow-x:auto; margin:16px 0; border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+  table { width:100%; border-collapse:collapse; font-size:0.84rem; }
+  thead tr { background:var(--navy); color:white; }
+  thead th { padding:11px 16px; text-align:left; font-size:0.7rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; white-space:nowrap; }
+  tbody tr { border-bottom:1px solid var(--gray-200); }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:nth-child(even) { background:var(--gray-50); }
+  tbody tr:hover { background:var(--blue-light); transition:background 0.15s; }
+  td { padding:11px 16px; vertical-align:top; color:var(--gray-800); line-height:1.6; }
+  td:first-child { font-weight:600; color:var(--navy); }
+  .proc-list { list-style:none; margin:0; padding:0; }
+  .proc-item { display:flex; gap:14px; padding:14px 16px; border-radius:var(--radius); border:1px solid var(--border); margin-bottom:10px; background:white; transition:box-shadow 0.15s; }
+  .proc-item:hover { box-shadow:var(--shadow-sm); }
+  .proc-num { width:26px; height:26px; background:var(--navy); color:white; border-radius:50%; font-size:0.72rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .proc-body { flex:1; }
+  .proc-title { font-size:0.88rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .proc-desc { font-size:0.83rem; color:var(--gray-800); line-height:1.65; margin:0; }
+  .proc-group-label { font-size:0.7rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:white; background:var(--navy-light); display:inline-block; padding:4px 12px; border-radius:2px; margin:18px 0 10px; }
+  .proc-group-label:first-of-type { margin-top:0; }
+  .takeaway-list { list-style:none; margin:0; padding:0; }
+  .takeaway-item { display:flex; gap:14px; padding:14px 16px; border-radius:var(--radius); background:var(--blue-light); border:1px solid #C5D8F5; margin-bottom:8px; font-size:0.87rem; color:var(--gray-800); line-height:1.65; align-items:flex-start; }
+  .takeaway-icon { color:var(--blue); font-size:1rem; flex-shrink:0; margin-top:1px; }
+  .next-step-list { list-style:none; margin:0; padding:0; }
+  .next-step-item { display:flex; gap:14px; padding:14px 16px; border-radius:var(--radius); background:var(--green-light); border:1px solid #B8DBCA; margin-bottom:8px; font-size:0.87rem; color:var(--gray-800); line-height:1.65; align-items:flex-start; }
+  .next-step-num { width:24px; height:24px; background:var(--green); color:white; border-radius:50%; font-size:0.7rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .gap-list { list-style:none; margin:0; padding:0; }
+  .gap-item { display:flex; gap:12px; padding:12px 16px; border-radius:var(--radius); background:var(--orange-light); border:1px solid #F5C8A8; margin-bottom:8px; font-size:0.86rem; color:var(--gray-800); line-height:1.65; align-items:flex-start; }
+  .gap-icon { color:var(--orange); font-size:0.9rem; flex-shrink:0; margin-top:2px; }
+  .source-group { margin-bottom:20px; }
+  .source-group:last-child { margin-bottom:0; }
+  .source-group-title { font-size:0.72rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--navy); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--gray-200); }
+  .source-list { list-style:none; margin:0; padding:0; }
+  .source-item { padding:8px 12px; border-radius:var(--radius); border:1px solid var(--border); margin-bottom:6px; background:var(--gray-50); font-size:0.83rem; }
+  .source-item .source-num { color:var(--navy); font-weight:700; margin-right:6px; }
+  .source-item .source-title { color:var(--navy); font-weight:600; display:inline; }
+  .source-item .source-desc { color:var(--gray-600); font-size:0.78rem; display:block; margin-top:2px; }
+  .sig-block { background:white; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:28px; }
+  .sig-header { background:var(--gray-50); border-bottom:1px solid var(--border); padding:12px 28px; font-size:0.7rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray-600); }
+  .sig-body { padding:24px 28px; display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .sig-field label { display:block; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray-600); margin-bottom:8px; }
+  .sig-line { border-bottom:1.5px solid var(--gray-400); height:32px; width:100%; }
+  .sig-note { font-size:0.72rem; color:var(--gray-400); margin-top:4px; }
+  .doc-footer { background:var(--navy); color:rgba(255,255,255,0.5); padding:20px 56px; display:flex; justify-content:space-between; align-items:center; gap:20px; font-size:0.72rem; letter-spacing:0.03em; }
+  hr { border:none; border-top:1px solid var(--gray-200); margin:20px 0; }
+  code { font-family:'SFMono-Regular',Consolas,monospace; font-size:0.82em; background:var(--gray-100); border:1px solid var(--gray-200); color:var(--navy); padding:1px 5px; border-radius:3px; }
+  .section-anchor { scroll-margin-top:16px; }
+  @media print { body { background:white; } .brand-bar { display:none; } .firm-header,.section-header { background:#0E1F3D !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; } .section,.memo-header,.toc-card,.sig-block { box-shadow:none; break-inside:avoid; } .page-wrapper { padding:0; max-width:100%; } }
+  @media (max-width:700px) { .firm-header { padding:20px; flex-direction:column; align-items:flex-start; } .page-wrapper { padding:20px 12px 48px; } .section-body { padding:20px 18px 24px; } .toc-list { columns:1; } .sig-body { grid-template-columns:1fr; } .doc-footer { flex-direction:column; padding:18px 20px; text-align:center; } .tab-nav { padding:0 16px; } }
+</style>
+</head>
+<body>
+
+<div class="brand-bar"></div>
+
+<header class="firm-header">
+  <div class="firm-logo">
+    <div class="firm-logo-mark">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <rect x="2" y="2" width="10" height="10" fill="#0E1F3D"/>
+        <rect x="14" y="2" width="10" height="10" fill="#0057A8"/>
+        <rect x="2" y="14" width="10" height="10" fill="#0057A8"/>
+        <rect x="14" y="14" width="10" height="10" fill="#0E1F3D" opacity="0.5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="firm-name">Audit &amp; Assurance Practice</div>
+      <div class="firm-tagline">Professional Standards &amp; Technical Research</div>
+    </div>
+  </div>
+  <div class="firm-header-right">
+    <div class="doc-type-badge">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M3 5h4M3 3h4M3 7h2" stroke="currentColor" stroke-width="1"/></svg>
+      Audit Workpaper — Technical Memo
+    </div>
+    <div class="doc-ref">Ref: AWP-TECH-2026-05 &nbsp;|&nbsp; Rev 1.0 &nbsp;|&nbsp; April 27, 2026</div>
+  </div>
+</header>
+
+<div class="confidential-bar">
+  Confidential &mdash; For Authorized Engagement Team Use Only &mdash; Do Not Distribute
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="tab1">&#128214;&nbsp; Tab 1 &mdash; Protocol Overview</button>
+  <button class="tab-btn" data-tab="tab2">&#128269;&nbsp; Tab 2 &mdash; Reliability &amp; Risk Assessment</button>
+</div>
+
+<!-- ═══════════════════════════════ TAB 1 ═══════════════════════════════ -->
+<div id="tab1" class="tab-panel active">
+<div class="page-wrapper">
+
+  <div class="memo-header">
+    <div class="memo-header-title">Memorandum — Protocol Overview</div>
+    <div class="memo-grid"><div class="memo-label">To</div><div class="memo-value">Audit Engagement File &nbsp;/&nbsp; Engagement Team</div></div>
+    <div class="memo-grid"><div class="memo-label">From</div><div class="memo-value">Digital Asset Practice Group &mdash; Audit &amp; Assurance</div></div>
+    <div class="memo-grid"><div class="memo-label">Date</div><div class="memo-value">April 27, 2026</div></div>
+    <div class="memo-grid"><div class="memo-label">Re</div><div class="memo-value"><strong>The Open Network (TON): Protocol Overview for CPA &amp; Audit Practitioners</strong></div></div>
+    <div class="memo-grid"><div class="memo-label">Classification</div><div class="memo-value"><span class="classification-badge">&#x1F4DA; Research &amp; Intelligence — Intermediate Level</span></div></div>
+  </div>
+
+  <div class="toc-card">
+    <div class="toc-header">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h6" stroke="#1A3461" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Table of Contents — Tab 1
+    </div>
+    <ul class="toc-list">
+      <li><a href="#t1-1"><span class="toc-num">I.</span> What Is The Open Network (TON)?</a></li>
+      <li><a href="#t1-2"><span class="toc-num">II.</span> History: From Telegram to Community Chain</a></li>
+      <li><a href="#t1-3"><span class="toc-num">III.</span> Architecture: Masterchain, Workchains &amp; Shards</a></li>
+      <li><a href="#t1-4"><span class="toc-num">IV.</span> Consensus, Performance &amp; Toncoin</a></li>
+      <li><a href="#t1-5"><span class="toc-num">V.</span> TON in Practice: Telegram &amp; Cocoon</a></li>
+      <li><a href="#t1-6"><span class="toc-num">VI.</span> On-Chain vs. Off-Chain Activity</a></li>
+      <li><a href="#t1-7"><span class="toc-num">VII.</span> Institutional Profile &amp; ASC 350-60</a></li>
+      <li><a href="#t1-8"><span class="toc-num">VIII.</span> Bibliography</a></li>
+    </ul>
+  </div>
+
+  <!-- T1-1 -->
+  <div id="t1-1" class="section section-anchor">
+    <div class="section-header"><span class="section-num">I</span><span class="section-title">What Is The Open Network (TON)?</span></div>
+    <div class="section-body">
+      <p>The Open Network (TON) is a Layer 1 blockchain designed for massive scale — its architecture is explicitly built to support hundreds of thousands of transactions per second (TPS) through an infinite sharding paradigm, where the network can dynamically split into parallel processing units as demand grows.<sup>1</sup> TON uses Proof of Stake (PoS) consensus and its native token is <strong>Toncoin (TON)</strong>.</p>
+      <p>What makes TON strategically distinctive from virtually every other blockchain is its exclusive integration with <strong>Telegram</strong> — the messaging platform with over 900 million active users worldwide. Since January 2025, TON became the exclusive blockchain for all Telegram Mini Apps (TMAs), giving it distribution at a scale that most blockchain ecosystems take years to reach organically.<sup>2</sup></p>
+
+      <div class="callout callout-plain">
+        <span class="callout-icon">&#x2713;</span>
+        <div class="callout-content">
+          <span class="callout-label">CPA Frame of Reference</span>
+          <p>Imagine Visa's payment network — but instead of being built by a bank consortium, it was built by the company that owns the messaging platform that half the world uses for daily communication. That is TON's strategic position: infrastructure designed from the ground up for massive throughput, now exclusively wired into Telegram's billion-user distribution channel. The audit implication is that Toncoin has a uniquely observable demand driver — Telegram Mini App transaction volume — that most cryptocurrencies lack.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1-2 -->
+  <div id="t1-2" class="section section-anchor">
+    <div class="section-header"><span class="section-num">II</span><span class="section-title">History: From Telegram to Community Chain</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Origin</span>Telegram's Blockchain Project (2018–2020)</div>
+        <p>TON was originally conceived and built by Nikolai Durov (Telegram co-founder and technical lead) and his team as "Telegram Open Network" beginning in 2018.<sup>3</sup> Telegram raised approximately $1.7 billion in an initial coin offering (ICO) in 2018 from accredited investors — at the time one of the largest ICOs in history. The token was called "GRAM."</p>
+        <p>In October 2019, the U.S. Securities and Exchange Commission (SEC) filed an emergency action against Telegram, alleging that the GRAM ICO was an unregistered securities offering. In June 2020, Telegram reached a settlement with the SEC, paid an $18.5 million penalty, returned approximately $1.2 billion to investors, and <strong>abandoned the project entirely</strong>.<sup>4</sup></p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Rebirth</span>Open-Source Community Continuation (2020–Present)</div>
+        <p>After Telegram's withdrawal, an open-source community called the "TON Foundation" adopted the codebase and relaunched the network independently. The GRAM token was renamed <strong>Toncoin (TON)</strong>, and the blockchain relaunched without Telegram's direct involvement or ownership. Critically, Telegram later re-engaged with the TON ecosystem on a commercial basis — endorsing TON as Telegram's official blockchain for payment and Mini App infrastructure — without having formal ownership or control of the TON protocol itself.<sup>5</sup></p>
+
+        <div class="callout callout-note">
+          <span class="callout-icon">&#x2139;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">Important Governance Distinction</span>
+            <p>Telegram does not own or control the TON blockchain. The TON Foundation (an independent open-source organization) governs the protocol. Telegram's relationship with TON is a commercial partnership — Telegram chose TON as its exclusive blockchain for Mini Apps, but it cannot alter TON's protocol parameters, validator set, or token supply unilaterally. This distinction is important for risk assessments: Telegram-specific regulatory actions would affect TON's distribution channel but not its underlying protocol integrity.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-3 -->
+  <div id="t1-3" class="section section-anchor">
+    <div class="section-header"><span class="section-num">III</span><span class="section-title">Architecture: Masterchain, Workchains &amp; Shardchains</span></div>
+    <div class="section-body">
+      <p>TON's architecture is among the most technically ambitious in blockchain design. Understanding it at a high level is important for auditors because it determines both the capabilities and the evidence-gathering complexity of the network.<sup>6</sup></p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Structure</span>Three-Level Hierarchy</div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Chain Level</th><th>Function</th><th>Quantity</th><th>Accounting Analogy</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Masterchain</td>
+                <td>Global state coordination; records validator set, protocol parameters, and cryptographic hashes of all workchain states</td>
+                <td>One (1)</td>
+                <td>The general ledger — the authoritative record that other ledgers (workchains) report into</td>
+              </tr>
+              <tr>
+                <td>Workchains</td>
+                <td>Independent blockchains that operate in parallel; each can have custom rules (e.g., different VM, smart contract language, asset types)</td>
+                <td>Up to 2<sup>32</sup> theoretically; currently one primary workchain (Workchain 0)</td>
+                <td>Subsidiary ledgers — separate books of record that feed into the masterchain general ledger</td>
+              </tr>
+              <tr>
+                <td>Shardchains</td>
+                <td>Sub-divisions of workchains that process transactions for a subset of accounts in parallel; shards split and merge dynamically based on load</td>
+                <td>Up to 2<sup>60</sup> per workchain theoretically</td>
+                <td>Departmental sub-ledgers — each handles a subset of transactions, periodically reconciling to the workchain</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Key Concept</span>Dynamic Sharding vs. Fixed Sharding</div>
+        <p>Most blockchain sharding implementations (including Ethereum's planned approach) use a fixed number of shards. TON uses <strong>dynamic sharding</strong>: shardchains automatically split when a shard becomes overloaded and merge when traffic drops. This means TON theoretically has no hard upper bound on processing capacity — capacity scales with network demand.<sup>7</sup></p>
+        <p>For auditors: dynamic sharding means that the "database" being audited does not have a fixed structure. A complete audit trail of all transactions requires querying potentially multiple shardchains that may have existed at different points in time. This adds complexity relative to single-chain networks like Ethereum.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-4 -->
+  <div id="t1-4" class="section section-anchor">
+    <div class="section-header"><span class="section-num">IV</span><span class="section-title">Consensus, Performance &amp; Toncoin</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Consensus</span>Byzantine Fault Tolerant Proof of Stake</div>
+        <p>TON uses a variant of Proof of Stake consensus with Byzantine Fault Tolerance (BFT). Validators are selected based on their Toncoin stake and must reach a supermajority agreement (2/3+) to finalize blocks. Block finality is near-instant — approximately 5 seconds — which is significantly faster than Ethereum's ~12-second slot time.<sup>8</sup></p>
+        <p>The validator set is currently approximately 300 active validators, a relatively small set for a major public blockchain. Validator participation requires a minimum stake of 300,000 Toncoin and a stake deposit in the ElectorSC (Elector Smart Contract), TON's built-in validator management system.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Performance</span>Throughput Claims</div>
+        <p>TON has demonstrated over <strong>100,000 TPS</strong> in controlled test conditions.<sup>9</sup> For context: Visa's network processes approximately 24,000 TPS at peak; Ethereum processes approximately 15–30 TPS. The 100,000 TPS figure is achieved through parallel shardchain processing and should be understood as a theoretical maximum under optimized conditions, not necessarily real-world sustained throughput during stress events.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Toncoin</span>Token Characteristics for Financial Reporting</div>
+        <p>Toncoin (TON) is the native token of The Open Network, used for gas fees, validator staking, and as a payment medium within the Telegram ecosystem.<sup>10</sup> Key characteristics relevant to FASB ASC 350-60:</p>
+        <ul>
+          <li>Freely transferable ERC-20 equivalent (using TON's FunC language contracts); listed on major centralized exchanges (Binance, OKX, Bybit, KuCoin)</li>
+          <li>Observable market price — clear Level 1 fair value input per ASC 820</li>
+          <li>Maximum supply: 5 billion TON; approximately 3.4 billion in circulation as of April 2026</li>
+          <li>Inflationary: validator staking rewards are minted as new Toncoin annually; deflationary pressure comes from gas fee burning</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-5 -->
+  <div id="t1-5" class="section section-anchor">
+    <div class="section-header"><span class="section-num">V</span><span class="section-title">TON in Practice: Telegram Integration &amp; Cocoon</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Milestone</span>Telegram Mini Apps — January 2025</div>
+        <p>In January 2025, Telegram announced that TON would become the <strong>exclusive blockchain</strong> for all Telegram Mini Apps (TMAs).<sup>11</sup> Mini Apps are lightweight web applications that run natively inside the Telegram client — games, exchanges, payment processors, social platforms — and can process Toncoin payments directly within the chat interface. This created an unprecedented blockchain distribution scenario: ~900 million Telegram users became potential TON users through their existing app.</p>
+        <p>The financial reporting implication is significant: many businesses now accept Toncoin as payment through Telegram Mini Apps. These transactions are on-chain and generate Toncoin inflows that require recognition and measurement under ASC 350-60. The volume of such transactions may be auditable by querying the TON blockchain directly.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Ecosystem</span>Cocoon: Decentralized AI Compute — December 2025</div>
+        <p>In December 2025, the Cocoon project launched on TON mainnet.<sup>12</sup> Cocoon (Confidential Compute Open Network) is a decentralized GPU computing marketplace built on TON — GPU owners contribute compute capacity, and buyers (AI workloads, model training) pay in Toncoin. Computing is performed inside <strong>Trusted Execution Environments (TEEs)</strong> — hardware-level secure enclaves that prevent the compute operator from accessing the data being processed, preserving confidentiality.</p>
+
+        <div class="callout callout-note">
+          <span class="callout-icon">&#x2139;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">Accounting Note — Cocoon Revenue Recognition</span>
+            <p>For entities that earn Toncoin by providing GPU capacity to Cocoon, each compute job completed represents a revenue event — Toncoin received in exchange for a service. The entity must determine: (1) whether the service has been performed (compute job completed per TEE attestation); (2) the Toncoin fair value at the time of service completion per ASC 350-60; (3) whether the Toncoin is immediately sold or held as a crypto asset. Each of these steps requires audit evidence from both on-chain data and operational records.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-6 -->
+  <div id="t1-6" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VI</span><span class="section-title">On-Chain vs. Off-Chain Activity</span></div>
+    <div class="section-body">
+      <p>TON's multi-chain architecture creates more complex on-chain evidence requirements than single-chain networks. Auditors must understand which chain level records the relevant transaction data.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Activity Type</th><th>Chain Level</th><th>Independently Verifiable?</th><th>Evidence Source</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Toncoin transfers between wallets</td><td>Workchain 0</td><td>Yes</td><td>tonscan.org, tonviewer.com block explorers</td></tr>
+            <tr><td>Smart contract execution (Mini App payments)</td><td>Workchain 0 / Shardchains</td><td>Yes — with shardchain indexing</td><td>Requires indexing API (e.g., TON Center API) — not just a simple explorer query</td></tr>
+            <tr><td>Validator election and staking events</td><td>Masterchain</td><td>Yes</td><td>Masterchain block explorer; ElectorSC contract queries</td></tr>
+            <tr><td>Cocoon compute job completion</td><td>Workchain + TEE Attestation</td><td>Partially — on-chain payment confirmed; off-chain TEE attestation confirms job completion</td><td>Dual: TON blockchain for payment + TEE attestation document for service delivery</td></tr>
+            <tr><td>Telegram Mini App revenue splits</td><td>Off-chain + on-chain</td><td>Partially — Toncoin transfer on-chain; revenue allocation logic off-chain</td><td>Smart contract code review + management disclosure of revenue-sharing terms</td></tr>
+            <tr><td>TON Foundation governance decisions</td><td>Off-chain (governance forum)</td><td>No — forum posts and voting not fully on-chain</td><td>TON governance forum (gov.ton.org), management inquiry</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+        <div class="callout-content">
+          <span class="callout-label">Shardchain Evidence Complexity</span>
+          <p>Unlike Ethereum where all transactions are on a single chain, TON transactions may be processed across multiple shardchains that existed at different points in time. A complete transaction history may require querying multiple shardchain states. Standard block explorers may not provide complete coverage — auditors handling material TON balances should confirm evidence completeness by cross-referencing the masterchain's cryptographic commitments to workchain/shardchain state roots.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T1-7 -->
+  <div id="t1-7" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VII</span><span class="section-title">Institutional Profile &amp; ASC 350-60 Considerations</span></div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Profile</span>Network Scale &amp; Market Standing</div>
+        <p>As of April 2026, Toncoin consistently ranks in the top 10 cryptocurrencies by market capitalization, reflecting its unique distribution advantage through Telegram.<sup>13</sup> The TON Foundation maintains significant treasury holdings of Toncoin, and validator staking is sufficiently distributed to avoid single-entity dominance. The network has operated without a major security incident since its community relaunch in 2020.</p>
+        <p>The SEC's 2020 action was against Telegram's GRAM token offering, not against the TON blockchain protocol or the community-relaunched Toncoin. Toncoin is a distinct token issued by a different entity under different circumstances. However, auditors should note the historical regulatory context when assessing residual regulatory risk.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Accounting</span>FASB ASC 350-60 Application</div>
+        <p>Toncoin's accounting treatment under FASB ASC 350-60 (effective fiscal years beginning after December 15, 2024) is relatively straightforward compared to some other digital assets:<sup>14</sup></p>
+        <ul>
+          <li><strong>Classification:</strong> Toncoin is an in-scope crypto asset — fungible, not a security under current U.S. law, and does not provide the holder with rights to goods or services from the issuer</li>
+          <li><strong>Measurement:</strong> Fair value through net income; Level 1 observable price from major exchanges (Binance, OKX)</li>
+          <li><strong>Disclosure:</strong> Entities must disclose Toncoin holdings, cost basis, fair value gains/losses recognized in income, and the exchange price source used</li>
+          <li><strong>Staking rewards:</strong> New Toncoin earned through validator staking is recognized as income at fair value on the date received; subsequently measured under ASC 350-60</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- T1-8: Bibliography -->
+  <div id="t1-8" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VIII</span><span class="section-title">Bibliography</span></div>
+    <div class="section-body">
+
+      <div class="source-group">
+        <div class="source-group-title">Primary Sources</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">1.</span> <span class="source-title">TON Foundation. "TON Whitepaper." Nikolai Durov, TON Foundation. 2019/2021 (community edition).</span><span class="source-desc">ton.org. The original technical specification for TON's infinite sharding architecture, masterchain structure, and BFT consensus mechanism.</span></li>
+          <li class="source-item"><span class="source-num">2.</span> <span class="source-title">TON Foundation. "TON Developer Documentation." docs.ton.org. Accessed April 2026.</span><span class="source-desc">Comprehensive developer reference covering smart contracts (FunC language), workchain structure, and block explorer APIs.</span></li>
+          <li class="source-item"><span class="source-num">3.</span> <span class="source-title">TON Foundation. "Cocoon — Confidential Compute Open Network Launch Announcement." blog.ton.org. December 2025.</span><span class="source-desc">Official announcement of Cocoon's TON mainnet launch, detailing TEE architecture and Toncoin payment mechanics for GPU compute.</span></li>
+          <li class="source-item"><span class="source-num">4.</span> <span class="source-title">Telegram. "Telegram Mini Apps — TON Integration Announcement." blog.telegram.org. January 2025.</span><span class="source-desc">Official Telegram announcement designating TON as the exclusive blockchain for all Telegram Mini App payment infrastructure.</span></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Regulatory &amp; Professional Standards</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">5.</span> <span class="source-title">SEC. "Litigation Release No. 24844: SEC v. Telegram Group Inc. and TON Issuer Inc." U.S. Securities and Exchange Commission. October 2019.</span><span class="source-desc">Original SEC emergency action against Telegram's GRAM ICO; context for understanding TON's regulatory history and the distinction between Telegram and community-issued Toncoin.</span></li>
+          <li class="source-item"><span class="source-num">6.</span> <span class="source-title">SEC. "SEC Settlement with Telegram Group." U.S. Securities and Exchange Commission. June 2020.</span><span class="source-desc">Final settlement requiring Telegram to pay $18.5M, return ~$1.2B to investors, and abandon the GRAM token project.</span></li>
+          <li class="source-item"><span class="source-num">7.</span> <span class="source-title">FASB. "ASU 2023-08 / ASC 350-60, Crypto Assets." FASB, effective fiscal years beginning after December 15, 2024.</span><span class="source-desc">Governing accounting standard for Toncoin measurement and disclosure — fair value through net income for in-scope crypto assets.</span></li>
+          <li class="source-item"><span class="source-num">8.</span> <span class="source-title">PCAOB. "AS 1105, Audit Evidence." PCAOB, as amended effective December 15, 2025.</span><span class="source-desc">Paragraph .10A: framework for treating independently retrieved blockchain data as audit evidence; relevant to TON multi-chain queries.</span></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Industry Research</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">9.</span> <span class="source-title">Messari. "TON Research Report — Network Overview and Ecosystem Analysis." messari.io. 2025.</span><span class="source-desc">Comprehensive third-party research on TON's technical architecture, token distribution, validator economics, and competitive positioning.</span></li>
+          <li class="source-item"><span class="source-num">10.</span> <span class="source-title">BlockchainX. "TON Technical Deep Dive: Sharding Architecture and Performance." blockchainx.tech. 2025.</span><span class="source-desc">Technical analysis of TON's infinite sharding model and practical performance benchmarks versus Ethereum and Solana.</span></li>
+          <li class="source-item"><span class="source-num">11.</span> <span class="source-title">metalamp.io. "Building on TON: A Developer's Perspective." 2025.</span><span class="source-desc">Developer-oriented analysis of TON's FunC smart contract language, cell-based data structure, and Mini App SDK integration points.</span></li>
+        </ul>
+      </div>
+
+      <div class="source-group">
+        <div class="source-group-title">Market &amp; News Data</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">12.</span> <span class="source-title">CoinMarketCap. "Toncoin (TON) — Price, Market Cap, Supply Data." coinmarketcap.com. Accessed April 2026.</span><span class="source-desc">Reference market data for Toncoin ASC 350-60 fair value determination; identifies exchange price sources and trading volume.</span></li>
+          <li class="source-item"><span class="source-num">13.</span> <span class="source-title">Phemex. "What Is TON? The Open Network Explained." phemex.com. 2025.</span><span class="source-desc">Market-oriented summary of TON's history, tokenomics, and Telegram integration for practitioners new to the protocol.</span></li>
+          <li class="source-item"><span class="source-num">14.</span> <span class="source-title">99Bitcoins. "TON Blockchain Review: Architecture, Consensus, and Ecosystem." 99bitcoins.com. 2025.</span><span class="source-desc">Accessible technical overview of TON consensus mechanics, validator economics, and block finality characteristics.</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /.page-wrapper tab1 -->
+</div><!-- /#tab1 -->
+
+<!-- ═══════════════════════════════ TAB 2 ═══════════════════════════════ -->
+<div id="tab2" class="tab-panel">
+<div class="page-wrapper">
+
+  <div class="memo-header">
+    <div class="memo-header-title">Memorandum — Reliability &amp; Risk Assessment</div>
+    <div class="memo-grid"><div class="memo-label">To</div><div class="memo-value">Audit Engagement File &nbsp;/&nbsp; Engagement Team</div></div>
+    <div class="memo-grid"><div class="memo-label">From</div><div class="memo-value">Digital Asset Practice Group &mdash; Audit &amp; Assurance</div></div>
+    <div class="memo-grid"><div class="memo-label">Date</div><div class="memo-value">April 27, 2026</div></div>
+    <div class="memo-grid"><div class="memo-label">Re</div><div class="memo-value"><strong>The Open Network (TON): Reliability &amp; Risk Assessment for Audit Purposes</strong></div></div>
+    <div class="memo-grid"><div class="memo-label">Classification</div><div class="memo-value"><span class="classification-badge">&#x1F512; Workpaper Documentation &mdash; Professional Judgment</span></div></div>
+  </div>
+
+  <div class="toc-card">
+    <div class="toc-header">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h6" stroke="#1A3461" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Table of Contents — Tab 2
+    </div>
+    <ul class="toc-list">
+      <li><a href="#sec-1"><span class="toc-num">I.</span> Purpose of This Memorandum</a></li>
+      <li><a href="#sec-2"><span class="toc-num">II.</span> Background &amp; Scope</a></li>
+      <li><a href="#sec-3"><span class="toc-num">III.</span> Data Integrity &amp; Multi-Chain Evidence</a></li>
+      <li><a href="#sec-4"><span class="toc-num">IV.</span> Consensus Mechanism &amp; Governance</a></li>
+      <li><a href="#sec-5"><span class="toc-num">V.</span> Telegram Dependency &amp; Ecosystem Risk</a></li>
+      <li><a href="#sec-6"><span class="toc-num">VI.</span> Token Classification &amp; Financial Reporting</a></li>
+      <li><a href="#sec-7"><span class="toc-num">VII.</span> Gaps &amp; Limitations</a></li>
+      <li><a href="#sec-8"><span class="toc-num">VIII.</span> Recommended Audit Procedures</a></li>
+      <li><a href="#sec-9"><span class="toc-num">IX.</span> Key Takeaways</a></li>
+      <li><a href="#sec-10"><span class="toc-num">X.</span> Sources &amp; References</a></li>
+    </ul>
+  </div>
+
+  <!-- SEC-1 -->
+  <div id="sec-1" class="section section-anchor">
+    <div class="section-header"><span class="section-num">I</span><span class="section-title">Purpose of This Memorandum</span></div>
+    <div class="section-body">
+      <p>This memorandum evaluates the reliability and audit risk profile of The Open Network (TON) blockchain and Toncoin for audit and assurance purposes. It assists engagement teams in assessing whether Toncoin balances, transaction histories, and staking income are supported by sufficient appropriate audit evidence, and evaluates key structural risks including TON's multi-chain architecture, Telegram concentration risk, and regulatory history.</p>
+      <div class="callout callout-plain">
+        <span class="callout-icon">&#x2713;</span>
+        <div class="callout-content">
+          <span class="callout-label">Bottom Line Up Front</span>
+          <p>TON's underlying blockchain infrastructure is technically mature and its Toncoin has clear Level 1 observable market prices — making it one of the more straightforward digital assets for ASC 350-60 measurement. The primary audit risks are: (1) multi-chain evidence complexity requiring indexing APIs rather than simple block explorer queries; (2) concentration risk from Telegram's exclusive distribution relationship; and (3) residual regulatory history from the 2020 SEC action (against Telegram's GRAM, not community Toncoin).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-2 -->
+  <div id="sec-2" class="section section-anchor">
+    <div class="section-header"><span class="section-num">II</span><span class="section-title">Background &amp; Scope</span></div>
+    <div class="section-body">
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Background</span>Protocol Overview</div>
+        <p>The Open Network (TON) is a Layer 1 PoS blockchain originally designed by Telegram co-founder Nikolai Durov, abandoned by Telegram following a 2020 SEC settlement, and continued independently by the TON Foundation open-source community. Toncoin is the native token. In January 2025, Telegram designated TON as the exclusive blockchain for its Mini App ecosystem, creating a direct link between TON transactions and Telegram's ~900M user base. In December 2025, Cocoon launched on TON mainnet as a decentralized AI compute network backed by Toncoin payments.</p>
+      </div>
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Scope</span>Scope of This Analysis</div>
+        <p>This assessment covers: (a) on-chain data integrity and multi-chain evidence considerations; (b) consensus mechanism reliability; (c) Telegram dependency and ecosystem concentration risks; (d) Toncoin classification under FASB ASC 350-60; (e) identified documentation and evidence gaps. Market risk, price volatility, and non-U.S. regulatory compliance are excluded from scope.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-3 -->
+  <div id="sec-3" class="section section-anchor">
+    <div class="section-header"><span class="section-num">III</span><span class="section-title">Data Integrity &amp; Multi-Chain Evidence</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-mod">&#x25CF; Moderate — Complexity Elevated by Architecture</span>
+      </div>
+      <p>TON's on-chain data is immutable and verifiable — the masterchain provides cryptographic commitments to all workchain and shardchain states, creating a provably complete root of trust. However, TON's infinite sharding architecture means that a complete transaction history may be distributed across multiple shardchains, requiring more sophisticated evidence-gathering than single-chain networks.</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Positive</span>Reliability Indicators</div>
+        <ul>
+          <li>Masterchain provides cryptographic (hash-based) commitments to all workchain states — the master record is tamper-evident</li>
+          <li>BFT consensus provides near-instant block finality (~5 seconds); no probabilistic settlement risk</li>
+          <li>Multiple independent block explorers operate (tonscan.org, tonviewer.com) providing redundant verification sources</li>
+          <li>TON Center API provides programmatic access to full transaction history across shardchains</li>
+          <li>Network has operated since 2020 community launch without a protocol-level security failure</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Risk Factors</span>Evidence Gathering Complexity</div>
+        <ul>
+          <li><strong>Shardchain evidence fragmentation:</strong> Transactions involving smart contracts may be split across multiple shardchains; standard block explorer confirmation of a wallet balance does not necessarily capture all associated smart contract interactions</li>
+          <li><strong>FunC smart contract language:</strong> TON uses a unique programming language (FunC) and a cell-based data structure (Bag of Cells / BoC) distinct from Ethereum's Solidity; most audit firms' smart contract review teams may lack TON-specific expertise</li>
+          <li><strong>Message routing complexity:</strong> TON uses asynchronous message passing between contracts rather than synchronous calls; tracing multi-step transactions requires understanding this message queue architecture</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SEC-4 -->
+  <div id="sec-4" class="section section-anchor">
+    <div class="section-header"><span class="section-num">IV</span><span class="section-title">Consensus Mechanism &amp; Governance</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-mod-high">&#x25CF; Moderate-High</span>
+      </div>
+      <p>TON's BFT PoS consensus is a well-tested paradigm, and the ElectorSC (validator management contract) provides a transparent, on-chain mechanism for validator selection and reward distribution. The primary governance concern is the relatively small active validator set (~300 validators) compared to Ethereum (~1,000,000 validators).</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Validators</span>Validator Set Assessment</div>
+        <ul>
+          <li>~300 active validators; validator selection based on Toncoin stake deposited in ElectorSC</li>
+          <li>Minimum stake: 300,000 TON (approximately $1.5M–$3M depending on Toncoin price) — high entry barrier reduces validator count but also reduces sybil attack risk</li>
+          <li>BFT threshold: 2/3+ of validators must agree to finalize a block; a coordinated attack requires compromising &gt;100 validators holding &gt;67% of staked Toncoin</li>
+          <li>Validator incentives: block rewards paid in new Toncoin minted per block; aligned with long-term network health</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Governance</span>Protocol Governance Structure</div>
+        <p>The TON Foundation governs protocol changes through a combination of off-chain community voting (governance forum) and validator signaling. There is no fully on-chain governance mechanism comparable to MakerDAO or Compound — protocol upgrades are ultimately implemented by validators choosing to run updated software. This is similar to Bitcoin's governance model: rough consensus + validator adoption, not a formal on-chain vote.</p>
+
+        <div class="callout callout-warn">
+          <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+          <div class="callout-content">
+            <span class="callout-label">TON Foundation Concentration</span>
+            <p>The TON Foundation and early supporters hold a significant proportion of total Toncoin supply. While the exact current foundation treasury balance requires current verification, historically significant allocations to the foundation create a governance concentration risk: the foundation's decisions on treasury Toncoin usage (including sales) can materially impact Toncoin market dynamics.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SEC-5 -->
+  <div id="sec-5" class="section section-anchor">
+    <div class="section-header"><span class="section-num">V</span><span class="section-title">Telegram Dependency &amp; Ecosystem Risk</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-low-mod">&#x25CF; Elevated — Concentration Risk</span>
+      </div>
+      <p>TON's most distinctive strategic asset is simultaneously its most significant concentration risk: the exclusive commercial relationship with Telegram. Virtually all of TON's retail user growth and transaction volume growth since 2025 is attributable to the Telegram Mini App integration. This creates a binary dependency:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Risk Factor</th><th>Description</th><th>Audit Impact</th><th>Severity</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Telegram Regulatory Action</td><td>Telegram operates in jurisdictions with varying regulatory treatment of crypto payments; a major jurisdiction banning Telegram's crypto features would reduce TON transaction volume materially</td><td>Toncoin demand decline → fair value impact</td><td><span class="badge badge-low-mod">Elevated</span></td></tr>
+            <tr><td>Telegram-TON Partnership Termination</td><td>Telegram could choose to adopt a different blockchain for Mini Apps; no known contractual lock-in period published</td><td>Loss of primary distribution channel → demand destruction</td><td><span class="badge badge-low">High</span></td></tr>
+            <tr><td>Pavel Durov Legal Risk</td><td>Telegram CEO Pavel Durov was arrested in France (August 2024) on charges related to content moderation; outcome could affect Telegram's operational capacity</td><td>Reputational and operational risk to Telegram; indirect TON impact</td><td><span class="badge badge-mod">Moderate</span></td></tr>
+            <tr><td>Mini App Fraud Risk</td><td>Telegram Mini Apps are third-party applications; fraudulent Mini Apps could process Toncoin transactions that are subsequently contested</td><td>Revenue recognition / transaction validity questions for clients receiving Toncoin through Mini Apps</td><td><span class="badge badge-mod">Moderate</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-6 -->
+  <div id="sec-6" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VI</span><span class="section-title">Token Classification &amp; Financial Reporting</span></div>
+    <div class="section-body">
+      <div class="assess-header">
+        <span class="assess-label">Overall Assessment:</span>
+        <span class="badge badge-mod-high">&#x25CF; Moderate-High — Relatively Straightforward</span>
+      </div>
+      <p>Toncoin's accounting treatment under FASB ASC 350-60 is among the more straightforward in our digital asset protocol review series. Key conclusions:</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">Classification</span>ASC 350-60 Analysis</div>
+        <ul>
+          <li><strong>In scope:</strong> Toncoin is fungible, transferable, listed on major exchanges, and does not convey rights to goods or services from the issuer — the standard ASC 350-60 criteria are satisfied</li>
+          <li><strong>Fair value measurement:</strong> Level 1 input under ASC 820 — Toncoin trades on Binance, OKX, Bybit, and KuCoin with significant daily volume; multiple active market price sources are available</li>
+          <li><strong>Staking income:</strong> Validator staking rewards are recognized as income at fair value on date received; subsequently measured at fair value through net income under ASC 350-60</li>
+          <li><strong>Cocoon compute income:</strong> Toncoin received for GPU compute services is revenue (not a crypto asset gain/loss) at the time the service is performed; recognize at fair value on service completion date per ASC 606 principles</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="sub-label">History</span>Regulatory Classification Context</div>
+        <p>The 2020 SEC action concerned Telegram's GRAM token — which was deemed an unregistered security at issuance due to the profit-expectation framework of the ICO. The community-issued Toncoin was not issued by Telegram and was not the subject of that action. However, no formal SEC staff no-action letter or guidance specifically addressing Toncoin's non-security status has been published. Entities holding significant Toncoin should consult legal counsel regarding current U.S. regulatory classification.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC-7 -->
+  <div id="sec-7" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VII</span><span class="section-title">Gaps &amp; Limitations</span></div>
+    <div class="section-body">
+      <p>The following gaps represent areas where available information is insufficient for definitive audit conclusions without additional procedures:</p>
+      <ul class="gap-list">
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Multi-Chain Evidence Completeness.</strong> Standard block explorer confirmation of Toncoin balances may not capture all associated smart contract state changes across shardchains. For clients with material Mini App or smart contract exposure, completeness of on-chain evidence requires verification via TON indexer API.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>No Published Formal Security Audit of Core Protocol.</strong> Unlike some Layer 1 networks, no Big 4 or top-tier smart contract firm has published a comprehensive protocol-level security audit covering TON's core consensus and cross-chain messaging layer that we have identified.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>Telegram Partnership Terms Undisclosed.</strong> The specific commercial terms of Telegram's exclusive TON integration are not publicly disclosed. Clients whose Toncoin valuation thesis is based on Telegram volume should recognize this undisclosed dependency as a material uncertainty.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>No SEC No-Action Letter for Toncoin.</strong> While the community-issued Toncoin is legally distinct from Telegram's GRAM, no formal U.S. regulatory guidance or no-action letter has been published confirming its non-security status.</div></li>
+        <li class="gap-item"><span class="gap-icon">&#x26A0;</span><div><strong>FunC/Smart Contract Audit Expertise.</strong> Few audit firms have staff with TON FunC smart contract expertise. Clients with material exposure to TON smart contracts (Mini Apps, Cocoon) should obtain independent FunC smart contract review before placing reliance on smart contract-generated balances.</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEC-8 -->
+  <div id="sec-8" class="section section-anchor">
+    <div class="section-header"><span class="section-num">VIII</span><span class="section-title">Recommended Audit Procedures</span></div>
+    <div class="section-body">
+      <p>The following procedures respond to the identified risks, consistent with PCAOB AS 1105 (as amended December 2025) and AICPA Digital Assets Practice Guide guidance.</p>
+
+      <span class="proc-group-label">Balance &amp; Transaction Verification</span>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <span class="proc-num">1</span>
+          <div class="proc-body">
+            <div class="proc-title">Multi-Level On-Chain Balance Confirmation</div>
+            <p class="proc-desc">Confirm Toncoin wallet balances using at least two independent block explorers (tonscan.org and tonviewer.com). For clients with smart contract interactions, additionally query the TON Center API or an equivalent indexer for complete shardchain transaction history. Document the query method, shardchain coverage scope, and confirmation as of a specific masterchain block height.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">2</span>
+          <div class="proc-body">
+            <div class="proc-title">Staking Reward Income Verification</div>
+            <p class="proc-desc">Obtain the client's validator staking address and query ElectorSC reward events. Verify that staking income is recorded at Toncoin fair value on the date each reward was received. Compare total staking rewards per on-chain ElectorSC events to the amount recorded in the income statement.</p>
+          </div>
+        </li>
+      </ul>
+
+      <span class="proc-group-label">Risk Assessment &amp; Classification</span>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <span class="proc-num">3</span>
+          <div class="proc-body">
+            <div class="proc-title">Telegram Dependency Disclosure Assessment</div>
+            <p class="proc-desc">For clients whose Toncoin holdings or business operations are materially dependent on Telegram's Mini App platform, assess whether going concern or concentration risk disclosures are required. Review publicly available information on Telegram's regulatory status in key jurisdictions of operation.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">4</span>
+          <div class="proc-body">
+            <div class="proc-title">Fair Value Price Source Documentation</div>
+            <p class="proc-desc">Document the Toncoin price source selected for ASC 350-60 fair value measurement. Confirm that the selected exchange qualifies as an "active market" per ASC 820. Perform spot-price comparison across Binance, OKX, and at least one aggregator (CoinMarketCap or CoinGecko) to confirm price reasonableness within 1% variance.</p>
+          </div>
+        </li>
+        <li class="proc-item">
+          <span class="proc-num">5</span>
+          <div class="proc-body">
+            <div class="proc-title">Mini App / Cocoon Revenue Recognition Testing</div>
+            <p class="proc-desc">For clients receiving Toncoin through Telegram Mini Apps or Cocoon compute contracts, test revenue recognition: confirm service delivery evidence (Mini App order records; Cocoon TEE attestation), confirm Toncoin receipt on-chain, confirm fair value recorded at service completion date, and verify Toncoin subsequently measured at period-end fair value per ASC 350-60.</p>
+          </div>
+        </li>
+      </ul>
+
+      <span class="proc-group-label">Legal &amp; Regulatory Review</span>
+      <ul class="proc-list">
+        <li class="proc-item">
+          <span class="proc-num">6</span>
+          <div class="proc-body">
+            <div class="proc-title">Regulatory Classification Legal Opinion</div>
+            <p class="proc-desc">For clients with material Toncoin exposure, obtain or review external legal counsel opinion on whether community-issued Toncoin constitutes a security under current U.S. federal law. Note that no formal SEC staff guidance or no-action letter has been published specifically addressing community Toncoin. Document legal counsel's conclusion and basis.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEC-9 -->
+  <div id="sec-9" class="section section-anchor">
+    <div class="section-header"><span class="section-num">IX</span><span class="section-title">Key Takeaways</span></div>
+    <div class="section-body">
+      <ul class="takeaway-list">
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>Toncoin is One of the Cleaner ASC 350-60 Applications.</strong> With Level 1 observable prices on major exchanges and a well-established network history since 2020, Toncoin measurement and disclosure under ASC 350-60 is more straightforward than most other digital assets in our review series. The complexity lives in the multi-chain evidence layer, not the accounting classification.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>Multi-Chain Architecture Requires Indexer-Level Evidence.</strong> TON's shardchain structure means standard block explorer confirmation may be insufficient for clients with smart contract interactions. Auditors should plan for TON Center API queries or equivalent when completeness of on-chain evidence is material to the engagement.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>Telegram Dependency Is the Single Largest Non-Technical Risk.</strong> TON's growth trajectory is inextricably linked to Telegram's platform. Clients should be required to disclose this dependency in financial statement notes. Any adverse development in Telegram's regulatory environment warrants immediate reassessment of Toncoin fair value assumptions.</div></li>
+        <li class="takeaway-item"><span class="takeaway-icon">&#x2192;</span><div><strong>Regulatory History Requires Disclosure, Not Necessarily Reclassification.</strong> The 2020 SEC action against Telegram's GRAM is not legally applicable to community-issued Toncoin. However, the history warrants disclosure and legal opinion documentation in any audit file. The absence of a formal no-action letter means regulatory classification risk remains open.</div></li>
+      </ul>
+
+      <hr>
+      <p style="font-size:0.84rem; color:var(--gray-600); margin-top:16px;"><strong>Suggested Next Steps:</strong></p>
+      <ul class="next-step-list">
+        <li class="next-step-item"><span class="next-step-num">1</span><div>For any client with Toncoin exposure, obtain external legal opinion on Toncoin's non-security classification before issuing an audit opinion referencing Toncoin balances.</div></li>
+        <li class="next-step-item"><span class="next-step-num">2</span><div>Assess whether clients' Toncoin disclosures adequately communicate the Telegram platform dependency risk as a concentration risk per ASC 275.</div></li>
+        <li class="next-step-item"><span class="next-step-num">3</span><div>Develop TON indexer API query capability within the engagement team's digital asset toolset for multi-chain evidence gathering on future engagements.</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEC-10 -->
+  <div id="sec-10" class="section section-anchor">
+    <div class="section-header"><span class="section-num">X</span><span class="section-title">Sources &amp; References</span></div>
+    <div class="section-body">
+      <div class="source-group">
+        <div class="source-group-title">Primary Sources</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">1.</span> <span class="source-title">TON Foundation. "TON Whitepaper." ton.org. 2021 (community edition).</span></li>
+          <li class="source-item"><span class="source-num">2.</span> <span class="source-title">TON Foundation. "Developer Documentation." docs.ton.org. Accessed April 2026.</span></li>
+          <li class="source-item"><span class="source-num">3.</span> <span class="source-title">Telegram. "Mini Apps TON Integration Announcement." blog.telegram.org. January 2025.</span></li>
+          <li class="source-item"><span class="source-num">4.</span> <span class="source-title">TON Foundation. "Cocoon Launch on TON Mainnet." blog.ton.org. December 2025.</span></li>
+        </ul>
+      </div>
+      <div class="source-group">
+        <div class="source-group-title">Regulatory &amp; Professional Standards</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">5.</span> <span class="source-title">SEC. "Litigation Release — SEC v. Telegram Group." U.S. SEC. October 2019 / June 2020 (settlement).</span></li>
+          <li class="source-item"><span class="source-num">6.</span> <span class="source-title">FASB ASU 2023-08 / ASC 350-60, Crypto Assets. Effective fiscal years beginning after December 15, 2024.</span></li>
+          <li class="source-item"><span class="source-num">7.</span> <span class="source-title">FASB ASC 820, Fair Value Measurement — Level 1/2/3 hierarchy and active market criteria.</span></li>
+          <li class="source-item"><span class="source-num">8.</span> <span class="source-title">PCAOB AS 1105, Audit Evidence, as amended effective December 15, 2025. Paragraph .10A.</span></li>
+        </ul>
+      </div>
+      <div class="source-group">
+        <div class="source-group-title">Industry Research &amp; Market Data</div>
+        <ul class="source-list">
+          <li class="source-item"><span class="source-num">9.</span> <span class="source-title">Messari. "TON Research Report." messari.io. 2025.</span></li>
+          <li class="source-item"><span class="source-num">10.</span> <span class="source-title">CoinMarketCap. "Toncoin (TON) Market Data." coinmarketcap.com. Accessed April 2026.</span></li>
+          <li class="source-item"><span class="source-num">11.</span> <span class="source-title">Phemex. "What Is TON? The Open Network Explained." phemex.com. 2025.</span></li>
+          <li class="source-item"><span class="source-num">12.</span> <span class="source-title">99Bitcoins. "TON Blockchain Review." 99bitcoins.com. 2025.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sig-block">
+    <div class="sig-header">Review &amp; Approval Sign-Off</div>
+    <div class="sig-body">
+      <div class="sig-field"><label>Preparer</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+      <div class="sig-field"><label>Reviewer</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+      <div class="sig-field"><label>Engagement Manager</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+      <div class="sig-field"><label>Partner / Concurring Reviewer</label><div class="sig-line"></div><div class="sig-note">Name / Title / Date</div></div>
+    </div>
+  </div>
+
+  <p style="font-size:0.75rem; color:var(--gray-400); text-align:center; margin-top:12px; line-height:1.6;">This memorandum is prepared for internal audit and assurance purposes only. It does not constitute investment advice, legal advice, or a formal audit opinion. Information is current as of April 27, 2026. Prepared by the Digital Asset Practice Group.</p>
+
+</div><!-- /.page-wrapper tab2 -->
+</div><!-- /#tab2 -->
+
+<footer class="doc-footer">
+  <div>Audit &amp; Assurance Practice &mdash; Digital Asset Group</div>
+  <div>Ref: AWP-TECH-2026-05 &nbsp;&middot;&nbsp; Rev 1.0</div>
+  <div>Confidential &mdash; Engagement Use Only</div>
+</footer>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById(this.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>

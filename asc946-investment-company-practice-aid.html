@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASC 946 Investment Company Practice Aid</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:    #0E1F3D;
+  --navy2:   #1A3461;
+  --blue:    #0057A8;
+  --blue-lt: #EEF4FF;
+  --green:   #14532D;
+  --green-m: #166534;
+  --green-lt:#DCFCE7;
+  --red:     #7F1D1D;
+  --red-m:   #991B1B;
+  --red-lt:  #FEE2E2;
+  --amber:   #78350F;
+  --amber-m: #92400E;
+  --amber-lt:#FEF3C7;
+  --purple:  #4C1D95;
+  --purple-lt:#EDE9FE;
+  --teal:    #134E4A;
+  --teal-lt: #CCFBF1;
+  --gray-50: #F8FAFC;
+  --gray-100:#F0F2F5;
+  --gray-200:#E2E6EC;
+  --gray-300:#CBD2DC;
+  --gray-400:#9AA4B2;
+  --gray-500:#64748B;
+  --gray-600:#5A6270;
+  --gray-800:#2C3240;
+  --border:  #D0D6E0;
+  --text:    #1A1E2A;
+  --shadow:  0 1px 4px rgba(0,0,0,.08);
+  --shadow2: 0 4px 16px rgba(0,0,0,.10);
+}
+html { font-size: 14px; scroll-behavior: smooth; }
+body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; background: var(--gray-100); color: var(--text); }
+
+/* ── TOP BAR ── */
+.top-bar { background: var(--navy); height: 4px; }
+
+/* ── HEADER ── */
+.header { background: linear-gradient(135deg, #0E1F3D 0%, #1A3461 100%); color: white; padding: 36px 48px 32px; }
+.header-eyebrow { font-size:.65rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; opacity:.5; margin-bottom:8px; }
+.header-title   { font-size:1.7rem; font-weight:800; letter-spacing:-.02em; line-height:1.15; margin-bottom:6px; }
+.header-sub     { font-size:.88rem; opacity:.65; max-width:700px; line-height:1.65; margin-bottom:22px; }
+.header-meta    { display:flex; gap:24px; flex-wrap:wrap; }
+.hmeta { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); border-radius:6px; padding:8px 14px; display:flex; flex-direction:column; gap:2px; }
+.hmeta-val { font-size:.88rem; font-weight:700; }
+.hmeta-lbl { font-size:.6rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; opacity:.55; }
+
+/* ── CONCLUSION BAR ── */
+.conclusion-bar { position:sticky; top:0; z-index:100; border-bottom:1px solid var(--border); box-shadow:var(--shadow2); transition: background .3s; }
+.conclusion-bar.c-unknown  { background:#1E3A5F; }
+.conclusion-bar.c-yes      { background:#14532D; }
+.conclusion-bar.c-no       { background:#7F1D1D; }
+.conclusion-bar.c-judgment { background:#78350F; }
+.conc-inner { max-width:1100px; margin:0 auto; padding:12px 32px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.conc-label { font-size:.62rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.55); white-space:nowrap; }
+.conc-result { font-size:1rem; font-weight:800; color:white; flex:1; }
+.conc-sub { font-size:.78rem; color:rgba(255,255,255,.7); }
+.conc-badges { display:flex; gap:8px; flex-wrap:wrap; }
+.badge { font-size:.68rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:3px 9px; border-radius:3px; }
+.badge-fund { background:rgba(255,255,255,.15); color:white; }
+.badge-fc   { background:rgba(62,207,142,.2); color:#3ecf8e; border:1px solid rgba(62,207,142,.3); }
+.badge-tc   { background:rgba(91,141,238,.2); color:#8bb4f8; border:1px solid rgba(91,141,238,.3); }
+
+/* ── NAV ── */
+.nav-bar { background:white; border-bottom:1px solid var(--border); }
+.nav-inner { max-width:1100px; margin:0 auto; padding:0 32px; display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
+.nav-inner::-webkit-scrollbar { display:none; }
+.nav-btn { border:none; border-bottom:2px solid transparent; background:none; color:var(--gray-500); font-size:.76rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:12px 14px; cursor:pointer; white-space:nowrap; transition:color .14s, border-color .14s; font-family:inherit; }
+.nav-btn:hover { color:var(--navy); }
+.nav-btn.active { color:var(--blue); border-bottom-color:var(--blue); }
+
+/* ── MAIN ── */
+.main { max-width:1100px; margin:0 auto; padding:28px 32px 80px; }
+
+/* ── SECTION CARDS ── */
+.section-card { background:white; border:1px solid var(--border); border-radius:10px; margin-bottom:20px; overflow:hidden; box-shadow:var(--shadow); }
+.section-head { padding:18px 24px 16px; border-bottom:1px solid var(--gray-100); display:flex; align-items:flex-start; gap:14px; }
+.sec-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+.sec-icon-blue   { background:var(--blue-lt);   }
+.sec-icon-green  { background:var(--green-lt);  }
+.sec-icon-amber  { background:var(--amber-lt);  }
+.sec-icon-purple { background:var(--purple-lt); }
+.sec-icon-teal   { background:var(--teal-lt);   }
+.sec-icon-red    { background:var(--red-lt);    }
+.sec-title   { font-size:1rem; font-weight:800; color:var(--navy); margin-bottom:3px; }
+.sec-subtitle{ font-size:.78rem; color:var(--gray-500); line-height:1.5; }
+.sec-body    { padding:22px 24px; }
+
+/* ── PROSE ── */
+.prose { font-size:.88rem; color:var(--gray-800); line-height:1.75; margin-bottom:14px; }
+.prose strong { color:var(--text); font-weight:700; }
+.prose em { color:var(--blue); font-style:normal; font-weight:600; }
+
+/* ── CALLOUTS ── */
+.callout { border-radius:7px; padding:14px 18px; margin-bottom:14px; font-size:.85rem; line-height:1.65; }
+.co-blue   { background:var(--blue-lt);   border-left:3px solid var(--blue);   color:#1e3a5f; }
+.co-green  { background:var(--green-lt);  border-left:3px solid var(--green-m); color:var(--green); }
+.co-amber  { background:var(--amber-lt);  border-left:3px solid var(--amber-m); color:var(--amber); }
+.co-red    { background:var(--red-lt);    border-left:3px solid var(--red-m);   color:var(--red); }
+.co-purple { background:var(--purple-lt); border-left:3px solid var(--purple);  color:var(--purple); }
+.co-teal   { background:var(--teal-lt);   border-left:3px solid var(--teal);    color:var(--teal); }
+.co-gray   { background:var(--gray-100);  border-left:3px solid var(--gray-300);color:var(--gray-600); }
+.callout-title { font-size:.65rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; margin-bottom:7px; opacity:.7; }
+.callout p  { margin-bottom:6px; }
+.callout p:last-child { margin-bottom:0; }
+.callout ul { padding-left:16px; display:flex; flex-direction:column; gap:4px; margin-top:6px; }
+
+/* ── CRITERION CARDS ── */
+.criterion { border:1px solid var(--border); border-radius:8px; margin-bottom:14px; overflow:hidden; }
+.crit-head { display:flex; gap:12px; align-items:flex-start; padding:14px 18px 12px; cursor:pointer; user-select:none; transition:background .1s; }
+.crit-head:hover { background:var(--gray-50); }
+.crit-num  { font-size:.65rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:3px; flex-shrink:0; margin-top:2px; }
+.cn-fc     { background:var(--blue-lt);   color:var(--blue); }
+.cn-tc     { background:var(--purple-lt); color:var(--purple); }
+.cn-da     { background:var(--teal-lt);   color:var(--teal); }
+.crit-title{ font-size:.92rem; font-weight:800; color:var(--navy); flex:1; line-height:1.4; }
+.crit-chev { font-size:.8rem; color:var(--gray-300); transition:transform .18s; flex-shrink:0; padding-top:3px; }
+.criterion.open .crit-chev { transform:rotate(90deg); }
+.crit-body { display:none; padding:0 18px 18px; border-top:1px solid var(--gray-100); }
+.criterion.open .crit-body { display:block; padding-top:16px; }
+
+/* ── ASSESSMENT SELECTOR ── */
+.assessment-row { margin-top:16px; padding-top:14px; border-top:1px solid var(--gray-100); }
+.assess-label { font-size:.65rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:var(--gray-400); margin-bottom:8px; }
+.assess-options { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.assess-opt { border:none; border-radius:6px; padding:7px 14px; font-size:.78rem; font-weight:700; cursor:pointer; font-family:inherit; border:1.5px solid var(--border); background:white; color:var(--gray-600); transition:all .14s; }
+.assess-opt:hover { border-color:var(--gray-400); }
+.assess-opt.sel-yes  { background:var(--green-lt);  color:var(--green-m);  border-color:#86EFAC; }
+.assess-opt.sel-no   { background:var(--red-lt);    color:var(--red-m);    border-color:#FCA5A5; }
+.assess-opt.sel-part { background:var(--amber-lt);  color:var(--amber-m);  border-color:#FDE68A; }
+.assess-opt.sel-na   { background:var(--gray-100);  color:var(--gray-500); border-color:var(--gray-300); }
+.assess-note { width:100%; border:1px solid var(--border); border-radius:5px; padding:7px 10px; font-size:.8rem; color:var(--text); font-family:inherit; resize:vertical; min-height:52px; outline:none; background:var(--gray-50); }
+.assess-note:focus { border-color:var(--blue); background:white; }
+
+/* ── INDICATOR GRID ── */
+.ind-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+@media(max-width:700px){ .ind-grid { grid-template-columns:1fr; } }
+.ind-box { border-radius:6px; padding:12px 14px; }
+.ind-for     { background:var(--green-lt); }
+.ind-against { background:var(--red-lt); }
+.ind-title   { font-size:.62rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+.ind-title-for     { color:var(--green-m); }
+.ind-title-against { color:var(--red-m); }
+.ind-box ul  { padding-left:14px; display:flex; flex-direction:column; gap:3px; }
+.ind-box li  { font-size:.8rem; line-height:1.5; }
+.ind-for li  { color:var(--green); }
+.ind-against li { color:var(--red); }
+
+/* ── DIGITAL ASSET BLOCK ── */
+.da-block { background:linear-gradient(135deg, #0D2137 0%, #0F3460 100%); border-radius:8px; padding:16px 18px; margin-top:14px; }
+.da-label { font-size:.62rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:#60A5FA; margin-bottom:8px; }
+.da-block p { font-size:.83rem; color:#CBD5E1; line-height:1.65; margin-bottom:6px; }
+.da-block p:last-child { margin-bottom:0; }
+.da-block ul { padding-left:15px; margin-top:6px; }
+.da-block li { font-size:.82rem; color:#94A3B8; line-height:1.6; margin-bottom:3px; }
+.da-block strong { color:#93C5FD; }
+.da-block .da-warn { color:#FCD34D; font-weight:700; }
+.da-block .da-good { color:#6EE7B7; font-weight:700; }
+
+/* ── STAKING ANALYSIS SECTION ── */
+.staking-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px; }
+@media(max-width:800px){ .staking-grid { grid-template-columns:1fr; } }
+.staking-card { border-radius:8px; padding:16px; border:1px solid var(--border); }
+.staking-card h4 { font-size:.82rem; font-weight:800; margin-bottom:8px; }
+.staking-card ul { padding-left:14px; display:flex; flex-direction:column; gap:4px; }
+.staking-card li { font-size:.78rem; line-height:1.55; color:var(--gray-600); }
+.sc-delegate { background:#F0FDF4; border-color:#86EFAC; }
+.sc-delegate h4 { color:var(--green-m); }
+.sc-validate { background:#FEF3C7; border-color:#FDE68A; }
+.sc-validate h4 { color:var(--amber-m); }
+.sc-liquid   { background:#EDE9FE; border-color:#C4B5FD; }
+.sc-liquid   h4 { color:var(--purple); }
+
+/* ── TWO-COL LAYOUT ── */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+@media(max-width:700px){ .two-col { grid-template-columns:1fr; } }
+
+/* ── FLOWCHART / DECISION TREE ── */
+.flow { display:flex; flex-direction:column; gap:0; align-items:center; margin:18px 0; }
+.flow-box { border-radius:8px; padding:11px 18px; font-size:.82rem; font-weight:700; text-align:center; width:100%; max-width:520px; }
+.fb-q    { background:var(--blue-lt);   color:var(--blue);   border:1.5px solid #BDD4F0; }
+.fb-yes  { background:var(--green-lt);  color:var(--green-m);border:1.5px solid #86EFAC; }
+.fb-no   { background:var(--red-lt);    color:var(--red-m);  border:1.5px solid #FCA5A5; }
+.fb-maybe{ background:var(--amber-lt);  color:var(--amber-m);border:1.5px solid #FDE68A; }
+.flow-arrow { font-size:1.1rem; color:var(--gray-300); margin:3px 0; }
+.flow-branch { display:flex; gap:12px; width:100%; max-width:520px; }
+.flow-branch .flow-box { flex:1; font-size:.76rem; }
+
+/* ── CONCLUSION PANEL ── */
+.conclusion-panel { border-radius:10px; padding:22px 26px; margin-top:24px; }
+.cp-unknown  { background:var(--gray-100); border:1.5px solid var(--border); }
+.cp-yes      { background:var(--green-lt); border:1.5px solid #86EFAC; }
+.cp-no       { background:var(--red-lt);   border:1.5px solid #FCA5A5; }
+.cp-judgment { background:var(--amber-lt); border:1.5px solid #FDE68A; }
+.cp-title { font-size:1.1rem; font-weight:900; margin-bottom:8px; }
+.cp-unknown  .cp-title { color:var(--gray-600); }
+.cp-yes      .cp-title { color:var(--green-m); }
+.cp-no       .cp-title { color:var(--red-m); }
+.cp-judgment .cp-title { color:var(--amber-m); }
+.cp-body { font-size:.86rem; line-height:1.7; }
+.cp-unknown  .cp-body { color:var(--gray-600); }
+.cp-yes      .cp-body { color:var(--green); }
+.cp-no       .cp-body { color:var(--red); }
+.cp-judgment .cp-body { color:var(--amber); }
+.score-dots { display:flex; gap:6px; margin-top:12px; flex-wrap:wrap; }
+.dot { width:20px; height:20px; border-radius:50%; font-size:.6rem; font-weight:800; display:flex; align-items:center; justify-content:center; color:white; }
+.dot-yes  { background:var(--green-m); }
+.dot-part { background:#D97706; }
+.dot-no   { background:var(--red-m); }
+.dot-none { background:var(--gray-300); color:var(--gray-500); }
+
+/* ── TABLE ── */
+.ref-table { width:100%; border-collapse:collapse; font-size:.82rem; margin-bottom:14px; border-radius:6px; overflow:hidden; border:1px solid var(--border); }
+.ref-table thead { background:var(--navy); color:white; }
+.ref-table th { padding:9px 12px; text-align:left; font-size:.65rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; }
+.ref-table td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:top; line-height:1.5; }
+.ref-table tbody tr:last-child td { border-bottom:none; }
+.ref-table tbody tr:nth-child(odd) { background:var(--gray-50); }
+
+/* ── PILLS ── */
+.pill { display:inline-block; font-size:.62rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; padding:2px 7px; border-radius:3px; }
+.pill-blue   { background:var(--blue-lt);   color:var(--blue);   }
+.pill-green  { background:var(--green-lt);  color:var(--green-m);}
+.pill-red    { background:var(--red-lt);    color:var(--red-m);  }
+.pill-amber  { background:var(--amber-lt);  color:var(--amber-m);}
+.pill-purple { background:var(--purple-lt); color:var(--purple); }
+.pill-teal   { background:var(--teal-lt);   color:var(--teal);   }
+
+/* ── PRINT ── */
+@media print {
+  body { background:white; font-size:11px; }
+  .conclusion-bar, .nav-bar, .top-bar { display:none !important; }
+  .header { background:var(--navy) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .section-card { box-shadow:none; break-inside:avoid; }
+  .criterion.open .crit-body, .crit-body { display:block !important; }
+  .assess-note { border:none; border-bottom:1px solid var(--border); background:transparent; }
+  @page { margin:1.5cm; }
+}
+
+@media(max-width:700px) {
+  .header { padding:24px 20px 20px; }
+  .header-title { font-size:1.3rem; }
+  .main { padding:16px; }
+}
+</style>
+</head>
+<body>
+<div class="top-bar"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-eyebrow">Practice Aid &nbsp;·&nbsp; ASC 946 &nbsp;·&nbsp; Investment Company Assessment</div>
+  <div class="header-title">ASC 946 Investment Company Determination</div>
+  <div class="header-sub">A practice aid to assist in evaluating whether an entity qualifies as an investment company under ASC 946, with detailed guidance on application to digital asset entities and the treatment of staking, delegating, and validating activities.</div>
+  <div class="header-meta">
+    <div class="hmeta"><div class="hmeta-val">ASC 946-10-15</div><div class="hmeta-lbl">Authority</div></div>
+    <div class="hmeta"><div class="hmeta-val">ASU 2013-08</div><div class="hmeta-lbl">Key Update</div></div>
+    <div class="hmeta"><div class="hmeta-val">2 FC + 6 TC</div><div class="hmeta-lbl">Criteria</div></div>
+    <div class="hmeta"><div class="hmeta-val">Not for Reg. IC</div><div class="hmeta-lbl">Scope Note</div></div>
+  </div>
+</div>
+
+<!-- STICKY CONCLUSION BAR -->
+<div class="conclusion-bar c-unknown" id="conclusionBar">
+  <div class="conc-inner">
+    <div class="conc-label">Assessment</div>
+    <div>
+      <div class="conc-result" id="concResult">Complete the assessment below to generate a conclusion</div>
+      <div class="conc-sub" id="concSub">Answer all Fundamental Characteristics first</div>
+    </div>
+    <div class="conc-badges" id="concBadges"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="navTo('background')">Background</button>
+    <button class="nav-btn" onclick="navTo('fc')">Fundamental Characteristics</button>
+    <button class="nav-btn" onclick="navTo('tc')">Typical Characteristics</button>
+    <button class="nav-btn" onclick="navTo('conclusion')">Conclusion</button>
+    <button class="nav-btn" onclick="navTo('digital')">Digital Asset Context</button>
+    <button class="nav-btn" onclick="navTo('staking')">Staking Analysis</button>
+    <button class="nav-btn" onclick="navTo('examples')">Scenarios</button>
+    <button class="nav-btn" onclick="window.print()">⎙ Print</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ══════════════════════════════════════════════════════ BACKGROUND ══ -->
+<div id="background" class="section-card">
+  <div class="section-head">
+    <div class="sec-icon sec-icon-blue">📋</div>
+    <div>
+      <div class="sec-title">What Is ASC 946 and Why Does It Matter?</div>
+      <div class="sec-subtitle">Background, significance of the determination, and the two-tier framework</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="prose">
+      <strong>ASC 946, Financial Services — Investment Companies</strong>, provides the accounting and financial reporting model for entities classified as investment companies. The determination is binary and consequential: an entity is either an investment company subject to ASC 946, or it is not, and the accounting treatment is fundamentally different between those two worlds.
+    </div>
+
+    <div class="callout co-blue">
+      <div class="callout-title">Why the Determination Matters So Much</div>
+      <p>Investment companies under ASC 946 carry <strong>substantially all of their investments at fair value through net income</strong> — changes in fair value flow directly to earnings regardless of whether they are realized. Non-investment companies follow the specific GAAP guidance for each asset type they hold (e.g., equity method for significant influence investments, historical cost for certain securities, ASC 350 for intangibles). Getting the classification wrong produces dramatically misstated financial statements.</p>
+    </div>
+
+    <div class="two-col">
+      <div class="callout co-green" style="margin:0">
+        <div class="callout-title">If Entity IS an Investment Company (ASC 946)</div>
+        <ul>
+          <li>Investments measured at <strong>fair value through net income</strong></li>
+          <li>Specialized disclosures (financial highlights, schedules of investments)</li>
+          <li>No consolidation of investees — held as investments at FV</li>
+          <li>Performance measured by total return (income + appreciation)</li>
+          <li>Financial statements: statement of assets &amp; liabilities, statement of operations, statement of changes in net assets</li>
+        </ul>
+      </div>
+      <div class="callout co-amber" style="margin:0">
+        <div class="callout-title">If Entity is NOT an Investment Company</div>
+        <ul>
+          <li>Each asset follows its applicable GAAP standard</li>
+          <li>Consolidation required when controlling interest held</li>
+          <li>Equity method for 20–50% ownership</li>
+          <li>Historical cost (less impairment) for many assets</li>
+          <li>Standard financial statements: balance sheet, income statement, cash flows</li>
+          <li>Crypto assets: currently ASC 350 (intangible asset) or, if elected, ASC 321 FV option</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-top:14px">
+      The assessment framework was significantly revised by <strong>ASU 2013-08</strong>, which replaced the previous rules-based approach with a principles-based, characteristics-focused model. The current framework requires evaluating <em>two Fundamental Characteristics</em> (both must be present) and <em>six Typical Characteristics</em> (evidence of investment company status — not all required, but more is stronger evidence).
+    </div>
+
+    <div class="callout co-gray">
+      <div class="callout-title">Regulated Investment Companies — Automatic Qualification</div>
+      <p>Entities regulated under the Investment Company Act of 1940 (mutual funds, ETFs, closed-end funds, BDCs registered under Section 8) are automatically investment companies under ASC 946 — no further assessment is required. This practice aid is primarily relevant for <strong>unregistered entities</strong> where the determination requires judgment: private funds, crypto funds, digital asset managers, DAOs with fund-like structures, family offices, holding companies, and similar entities.</p>
+    </div>
+
+    <div class="flow">
+      <div class="flow-box fb-q">Does the entity have BOTH Fundamental Characteristics?</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-branch">
+        <div class="flow-box fb-no">NO → Entity is NOT an investment company.<br>Stop here.</div>
+        <div class="flow-box fb-yes">YES → Proceed to assess Typical Characteristics</div>
+      </div>
+      <div class="flow-arrow">↓ (if yes)</div>
+      <div class="flow-box fb-q">How many of the 6 Typical Characteristics are present?</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-branch">
+        <div class="flow-box fb-yes">All 6 present → Strong evidence of investment company status</div>
+        <div class="flow-box fb-maybe">Some present → Judgment required — weigh facts &amp; circumstances</div>
+        <div class="flow-box fb-no">Few/none → Entity is likely NOT an investment company</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ FUNDAMENTAL CHARACTERISTICS ══ -->
+<div id="fc" class="section-card">
+  <div class="section-head">
+    <div class="sec-icon sec-icon-blue">🔑</div>
+    <div>
+      <div class="sec-title">Fundamental Characteristics — Both Required</div>
+      <div class="sec-subtitle">ASC 946-10-15-12 through 15-14. Both must be present; absence of either means the entity is NOT an investment company.</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="callout co-amber">
+      <div class="callout-title">Critical Rule</div>
+      <p>The Fundamental Characteristics are <strong>threshold conditions</strong> — they are not a matter of weighing or balancing. If the entity does not have <em>both</em> characteristics, it cannot be an investment company under ASC 946, regardless of how many Typical Characteristics it exhibits. The assessment stops here if either is absent.</p>
+    </div>
+
+    <!-- FC-1 -->
+    <div class="criterion open" id="crit-FC1">
+      <div class="crit-head" onclick="toggleCrit('FC1')">
+        <span class="crit-num cn-fc">FC-1</span>
+        <div class="crit-title">Investment Purpose: The entity's business purpose is to invest for returns from capital appreciation, investment income, or both</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="prose">
+          The entity must exist <em>for the purpose of investing</em> — that is, its primary reason for being is to deploy capital into financial instruments, other assets, or interests in other entities, and to generate returns for its investors through appreciation, income distributions, or both. This is a purpose test, not merely an activity test.
+        </div>
+        <div class="prose">
+          The purpose must be evident in the entity's <strong>governing documents, offering memoranda, investor communications, management representations, and actual activities.</strong> An entity that holds investments as a byproduct of its operational activities — such as a technology company that receives warrants from customers — fails this test even if it holds many appreciated investments.
+        </div>
+        <div class="prose">
+          <strong>The distinction between "investment for return" vs. "operational strategic purpose" is the most common area of judgment.</strong> A parent company that holds subsidiaries to operate them strategically (not to realize investment gains) is not an investment company. A fund that holds those same subsidiaries with the primary intent of selling them at a gain is.
+        </div>
+
+        <div class="ind-grid">
+          <div class="ind-box ind-for">
+            <div class="ind-title ind-title-for">✓ Supports FC-1</div>
+            <ul>
+              <li>Governing documents state investment/return generation as primary purpose</li>
+              <li>Defined investment period and liquidation/exit strategy</li>
+              <li>Performance measured by IRR, MOIC, or total return</li>
+              <li>Management evaluated on investment returns</li>
+              <li>Exit/sale is the expected monetization event</li>
+              <li>No operational involvement in investees</li>
+              <li>Carried interest or performance fee structure</li>
+            </ul>
+          </div>
+          <div class="ind-box ind-against">
+            <div class="ind-title ind-title-against">✗ Undermines FC-1</div>
+            <ul>
+              <li>Entity holds assets for strategic, operational, or synergistic reasons</li>
+              <li>Entity operates portfolio companies (management involvement)</li>
+              <li>Investments are not expected to be sold for gain</li>
+              <li>Business purpose is a product/service, not return generation</li>
+              <li>No defined fund life or exit strategy</li>
+              <li>Management evaluated on operational metrics, not investment returns</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="da-block">
+          <div class="da-label">🪙 Digital Asset Application — FC-1</div>
+          <p><strong>Crypto fund / digital asset fund:</strong> If the entity's documents state its purpose is to generate returns for investors through investment in crypto assets (BTC, ETH, altcoins, DeFi protocols, NFTs), FC-1 is clearly met. The investment return purpose is explicit.</p>
+          <p><strong>Crypto operating company holding treasury crypto:</strong> A company whose primary business is providing crypto exchange, custody, lending, or blockchain infrastructure services — but which also holds crypto on its own balance sheet for treasury purposes — <span class="da-warn">does NOT meet FC-1</span>. The treasury position is incidental to operations.</p>
+          <p><strong>Entity holding crypto "on behalf of investors" for yield:</strong> If the entity's structure and purpose is to pool investor capital into crypto assets to generate yield (staking rewards, lending interest, liquidity provision fees), FC-1 is likely met — provided this is the primary purpose, not a side activity. The <span class="da-warn">key risk</span> is whether the entity has also taken on operational characteristics (running validators, operating DeFi protocols) that undermine the pure investment purpose.</p>
+          <p><strong>Staking-as-service provider vs. staking-as-investor:</strong> An entity that operates staking infrastructure as a service for third parties (a validator operator) is acting operationally. An entity that <em>delegates</em> its investors' crypto to validators to earn yield is acting as an investor. <span class="da-good">Delegating = investment activity. Running validator nodes for others = operational activity.</span></p>
+        </div>
+
+        <div class="assessment-row">
+          <div class="assess-label">FC-1 Assessment</div>
+          <div class="assess-options">
+            <button class="assess-opt" onclick="setAssess('FC1','yes',this)">✓ Yes — Met</button>
+            <button class="assess-opt" onclick="setAssess('FC1','part',this)">~ Partially / Uncertain</button>
+            <button class="assess-opt" onclick="setAssess('FC1','no',this)">✗ No — Not Met</button>
+          </div>
+          <textarea class="assess-note" placeholder="Document your basis for conclusion, facts considered, and any entity-specific considerations…" oninput="saveNotes('FC1',this.value)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- FC-2 -->
+    <div class="criterion" id="crit-FC2">
+      <div class="crit-head" onclick="toggleCrit('FC2')">
+        <span class="crit-num cn-fc">FC-2</span>
+        <div class="crit-title">The entity obtains funds from one or more investors for the purpose of providing those investors with investment management services</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="prose">
+          The entity must be in the business of <em>managing investments on behalf of others</em>. It receives funds from investors with the understanding that the entity will manage those funds as investments and deliver investment returns. This characteristic distinguishes an investment company from a company that simply <em>is</em> an investment (e.g., a portfolio company).
+        </div>
+        <div class="prose">
+          <strong>"Investment management services"</strong> means the entity actively manages the portfolio — making or participating in investment decisions, asset allocation, security selection, risk management — rather than passively holding assets. Importantly, a single-investor fund can still meet this criterion: the investor count requirement is in the Typical Characteristics (TC-2), not here.
+        </div>
+        <div class="prose">
+          <strong>The "for the purpose of providing investment management services" language is critical.</strong> If investors contribute capital and simply receive a pro-rata share of whatever the entity earns from its operations — with no active investment management occurring — this characteristic may not be met. The entity must actually be performing investment management.
+        </div>
+
+        <div class="ind-grid">
+          <div class="ind-box ind-for">
+            <div class="ind-title ind-title-for">✓ Supports FC-2</div>
+            <ul>
+              <li>Entity has a defined investment manager (GP, advisor, manager)</li>
+              <li>Investment management agreement in place</li>
+              <li>Capital contributed by LPs / investors for investment purposes</li>
+              <li>Management fee charged to investors for advisory services</li>
+              <li>Investment policy statement / mandate governs decisions</li>
+              <li>Investors are passive (no day-to-day operational role)</li>
+              <li>Entity reports performance to investors (capital statements, NAV)</li>
+            </ul>
+          </div>
+          <div class="ind-box ind-against">
+            <div class="ind-title ind-title-against">✗ Undermines FC-2</div>
+            <ul>
+              <li>No defined investment manager — entity is self-managed operationally</li>
+              <li>Investors are also operators (co-management by all investors)</li>
+              <li>Capital obtained for operational business purposes, not investment mgmt</li>
+              <li>Entity simply operates a business; investors receive operating returns</li>
+              <li>No investment mandate or portfolio management framework</li>
+              <li>No management fee — returns are purely from operations</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="da-block">
+          <div class="da-label">🪙 Digital Asset Application — FC-2</div>
+          <p><strong>Crypto fund with a manager:</strong> A fund with a GP/manager that selects and manages a portfolio of crypto assets on behalf of LPs clearly provides investment management services. FC-2 is met.</p>
+          <p><strong>DAO / decentralized protocol:</strong> DAOs present significant complexity. If token holders vote on protocol direction and the "fund" is essentially self-governed by participants, the question is whether there is a distinct investment management function. A DAO that collectively decides how to deploy treasury funds may not have a sufficiently distinct "manager" providing investment management services. <span class="da-warn">This is an area of significant judgment.</span></p>
+          <p><strong>Crypto yield platform (e.g., pooling investor assets for staking):</strong> If the platform takes custody of investor assets, makes decisions about where/how to deploy them (which validators, which protocols), and charges a management or platform fee, this looks more like investment management. If investors retain direct control and the platform merely facilitates, the analysis is less clear.</p>
+          <p><strong>Staking consideration:</strong> If the entity pools investor crypto and <strong>makes decisions about delegation</strong> — which validators to use, when to move between validators, how to optimize yield — that decision-making function is analogous to investment management. If the entity simply routes assets to a predetermined validator with no discretion, the investment management element is weaker.</p>
+        </div>
+
+        <div class="assessment-row">
+          <div class="assess-label">FC-2 Assessment</div>
+          <div class="assess-options">
+            <button class="assess-opt" onclick="setAssess('FC2','yes',this)">✓ Yes — Met</button>
+            <button class="assess-opt" onclick="setAssess('FC2','part',this)">~ Partially / Uncertain</button>
+            <button class="assess-opt" onclick="setAssess('FC2','no',this)">✗ No — Not Met</button>
+          </div>
+          <textarea class="assess-note" placeholder="Document your basis for conclusion…" oninput="saveNotes('FC2',this.value)"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ TYPICAL CHARACTERISTICS ══ -->
+<div id="tc" class="section-card">
+  <div class="section-head">
+    <div class="sec-icon sec-icon-purple">⚖️</div>
+    <div>
+      <div class="sec-title">Typical Characteristics — Evidence Assessment</div>
+      <div class="sec-subtitle">ASC 946-10-15-12(b). Six characteristics assessed holistically — not all required, but more present = stronger evidence of investment company status.</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="callout co-purple">
+      <div class="callout-title">How to Read the Typical Characteristics</div>
+      <p>The typical characteristics are <strong>not individually required</strong> — they are evidence points. The ASC 946 framework asks whether the entity's facts and circumstances, taken as a whole, indicate it is operating as an investment company. All six present = very strong evidence. Four or five present, depending on which ones = likely. Two or three = judgment-intensive. One or fewer = likely not an investment company even if both fundamental characteristics are met.</p>
+      <p style="margin-top:8px">FASB indicated that <strong>TC-6 (Fair Value Basis)</strong> is the most critical of the six — an entity that does not manage its investments primarily on a fair value basis is unlikely to be an investment company regardless of other characteristics.</p>
+    </div>
+
+    <!-- TC-1 -->
+    <div class="criterion" id="crit-TC1">
+      <div class="crit-head" onclick="toggleCrit('TC1')">
+        <span class="crit-num cn-tc">TC-1</span>
+        <div class="crit-title">More than one investment</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="prose">
+          Investment companies typically hold portfolios of multiple investments to spread risk and generate diversified returns. Holding a single investment is not disqualifying — single-purpose vehicles exist — but it is a weaker indicator. An entity holding one investment should have a compelling explanation for why it otherwise qualifies.
+        </div>
+        <div class="prose">
+          <strong>How to count:</strong> Each discrete investment (position in a security, loan to a different borrower, interest in a different real estate property) counts separately. However, multiple positions in the same issuer may be treated as one investment in some contexts.
+        </div>
+        <div class="da-block">
+          <div class="da-label">🪙 Digital Asset Application — TC-1</div>
+          <p>A crypto fund holding BTC, ETH, SOL, and positions in DeFi protocols clearly has multiple investments. <strong>A fund holding only BTC</strong> (e.g., a Bitcoin-only fund) technically has one investment — but this single-asset concentration is common in crypto funds and, by itself, is not disqualifying. Consider whether the fund holds BTC across multiple custodians or structures that might be treated as multiple positions. Note that a Bitcoin ETF, despite holding only BTC, is clearly an investment company — the single-asset characteristic is outweighed by all other evidence.</p>
+          <p>For staking vehicles: a single-asset staking fund (ETH-only staking) has one "investment" but generates income through a well-defined investment activity. <span class="da-warn">This characteristic alone does not disqualify it.</span></p>
+        </div>
+        <div class="assessment-row">
+          <div class="assess-label">TC-1 Assessment</div>
+          <div class="assess-options">
+            <button class="assess-opt" onclick="setAssess('TC1','yes',this)">✓ Present</button>
+            <button class="assess-opt" onclick="setAssess('TC1','part',this)">~ Partial</button>
+            <button class="assess-opt" onclick="setAssess('TC1','no',this)">✗ Not Present</button>
+            <button class="assess-opt" onclick="setAssess('TC1','na',this)">N/A</button>
+          </div>
+          <textarea class="assess-note" placeholder="Notes…" oninput="saveNotes('TC1',this.value)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- TC-2 -->
+    <div class="criterion" id="crit-TC2">
+      <div class="crit-head" onclick="toggleCrit('TC2')">
+        <span class="crit-num cn-tc">TC-2</span>
+        <div class="crit-title">More than one investor</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="prose">
+          Most investment companies pool capital from multiple investors. However, single-investor funds (managed accounts, separately managed accounts, feeder funds) can still be investment companies — this characteristic is evidence, not a requirement. A single-investor vehicle managed by a third-party investment manager under an investment mandate has strong evidence on other characteristics that can outweigh the single-investor limitation.
+        </div>
+        <div class="prose">
+          <strong>What counts as a separate investor:</strong> Each entity or person with a distinct ownership interest counts. Feeder funds that consolidate their interest count as one investor from the master fund's perspective, but the master fund may still qualify as an investment company.
+        </div>
+        <div class="da-block">
+          <div class="da-label">🪙 Digital Asset Application — TC-2</div>
+          <p>Most crypto funds and yield-generating crypto vehicles have multiple investors by design. A pooled staking vehicle where many token holders deposit ETH in exchange for liquid staking tokens (like stETH) has <strong>many investors</strong> and clearly meets TC-2. A family office that self-manages its own crypto portfolio has only one "investor" (itself) — this characteristic is not met, but the entity may still fail for other reasons (typically FC-2 as well).</p>
+        </div>
+        <div class="assessment-row">
+          <div class="assess-label">TC-2 Assessment</div>
+          <div class="assess-options">
+            <button class="assess-opt" onclick="setAssess('TC2','yes',this)">✓ Present</button>
+            <button class="assess-opt" onclick="setAssess('TC2','part',this)">~ Partial (single investor)</button>
+            <button class="assess-opt" onclick="setAssess('TC2','no',this)">✗ Not Present</button>
+            <button class="assess-opt" onclick="setAssess('TC2','na',this)">N/A</button>
+          </div>
+          <textarea class="assess-note" placeholder="Notes…" oninput="saveNotes('TC2',this.value)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- TC-3 -->
+    <div class="criterion" id="crit-TC3">
+      <div class="crit-head" onclick="toggleCrit('TC3')">
+        <span class="crit-num cn-tc">TC-3</span>
+        <div class="crit-title">Investors that are not related parties of the investment manager or general partner</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="prose">
+          This characteristic tests whether the investment management function is genuinely independent — i.e., the manager is managing money for unrelated investors at arm's length, not simply organizing family wealth or creating a structure between affiliated entities. When investors are all related to the manager, the arrangement resembles a holding company more than a fund.
+        </div>
+        <div class="prose">
+          <strong>Related parties</strong> for this purpose generally include family members, affiliates, entities under common control, and employees of the investment manager. If <em>all</em> capital comes from related parties, this characteristic is not met. If a mix of related and unrelated investors participate, partial credit may be appropriate — but consider whether the unrelated investors are incidental or central to the entity's character.
+        </div>
+        <div class="da-block">
+          <div class="da-label">🪙 Digital Asset Application — TC-3</div>
+          <p>A public staking protocol or crypto fund open to any investor clearly has unrelated investors. The challenge arises with <strong>early-stage crypto funds or DAOs</strong> where the founders, developers, and initial token holders are closely affiliated — if the initial investors are predominantly team members and affiliates, TC-3 may not be met initially, even if the intent is to open to the public. Consider evaluating at the reporting date, not at inception.</p>
+        </div>
+        <div class="assessment-row">
+          <div class="assess-label">TC-3 Assessment</div>
+          <div class="assess-options">
+            <button class="assess-opt" onclick="setAssess('TC3','yes',this)">✓ Present</button>
+            <button class="assess-opt" onclick="setAssess('TC3','part',this)">~ Partial</button>
+            <button class="assess-opt" onclick="setAssess('TC3','no',this)">✗ Not Present</button>
+            <button class="assess-opt" onclick="setAssess('TC3','na',this)">N/A</button>
+          </div>
+          <textarea class="assess-note" placeholder="Notes…" oninput="saveNotes('TC3',this.value)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- TC-4 -->
+    <div class="criterion" id="crit-TC4">
+      <div class="crit-head" onclick="toggleCrit('TC4')">
+        <span class="crit-num cn-tc">TC-4</span>
+        <div class="crit-title">Ownership interests are in the form of equity or partnership interests</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="prose">
+          Investors in an investment company typically hold <strong>equity-type interests</strong> — limited partnership interests, shares of common stock, membership interests — that represent a residual claim on the net assets of the fund. This is the classic LP/GP or fund share structure. The ownership interest should represent participation in the gains and losses of the investment portfolio, not a fixed return.
+        </div>
+        <div class="prose">
+          Entities where "investors" hold <strong>debt instruments</strong> (notes, bonds) that pay a fixed return regardless of investment performance are not exhibiting this characteristic — those holders are creditors, not investors. However, participating notes or profit-participation arrangements that share in gains might be closer to equity-like interests depending on the specific terms.
+        </div>
+        <div class="da-block">
+          <div class="da-label">🪙 Digital Asset Application — TC-4</div>
+          <p><strong>Fund interests (LP units, LLC membership interests):</strong> Classic investment company structure — TC-4 clearly met.</p>
+          <p><strong>Liquid staking tokens (LSTs):</strong> Tokens like stETH, rETH, or cbETH represent a pro-rata share of pooled staked ETH plus accumulated rewards. These function economically like equity interests — each token represents a residual claim on a proportionate share of the pool. <span class="da-good">Strong argument that LSTs satisfy TC-4.</span></p>
+          <p><strong>Yield-bearing tokens vs. fixed-return tokens:</strong> If a token pays a <em>variable</em> return based on staking yields (analogous to dividends on equity), it looks like an equity interest. If a token pays a <em>fixed</em> APY regardless of underlying performance (structured like debt), TC-4 is less clear.</p>
+          <p><strong>Governance tokens with economic rights:</strong> Governance tokens that also carry proportionate economic interests in protocol revenue may qualify, but this requires careful analysis of the token's specific rights.</p>
+        </div>
+        <div class="assessment-row">
+          <div class="assess-label">TC-4 Assessment</div>
+          <div class="assess-options">
+            <button class="assess-opt" onclick="setAssess('TC4','yes',this)">✓ Present</button>
+            <button class="assess-opt" onclick="setAssess('TC4','part',this)">~ Partial / Uncertain</button>
+            <button class="assess-opt" onclick="setAssess('TC4','no',this)">✗ Not Present</button>
+            <button class="assess-opt" onclick="setAssess('TC4','na',this)">N/A</button>
+          </div>
+          <textarea class="assess-note" placeholder="Notes…" oninput="saveNotes('TC4',this.value)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- TC-5 -->
+    <div class="criterion" id="crit-TC5">
+      <div class="crit-head" onclick="toggleCrit('TC5')">
+        <span class="crit-num cn-tc">TC-5</span>
+        <div class="crit-title">Pooling of funds</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="prose">
+          Investment companies typically <strong>pool the capital of multiple investors</strong> into a common fund, which is then invested collectively. Pooling provides economies of scale (access to investment opportunities too large for any single investor), diversification, and professional management. The pooled nature means no single investor controls the investment decisions of the fund.
+        </div>
+        <div class="prose">
+          A separately managed account (SMA) where a single investor's assets are kept segregated and managed specifically for that investor is not pooled. Such arrangements may still qualify as investment companies under certain circumstances, but TC-5 would not be met.
+        </div>
+        <div class="da-block">
+          <div class="da-label">🪙 Digital Asset Application — TC-5</div>
+          <p><strong>Pooled staking protocols:</strong> The entire value proposition of liquid staking protocols (Lido, Rocket Pool, Coinbase cbETH, etc.) is pooling — individual ETH holders who don't meet the 32 ETH validator minimum contribute to a shared pool. This is textbook pooling. <span class="da-good">TC-5 strongly met for pooled staking vehicles.</span></p>
+          <p><strong>Validator node operated for individual account:</strong> An entity running a single dedicated validator for its own account (or one investor's account) is not pooling. TC-5 not met in this structure.</p>
+          <p><strong>DeFi liquidity pools:</strong> Liquidity pools (Uniswap, Curve, Aave) pool capital from multiple participants — in a mechanical sense, this resembles pooling. However, the purpose is operational (facilitating trades, lending) rather than investment management, which affects the FC analysis more than TC-5.</p>
+        </div>
+        <div class="assessment-row">
+          <div class="assess-label">TC-5 Assessment</div>
+          <div class="assess-options">
+            <button class="assess-opt" onclick="setAssess('TC5','yes',this)">✓ Present</button>
+            <button class="assess-opt" onclick="setAssess('TC5','part',this)">~ Partial</button>
+            <button class="assess-opt" onclick="setAssess('TC5','no',this)">✗ Not Present</button>
+            <button class="assess-opt" onclick="setAssess('TC5','na',this)">N/A</button>
+          </div>
+          <textarea class="assess-note" placeholder="Notes…" oninput="saveNotes('TC5',this.value)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- TC-6 -->
+    <div class="criterion" id="crit-TC6">
+      <div class="crit-head" onclick="toggleCrit('TC6')">
+        <span class="crit-num cn-tc">TC-6</span>
+        <div class="crit-title">Reporting entity manages substantially all of its investments on a fair value basis <span style="font-size:.75rem;color:#6B21A8;font-weight:700">(Most Critical)</span></div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="callout co-purple" style="margin-bottom:14px">
+          <div class="callout-title">FASB's Most Critical Characteristic</div>
+          <p>FASB explicitly noted in the basis for conclusions of ASU 2013-08 that <strong>TC-6 carries the most weight</strong> among the typical characteristics. Managing investments on a fair value basis is the hallmark of investment company accounting — it is the reason the ASC 946 model exists. An entity that primarily measures and manages on a cost or other basis is unlikely to be an investment company regardless of how many other TCs are present.</p>
+        </div>
+        <div class="prose">
+          <strong>"Manages on a fair value basis"</strong> means the entity <em>actually uses fair value information to make investment decisions</em> — entry decisions, exit decisions, portfolio monitoring, and performance measurement all rely on fair value. This is distinct from simply <em>reporting</em> at fair value: an entity could be required to report at FV for accounting purposes without actually managing its portfolio on that basis.
+        </div>
+        <div class="prose">
+          Evidence of fair value management includes: investment committee materials based on FV/NAV, investor reporting showing FV, performance metrics based on total return (appreciation + income), formal valuation processes for illiquid investments, and management represented by a portfolio management function rather than a board overseeing operations.
+        </div>
+
+        <div class="ind-grid">
+          <div class="ind-box ind-for">
+            <div class="ind-title ind-title-for">✓ Supports TC-6</div>
+            <ul>
+              <li>Investment committee uses FV data to make buy/sell decisions</li>
+              <li>Investor capital statements show FV of portfolio</li>
+              <li>Performance reported as total return (income + appreciation)</li>
+              <li>Formal quarterly/annual valuation process for illiquid assets</li>
+              <li>NAV-based investor entry/exit pricing</li>
+              <li>Portfolio monitoring on mark-to-market basis</li>
+              <li>Risk management focused on FV exposure</li>
+            </ul>
+          </div>
+          <div class="ind-box ind-against">
+            <div class="ind-title ind-title-against">✗ Undermines TC-6</div>
+            <ul>
+              <li>Investments carried at cost; FV not tracked internally</li>
+              <li>Performance measured by operating metrics (revenue, EBITDA)</li>
+              <li>No formal valuation process; assets not marked to market</li>
+              <li>Management decisions based on operational considerations, not FV</li>
+              <li>Investor returns are fixed/contractual, not FV-based</li>
+              <li>Acquisitions evaluated on strategic fit, not FV IRR</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="da-block">
+          <div class="da-label">🪙 Digital Asset Application — TC-6</div>
+          <p><strong>Crypto funds:</strong> Most crypto assets trade on active markets with readily determinable fair values (and most are now required to be measured at FV under ASU 2023-08 for non-investment-company entities anyway). Crypto fund managers unambiguously manage on a FV basis — entry/exit decisions, position sizing, and risk management all use real-time market prices. <span class="da-good">TC-6 is typically the strongest characteristic for crypto funds.</span></p>
+          <p><strong>Staking vehicles:</strong> The value of staked ETH (or other PoS assets) is determinable by reference to the market price of the underlying token. A staking vehicle that tracks the fair value of its staked position and reports NAV to investors manages on a FV basis. <span class="da-good">TC-6 met for well-structured staking vehicles.</span></p>
+          <p><strong>Key distinction:</strong> If the staking vehicle focuses only on the <em>yield rate</em> (APY) and not on the fair value of the underlying staked principal, this may suggest the entity is managing on a yield/income basis rather than a total-return/fair-value basis. Comprehensive FV management requires tracking both income and the mark-to-market of the principal position.</p>
+          <p><strong>Illiquid tokens / early-stage investments:</strong> Entities holding illiquid tokens or early-stage investments need a formal valuation process. If the entity uses ad-hoc or no valuation methodology for illiquid positions, TC-6 is weakened even if liquid positions are marked to market.</p>
+        </div>
+
+        <div class="assessment-row">
+          <div class="assess-label">TC-6 Assessment</div>
+          <div class="assess-options">
+            <button class="assess-opt" onclick="setAssess('TC6','yes',this)">✓ Present</button>
+            <button class="assess-opt" onclick="setAssess('TC6','part',this)">~ Partial / Uncertain</button>
+            <button class="assess-opt" onclick="setAssess('TC6','no',this)">✗ Not Present</button>
+            <button class="assess-opt" onclick="setAssess('TC6','na',this)">N/A</button>
+          </div>
+          <textarea class="assess-note" placeholder="Notes…" oninput="saveNotes('TC6',this.value)"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ CONCLUSION ══ -->
+<div id="conclusion" class="section-card">
+  <div class="section-head">
+    <div class="sec-icon sec-icon-green">📊</div>
+    <div>
+      <div class="sec-title">Assessment Conclusion</div>
+      <div class="sec-subtitle">Based on your responses above — updates in real time as you complete the assessment</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div id="conclusionPanel" class="conclusion-panel cp-unknown">
+      <div class="cp-title" id="cpTitle">Complete the assessment above</div>
+      <div class="cp-body" id="cpBody">Answer all Fundamental Characteristics and as many Typical Characteristics as applicable to generate a conclusion.</div>
+      <div class="score-dots" id="scoreDots"></div>
+    </div>
+
+    <div style="margin-top:18px">
+      <div class="assess-label" style="margin-bottom:8px">Overall Conclusion &amp; Documentation</div>
+      <textarea class="assess-note" style="min-height:100px" placeholder="Document overall conclusion, significant judgment areas, references to authoritative guidance considered, and any planned disclosures or accounting policy elections…" oninput="saveNotes('OVERALL',this.value)"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ DIGITAL ASSET CONTEXT ══ -->
+<div id="digital" class="section-card">
+  <div class="section-head">
+    <div class="sec-icon sec-icon-teal">🪙</div>
+    <div>
+      <div class="sec-title">Digital Asset Entity Context — How the Framework Applies</div>
+      <div class="sec-subtitle">Detailed analysis of how ASC 946 criteria apply across common digital asset entity structures</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div class="prose">
+      The digital asset space has produced a wide variety of entity structures — many of which sit in genuine grey areas with respect to the ASC 946 determination. The core challenge is that <strong>the traditional markers of investment vs. operational activity are blurred in crypto</strong>: a company can "hold crypto" that is simultaneously an investment and an operational tool; staking generates income that looks like investment income but requires operational infrastructure; DeFi protocols pool capital like funds but operate like software platforms.
+    </div>
+
+    <div class="callout co-blue">
+      <div class="callout-title">The Central Question for Any Digital Asset Entity</div>
+      <p>Is the entity <strong>deploying capital in crypto assets to generate investment returns for investors</strong>, or is it <strong>operating a business that happens to involve crypto</strong>? If you can describe the entity's primary value proposition without mentioning investors' return expectations — i.e., if the core product is an exchange, a wallet, a protocol, or infrastructure — it is probably not an investment company regardless of what it holds.</p>
+    </div>
+
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Entity Type</th>
+          <th>FC-1 (Purpose)</th>
+          <th>FC-2 (Mgmt Services)</th>
+          <th>TC Assessment</th>
+          <th>Likely Conclusion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Crypto Hedge Fund / VC Fund</strong><br><span style="font-size:.75rem;color:var(--gray-400)">LP/GP, formal mandate, trades tokens/coins/equity</span></td>
+          <td><span class="pill pill-green">Met</span></td>
+          <td><span class="pill pill-green">Met</span></td>
+          <td>All 6 typically present</td>
+          <td><span class="pill pill-green">Investment Company</span></td>
+        </tr>
+        <tr>
+          <td><strong>Pooled Staking Vehicle (LST protocol)</strong><br><span style="font-size:.75rem;color:var(--gray-400)">Pools ETH, delegates to validators, issues LSTs</span></td>
+          <td><span class="pill pill-amber">Judgment</span></td>
+          <td><span class="pill pill-amber">Judgment</span></td>
+          <td>TC-1 (weak), TC-2 ✓, TC-3 ✓, TC-4 ✓, TC-5 ✓, TC-6 ✓</td>
+          <td><span class="pill pill-amber">Likely Yes — Judgment</span></td>
+        </tr>
+        <tr>
+          <td><strong>Single Validator Operator</strong><br><span style="font-size:.75rem;color:var(--gray-400)">Operates nodes for own account or for fee</span></td>
+          <td><span class="pill pill-red">Not Met</span></td>
+          <td><span class="pill pill-red">Not Met</span></td>
+          <td>Multiple TCs absent</td>
+          <td><span class="pill pill-red">NOT an Investment Company</span></td>
+        </tr>
+        <tr>
+          <td><strong>Crypto Exchange / Custodian</strong><br><span style="font-size:.75rem;color:var(--gray-400)">Holds crypto in custody for customers, earns fees</span></td>
+          <td><span class="pill pill-red">Not Met</span></td>
+          <td><span class="pill pill-red">Not Met</span></td>
+          <td>N/A</td>
+          <td><span class="pill pill-red">NOT an Investment Company</span></td>
+        </tr>
+        <tr>
+          <td><strong>Corporate Treasury Holding Crypto</strong><br><span style="font-size:.75rem;color:var(--gray-400)">Tech/mining co. holding BTC/ETH as treasury asset</span></td>
+          <td><span class="pill pill-red">Not Met</span></td>
+          <td><span class="pill pill-red">Not Met</span></td>
+          <td>N/A</td>
+          <td><span class="pill pill-red">NOT an Investment Company</span></td>
+        </tr>
+        <tr>
+          <td><strong>DeFi Protocol / DAO</strong><br><span style="font-size:.75rem;color:var(--gray-400)">Decentralized protocol, liquidity pools, governance tokens</span></td>
+          <td><span class="pill pill-red">Likely Not Met</span></td>
+          <td><span class="pill pill-amber">Uncertain</span></td>
+          <td>Highly fact-specific</td>
+          <td><span class="pill pill-amber">Highly Fact-Specific</span></td>
+        </tr>
+        <tr>
+          <td><strong>Crypto Mining Company</strong><br><span style="font-size:.75rem;color:var(--gray-400)">Generates crypto through PoW mining, sells or holds</span></td>
+          <td><span class="pill pill-red">Not Met</span></td>
+          <td><span class="pill pill-red">Not Met</span></td>
+          <td>N/A — operational business</td>
+          <td><span class="pill pill-red">NOT an Investment Company</span></td>
+        </tr>
+        <tr>
+          <td><strong>Family Office — Crypto Portfolio</strong><br><span style="font-size:.75rem;color:var(--gray-400)">Single family managing crypto for own account</span></td>
+          <td><span class="pill pill-amber">Possibly Met</span></td>
+          <td><span class="pill pill-amber">Uncertain</span></td>
+          <td>TC-2, TC-3, TC-5 typically absent</td>
+          <td><span class="pill pill-red">Likely NOT — Unless Structured as Fund</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout co-amber" style="margin-top:6px">
+      <div class="callout-title">The "Incidental Activities" Issue</div>
+      <p>ASC 946-10-15 notes that investment companies may have activities that are <strong>incidental</strong> to their investment activities without losing investment company status. The question is whether operational activities (validator operations, protocol governance, treasury management) are truly incidental to the investment purpose, or whether they represent a distinct and material operating business. <strong>There is no bright-line test.</strong> Consider: if the operational activities were stripped away, would the entity still function as an investment company? If yes, the operational activities may be incidental.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ STAKING ANALYSIS ══ -->
+<div id="staking" class="section-card">
+  <div class="section-head">
+    <div class="sec-icon sec-icon-amber">⛓️</div>
+    <div>
+      <div class="sec-title">Staking, Delegating &amp; Validating — Impact on the Assessment</div>
+      <div class="sec-subtitle">Detailed analysis of how different staking structures affect each ASC 946 criterion</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div class="prose">
+      Staking activities sit at the intersection of investment and operational activity, which is exactly why they complicate the ASC 946 analysis. The way the entity participates in staking — whether passively delegating, actively running validator infrastructure, or operating as a pooled staking protocol — has significant implications for each criterion.
+    </div>
+
+    <div class="callout co-blue">
+      <div class="callout-title">Understanding the Staking Spectrum</div>
+      <p>Proof-of-stake blockchains (Ethereum, Solana, Cosmos, Cardano, Avalanche, etc.) require participants to lock tokens as economic security. Returns are generated through block rewards and transaction fees. The key distinction for ASC 946 is <strong>who bears the operational responsibility and risk</strong>:</p>
+      <ul>
+        <li><strong>Delegating:</strong> Token holder assigns their staking rights to a validator and receives a share of rewards. Passive — analogous to lending securities or investing in a bond for yield.</li>
+        <li><strong>Validating:</strong> Token holder or entity runs the actual validator node — uptime monitoring, software updates, slashing risk management. Active infrastructure operation.</li>
+        <li><strong>Pooled staking (LSTs):</strong> Many holders contribute to a pooled protocol that collectively stakes and issues representative tokens. The protocol operates the validators; holders are passive.</li>
+      </ul>
+    </div>
+
+    <div class="staking-grid">
+      <div class="staking-card sc-delegate">
+        <h4>Passive Delegation</h4>
+        <ul>
+          <li>Holder selects a validator; tokens delegated</li>
+          <li>No infrastructure to run or maintain</li>
+          <li>Income = staking yield (investment income)</li>
+          <li>Slashing risk: limited (delegator vs. validator)</li>
+          <li>Analogous to: investing in a bond/money market fund</li>
+          <li><strong>ASC 946 view:</strong> Supports investment company characterization — clearly an investment activity generating income from deployed capital</li>
+        </ul>
+      </div>
+      <div class="staking-card sc-validate">
+        <h4>Active Validation</h4>
+        <ul>
+          <li>Entity operates validator node(s)</li>
+          <li>Infrastructure, uptime, software management required</li>
+          <li>Income = block rewards + transaction fees + MEV</li>
+          <li>Full slashing risk on operator</li>
+          <li>Analogous to: operating a financial services business</li>
+          <li><strong>ASC 946 view:</strong> Operational activity. Running validators for one's own return is less investment-like. Running for others' return looks more like a service business. Undermines FC-1 and TC-6.</li>
+        </ul>
+      </div>
+      <div class="staking-card sc-liquid">
+        <h4>Pooled Liquid Staking</h4>
+        <ul>
+          <li>Protocol pools deposits; issues liquid staking tokens</li>
+          <li>Protocol operates validators; depositors are passive</li>
+          <li>LST = proportionate claim on pool + rewards</li>
+          <li>Secondary market liquidity for the LST</li>
+          <li>Analogous to: ETF or money market fund</li>
+          <li><strong>ASC 946 view:</strong> Most investment-company-like structure. FC-1, FC-2, TC-2, TC-4, TC-5, TC-6 all potentially met. The protocol issuing LSTs may be an investment company; the protocol operating infrastructure may be an operating company. They are often separate legal entities.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-top:6px"><strong>Criterion-by-Criterion Analysis of Staking Activities:</strong></div>
+
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Criterion</th>
+          <th>Passive Delegating</th>
+          <th>Running Validator Nodes</th>
+          <th>Pooled Staking Protocol (LSTs)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>FC-1</strong> Investment purpose</td>
+          <td><span class="pill pill-green">Supports</span> — yield from deployed capital</td>
+          <td><span class="pill pill-red">Undermines</span> — operational infrastructure activity</td>
+          <td><span class="pill pill-green">Supports</span> — pooling for investor yield</td>
+        </tr>
+        <tr>
+          <td><strong>FC-2</strong> Mgmt services to investors</td>
+          <td><span class="pill pill-amber">Neutral</span> — depends on entity structure</td>
+          <td><span class="pill pill-red">Undermines</span> — providing validation services, not investment mgmt</td>
+          <td><span class="pill pill-green">Supports</span> — entity manages deployment on behalf of depositors</td>
+        </tr>
+        <tr>
+          <td><strong>TC-1</strong> Multiple investments</td>
+          <td><span class="pill pill-amber">Neutral</span> — depends on how many validators/chains used</td>
+          <td><span class="pill pill-amber">Neutral</span></td>
+          <td><span class="pill pill-green">Supports</span> — often multiple validators</td>
+        </tr>
+        <tr>
+          <td><strong>TC-6</strong> Fair value basis</td>
+          <td><span class="pill pill-green">Supports</span> if entity tracks FV of staked position</td>
+          <td><span class="pill pill-amber">Uncertain</span> — if focused on yield rate vs. total FV</td>
+          <td><span class="pill pill-green">Supports</span> — NAV of pool typically tracked at FV</td>
+        </tr>
+        <tr>
+          <td><strong>Slashing risk impact</strong></td>
+          <td>Limited — delegator bears limited slashing exposure</td>
+          <td>Full — operator bears all slashing risk. This is an operational risk, not investment risk.</td>
+          <td>Mutualized across pool — insurance/reserves often maintained</td>
+        </tr>
+        <tr>
+          <td><strong>Income character</strong></td>
+          <td>Investment income — analogous to dividends/interest</td>
+          <td>Mixed — block rewards + service fees. Operational income characteristics.</td>
+          <td>Investment income — distributed proportionately to pool</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout co-red">
+      <div class="callout-title">The Slashing Risk / Operational Risk Issue</div>
+      <p>When an entity runs validator nodes, it bears <strong>slashing risk</strong> — the blockchain protocol can penalize (slash) the validator's staked balance for downtime or malicious behavior. From an ASC 946 perspective, this is significant: slashing risk is an <em>operational risk</em> (risk of loss from infrastructure failure or misconfiguration), not a market risk or credit risk. An entity bearing full operational slashing risk as a validator is exhibiting characteristics of an operating company, not an investment company.</p>
+      <p style="margin-top:8px">Contrast this with <strong>delegators</strong>, who may bear limited indirect slashing exposure but do not bear the operational responsibility. This distinction is analogous to the difference between a fund that invests in bank loans (bears credit risk — investment risk) vs. a bank that originates loans (bears operational and credit risk — operating company).</p>
+    </div>
+
+    <div class="callout co-teal">
+      <div class="callout-title">MEV (Maximal Extractable Value) and Its Impact</div>
+      <p>Entities running validators may earn MEV — income generated by reordering, inserting, or censoring transactions within blocks. MEV is fundamentally an <strong>operational revenue stream</strong> derived from running infrastructure, not from investment activity. An entity whose material revenue is derived from MEV extraction is exhibiting operational company characteristics. The larger MEV is as a proportion of total income, the more it undercuts an investment company argument.</p>
+    </div>
+
+    <div class="callout co-purple">
+      <div class="callout-title">Restaking (EigenLayer and Similar Protocols)</div>
+      <p>Restaking protocols (like EigenLayer on Ethereum) allow already-staked assets to be simultaneously staked for additional protocols, earning additional yield. From an ASC 946 perspective, restaking is an additional layer of investment activity (deploying staked capital for additional return) — it <em>supports</em> the investment company characterization if done passively through a restaking manager. However, entities that operate Actively Validated Services (AVSs) on restaking platforms are again performing operational activities, not purely investment activities. The same delegation vs. operation distinction applies.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SCENARIOS ══ -->
+<div id="examples" class="section-card">
+  <div class="section-head">
+    <div class="sec-icon sec-icon-red">📚</div>
+    <div>
+      <div class="sec-title">Illustrative Scenarios</div>
+      <div class="sec-subtitle">Walk-through examples applying the framework to common digital asset situations</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <!-- Scenario 1 -->
+    <div class="criterion open" id="crit-S1">
+      <div class="crit-head" onclick="toggleCrit('S1')">
+        <span class="crit-num cn-da">Scenario 1</span>
+        <div class="crit-title">CryptoAlpha Fund, LP — A traditional crypto hedge fund structure</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="callout co-gray">
+          <div class="callout-title">Facts</div>
+          <p>CryptoAlpha Fund, LP is a Cayman-exempted limited partnership with a Delaware-based general partner. The GP charges a 2% management fee and 20% carried interest. The fund has 45 unrelated LP investors who contributed $250M in capital. The GP invests in BTC, ETH, liquid tokens, DeFi protocol tokens, and early-stage SAFT agreements. The fund operates a 5-year life. All investments are tracked on a fair value basis, and monthly NAV reports are sent to investors. The fund earns staking yield by delegating ETH to third-party validators.</p>
+        </div>
+        <div class="two-col">
+          <div class="callout co-green" style="margin:0">
+            <div class="callout-title">Assessment — Meets ASC 946</div>
+            <ul>
+              <li><strong>FC-1:</strong> ✓ Explicit investment purpose — governing docs, investment mandate, defined fund life, carried interest structure</li>
+              <li><strong>FC-2:</strong> ✓ GP provides investment management services to LP investors; management fee paid for advisory</li>
+              <li><strong>TC-1:</strong> ✓ Multiple investments across multiple tokens</li>
+              <li><strong>TC-2:</strong> ✓ 45 LP investors</li>
+              <li><strong>TC-3:</strong> ✓ LPs are unrelated third parties</li>
+              <li><strong>TC-4:</strong> ✓ LP interests = equity interests in the fund</li>
+              <li><strong>TC-5:</strong> ✓ Pooled capital structure</li>
+              <li><strong>TC-6:</strong> ✓ All investments tracked at FV, NAV reported monthly</li>
+            </ul>
+          </div>
+          <div class="callout co-blue" style="margin:0">
+            <div class="callout-title">Staking Note</div>
+            <p>The fund delegates ETH to third-party validators — this is <strong>passive investment income</strong> and does not undermine the investment company conclusion. The staking activity is incidental to and consistent with the investment purpose. Staking rewards are investment income analogous to dividends. The fund does not operate the validator infrastructure.</p>
+          </div>
+        </div>
+        <div class="callout co-green" style="margin-top:10px">
+          <strong>Conclusion: Investment Company under ASC 946</strong> — All criteria clearly met. Investments carried at fair value through income.
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenario 2 -->
+    <div class="criterion" id="crit-S2">
+      <div class="crit-head" onclick="toggleCrit('S2')">
+        <span class="crit-num cn-da">Scenario 2</span>
+        <div class="crit-title">StakePool Protocol LLC — A pooled ETH liquid staking platform</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="callout co-gray">
+          <div class="callout-title">Facts</div>
+          <p>StakePool is a protocol that accepts ETH deposits from retail and institutional users and issues liquid staking tokens (spETH) representing each depositor's pro-rata interest in the pool plus accumulated staking rewards. StakePool's smart contract allocates pooled ETH across a curated set of validator operators that StakePool has vetted and contracted with. StakePool charges a 10% fee on staking rewards. spETH is freely transferable and trades on secondary markets. The protocol's governance is managed by a small team; token holders have limited governance rights. StakePool employs engineers to monitor validator performance and manages relationships with validator operators.</p>
+        </div>
+        <div class="callout co-amber">
+          <div class="callout-title">Analysis — This Is Where It Gets Interesting</div>
+          <p><strong>FC-1 (Purpose):</strong> StakePool's purpose is to generate staking yield for its depositors — this looks like investment management. However, the protocol also has operational dimensions: vetting and managing validator relationships, engineering the smart contract infrastructure, monitoring performance. Is this investment management or operations? <em>Judgment required.</em> If the primary value creation is selecting and allocating to the best validators for yield optimization, this tilts toward investment management. If the primary value is the technical infrastructure, it tilts operational.</p>
+          <p style="margin-top:8px"><strong>FC-2 (Mgmt Services):</strong> StakePool does make decisions on behalf of depositors about which validators to use — this is arguably investment management. However, the depositors didn't contract with StakePool for "investment management services" in the traditional sense — they used a protocol. This is a genuine grey area.</p>
+          <p style="margin-top:8px"><strong>TC-4 (Equity Interests):</strong> spETH tokens represent residual claims on the pool's assets — this looks like equity. If spETH is classified as equity by the issuer, TC-4 is met.</p>
+          <p style="margin-top:8px"><strong>TC-6 (FV Basis):</strong> The pool's value is determinable by the fair value of staked ETH. If the protocol tracks NAV and reports to depositors on a FV basis, TC-6 is met.</p>
+        </div>
+        <div class="two-col">
+          <div class="callout co-amber" style="margin:0">
+            <div class="callout-title">Investment Company Argument (If Structured Properly)</div>
+            <p>If StakePool: (1) treats its primary function as <em>investment allocation</em> (choosing validators = selecting investments), (2) reports pool value at FV, (3) has clear investment mandate, and (4) the operational activities (smart contracts, monitoring) are <em>incidental</em> to the investment function — then an investment company argument is viable. Structural separation of the protocol operator from the investment pool helps significantly.</p>
+          </div>
+          <div class="callout co-red" style="margin:0">
+            <div class="callout-title">Not an Investment Company Argument</div>
+            <p>If StakePool: (1) earns material revenue from protocol fees that are <em>operational</em> in nature, (2) has substantial engineering/operational headcount, (3) is governed primarily by tech/product roadmap decisions, and (4) the staking is fundamentally providing infrastructure as a service — then the operational character dominates. Consider whether a software company analogy is more apt than a fund analogy.</p>
+          </div>
+        </div>
+        <div class="callout co-amber" style="margin-top:10px">
+          <strong>Conclusion: Judgment-Intensive — Likely Requires Legal Structuring Decision</strong>. The outcome depends heavily on how the entity is structured, governed, and described in its documents. Many similar protocols have pursued non-investment-company accounting by characterizing their activities as operational.
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenario 3 -->
+    <div class="criterion" id="crit-S3">
+      <div class="crit-head" onclick="toggleCrit('S3')">
+        <span class="crit-num cn-da">Scenario 3</span>
+        <div class="crit-title">NodeOps Inc. — A professional validator node operator</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="callout co-gray">
+          <div class="callout-title">Facts</div>
+          <p>NodeOps operates Ethereum, Solana, and Cosmos validator nodes on behalf of institutional clients. Clients delegate their tokens to NodeOps validators and pay a 5% commission on staking rewards. NodeOps runs the infrastructure, manages uptime, absorbs slashing insurance costs, and optimizes MEV. NodeOps also holds some ETH and SOL on its own balance sheet which is staked through its own validators. NodeOps' primary revenue is validator service commissions, not investment returns on its own holdings.</p>
+        </div>
+        <div class="callout co-red">
+          <div class="callout-title">Assessment — Not an Investment Company</div>
+          <p><strong>FC-1 FAILS:</strong> NodeOps' primary purpose is to <em>provide validator infrastructure services</em>, not to invest capital for investment returns. Its value proposition is operational excellence in running blockchain infrastructure. Its own holdings are incidental to this service business.</p>
+          <p style="margin-top:8px"><strong>FC-2 FAILS:</strong> NodeOps provides <em>infrastructure/validation services</em> to its clients — not investment management services. Clients manage their own investment decisions about what to stake; NodeOps handles the technical execution. This is more analogous to an outsourced IT provider or prime broker than an investment manager.</p>
+          <p style="margin-top:8px"><strong>Multiple TCs would also fail:</strong> The "clients" are not investors with equity interests in a fund — they are service customers. No pooling, no equity interests issued, no NAV-based management.</p>
+        </div>
+        <div class="callout co-red" style="margin-top:10px">
+          <strong>Conclusion: NOT an Investment Company.</strong> NodeOps is an operating company providing blockchain infrastructure services. Accounting follows general GAAP, not ASC 946. Own crypto holdings would be subject to ASU 2023-08 (FV option for in-scope assets) or ASC 350 (cost less impairment for intangibles, unless FV election made).
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenario 4 -->
+    <div class="criterion" id="crit-S4">
+      <div class="crit-head" onclick="toggleCrit('S4')">
+        <span class="crit-num cn-da">Scenario 4</span>
+        <div class="crit-title">DigitalHoldings Corp — Corporate treasury strategy investing heavily in Bitcoin</div>
+        <span class="crit-chev">▶</span>
+      </div>
+      <div class="crit-body">
+        <div class="callout co-gray">
+          <div class="callout-title">Facts</div>
+          <p>DigitalHoldings Corp is a publicly traded company that converted substantially all of its corporate treasury to Bitcoin. The company has minimal operating revenue — it does occasional consulting work. Management has stated that BTC appreciation is the primary driver of shareholder value. The company holds $3B in BTC and has $5M in consulting revenue. The company's CEO regularly discusses BTC price targets on earnings calls. The company has issued equity (stock) that trades on the NYSE, and shareholders are implicitly "invested" in BTC appreciation through the stock.</p>
+        </div>
+        <div class="callout co-amber">
+          <div class="callout-title">Analysis — The Notorious Grey Area</div>
+          <p><strong>FC-1:</strong> This is fact-intensive. The company's <em>economic purpose</em> has effectively become holding BTC for appreciation — which looks like investment activity. However, the legal form is a corporation with operating activities, not an investment fund. FASB has generally not blessed the reclassification of operating companies as investment companies simply because they hold large investment positions.</p>
+          <p style="margin-top:8px"><strong>FC-2:</strong> The company is NOT providing investment management services to its shareholders. Shareholders buy stock through the public markets — they are not contributing capital to a managed fund. The company is managing its own balance sheet, not investors' portfolios.</p>
+          <p style="margin-top:8px"><strong>TC Analysis:</strong> No pooling. No equity interests issued in a fund structure. Shareholders hold <em>corporate equity</em>, not fund interests. The company is not managing investments on behalf of investors — it is managing its own assets.</p>
+        </div>
+        <div class="callout co-red" style="margin-top:10px">
+          <strong>Conclusion: NOT an Investment Company</strong> — despite the economic reality looking investment-like. FC-2 is not met because the company is not providing investment management services to investors. Its BTC holdings are subject to ASU 2023-08 fair value accounting (as an elected option for in-scope crypto assets) or ASC 350. This conclusion is consistent with SEC staff positions as well.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let assess = {}; // { FC1: 'yes'|'no'|'part'|'na'|null, ... }
+let notes  = {};
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('asc946_state') || '{}');
+    assess = s.assess || {};
+    notes  = s.notes  || {};
+  } catch { assess = {}; notes = {}; }
+  // Restore note textareas
+  Object.entries(notes).forEach(([k, v]) => {
+    document.querySelectorAll(`[data-key="${k}"]`).forEach(el => el.value = v);
+  });
+  // Restore button selections
+  Object.entries(assess).forEach(([k, v]) => {
+    const row = document.getElementById('crit-' + k);
+    if (!row) return;
+    row.querySelectorAll('.assess-opt').forEach(btn => {
+      const val = btn.getAttribute('data-val');
+      if (val === v) btn.classList.add('sel-' + v);
+    });
+  });
+  updateConclusion();
+}
+
+function saveState() {
+  try { localStorage.setItem('asc946_state', JSON.stringify({ assess, notes })); } catch {}
+}
+
+function saveNotes(key, val) { notes[key] = val; saveState(); }
+
+function setAssess(key, val, btn) {
+  assess[key] = val;
+  // Clear other buttons in same row
+  const row = document.getElementById('crit-' + key);
+  if (row) {
+    row.querySelectorAll('.assess-opt').forEach(b => {
+      b.classList.remove('sel-yes','sel-no','sel-part','sel-na');
+    });
+  }
+  btn.classList.add('sel-' + val);
+  saveState();
+  updateConclusion();
+}
+
+// ─── CRITERION TOGGLES ───────────────────────────────────────────────────────
+function toggleCrit(id) {
+  const el = document.getElementById('crit-' + id);
+  if (el) el.classList.toggle('open');
+}
+
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+function navTo(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+}
+
+// ─── CONCLUSION ENGINE ───────────────────────────────────────────────────────
+function updateConclusion() {
+  const fc1 = assess['FC1'];
+  const fc2 = assess['FC2'];
+  const tcs = ['TC1','TC2','TC3','TC4','TC5','TC6'].map(k => assess[k] || null);
+
+  const bar    = document.getElementById('conclusionBar');
+  const panel  = document.getElementById('conclusionPanel');
+  const title  = document.getElementById('cpTitle');
+  const body   = document.getElementById('cpBody');
+  const dots   = document.getElementById('scoreDots');
+  const cRes   = document.getElementById('concResult');
+  const cSub   = document.getElementById('concSub');
+  const cBadge = document.getElementById('concBadges');
+
+  // FC assessment
+  const fc1Met  = fc1 === 'yes';
+  const fc1Part = fc1 === 'part';
+  const fc2Met  = fc2 === 'yes';
+  const fc2Part = fc2 === 'part';
+  const fcAnswered = fc1 && fc2;
+
+  // Count TCs
+  const tcYes  = tcs.filter(t => t === 'yes').length;
+  const tcPart = tcs.filter(t => t === 'part').length;
+  const tcNo   = tcs.filter(t => t === 'no').length;
+  const tcAnswered = tcs.filter(t => t !== null).length;
+
+  // Dots
+  const tcKeys = ['TC1','TC2','TC3','TC4','TC5','TC6'];
+  dots.innerHTML = tcKeys.map((k, i) => {
+    const v = tcs[i];
+    const cls = v === 'yes' ? 'dot-yes' : v === 'part' ? 'dot-part' : v === 'no' ? 'dot-no' : 'dot-none';
+    const label = v ? (v === 'yes' ? '✓' : v === 'no' ? '✗' : '~') : k.replace('TC','');
+    return `<div class="dot ${cls}" title="${k}: ${v || 'not answered'}">${label}</div>`;
+  }).join('');
+
+  if (!fcAnswered) {
+    setTheme('unknown', bar, panel);
+    title.textContent  = 'Answer both Fundamental Characteristics to continue';
+    body.textContent   = 'FC-1 (Investment Purpose) and FC-2 (Investor Management Services) must both be assessed first — they are threshold conditions.';
+    cRes.textContent   = 'Assessment incomplete';
+    cSub.textContent   = 'Complete FC-1 and FC-2 first';
+    cBadge.innerHTML   = '';
+    return;
+  }
+
+  // Both FCs must be fully met
+  if (fc1 === 'no' || fc2 === 'no') {
+    setTheme('no', bar, panel);
+    const which = fc1 === 'no' ? 'FC-1 (Investment Purpose)' : 'FC-2 (Investment Management Services)';
+    title.textContent = '⛔ NOT an Investment Company — Fundamental Characteristic Not Met';
+    body.textContent  = `${which} is not met. Both fundamental characteristics are threshold conditions — if either is absent, the entity cannot qualify as an investment company under ASC 946, regardless of how many typical characteristics are present. Stop here. Confirm whether any other investment company guidance applies (e.g., entity is registered under the 1940 Act).`;
+    cRes.textContent  = 'NOT an Investment Company';
+    cSub.textContent  = `${which} not met — assessment ends here`;
+    cBadge.innerHTML  = `<span class="badge badge-fund">ASC 946 Does Not Apply</span>`;
+    return;
+  }
+
+  if (fc1Part || fc2Part) {
+    // Uncertain FCs — harder to conclude
+    setTheme('judgment', bar, panel);
+    title.textContent = '⚠ Fundamental Characteristic Uncertain — Significant Judgment Required';
+    body.textContent  = 'One or both Fundamental Characteristics are assessed as uncertain/partial. If both FCs cannot be clearly established, investment company status cannot be confirmed. Consider whether additional facts would resolve the uncertainty, and whether a legal restructuring would be appropriate to achieve a definitive conclusion. Proceed to review Typical Characteristics for context, but note that uncertain FCs make the overall conclusion uncertain regardless of TC results.';
+    cRes.textContent  = 'Investment Company Status Uncertain';
+    cSub.textContent  = 'FC uncertainty — seek additional facts or legal guidance';
+    cBadge.innerHTML  = `<span class="badge badge-fund">Judgment Required</span>`;
+    return;
+  }
+
+  // Both FCs met — assess TCs
+  if (tcAnswered < 3) {
+    setTheme('judgment', bar, panel);
+    title.textContent = '✓ Fundamental Characteristics Met — Assessing Typical Characteristics...';
+    body.textContent  = 'Both fundamental characteristics are present. Continue assessing the six typical characteristics to form an overall conclusion. Note that TC-6 (Fair Value Basis) carries the most weight.';
+    cRes.textContent  = 'Both FC Met — Continue with Typical Characteristics';
+    cSub.textContent  = `${6 - tcAnswered} typical characteristics remaining`;
+    cBadge.innerHTML  = `<span class="badge badge-fc">FC-1 ✓</span><span class="badge badge-fc">FC-2 ✓</span>`;
+    return;
+  }
+
+  // Score
+  const score = tcYes + (tcPart * 0.5);
+  const tc6met = assess['TC6'];
+
+  if (score >= 5 && tc6met === 'yes') {
+    setTheme('yes', bar, panel);
+    title.textContent = '✅ Investment Company — Strong Evidence';
+    body.textContent  = `Both fundamental characteristics are met, and ${tcYes} of 6 typical characteristics are present (plus ${tcPart} partial). TC-6 (Fair Value Basis) — the most critical characteristic — is present. This combination provides strong evidence that the entity is an investment company under ASC 946. Apply investment company accounting: investments at fair value through income, investment company financial statement presentation, and required ASC 946 disclosures.`;
+    cRes.textContent  = 'Investment Company — ASC 946 Applies';
+    cSub.textContent  = `Both FC met · ${tcYes}/6 TC present · TC-6 ✓`;
+    cBadge.innerHTML  = `<span class="badge badge-fc">FC-1 ✓</span><span class="badge badge-fc">FC-2 ✓</span><span class="badge badge-tc">${tcYes}/6 TC</span>`;
+  } else if (score >= 3.5 || (score >= 3 && tc6met === 'yes')) {
+    setTheme('judgment', bar, panel);
+    title.textContent = '⚠ Likely Investment Company — Judgment Required';
+    body.textContent  = `Both fundamental characteristics are met. ${tcYes} typical characteristics are present and ${tcPart} are partial. ${tc6met === 'yes' ? 'TC-6 (Fair Value Basis) is present, which is the most critical indicator.' : 'Note: TC-6 (Fair Value Basis — most critical) is not clearly present, which weakens the conclusion.'} The overall pattern suggests investment company status, but the missing typical characteristics should be documented and the rationale for the conclusion should be supported by reference to specific facts and circumstances. Consider engagement with a technical accounting advisor.`;
+    cRes.textContent  = 'Likely Investment Company — Judgment-Intensive';
+    cSub.textContent  = `Both FC met · ${tcYes}/6 TC present · ${tc6met === 'yes' ? 'TC-6 ✓' : 'TC-6 uncertain'}`;
+    cBadge.innerHTML  = `<span class="badge badge-fc">FC-1 ✓</span><span class="badge badge-fc">FC-2 ✓</span><span class="badge badge-tc">${tcYes}/6 TC</span>`;
+  } else if (tc6met === 'no' && score >= 3) {
+    setTheme('judgment', bar, panel);
+    title.textContent = '⚠ TC-6 (Fair Value Basis) Not Met — Investment Company Status Unlikely';
+    body.textContent  = 'Both fundamental characteristics are met, but TC-6 — the most critical typical characteristic — is not present. FASB noted that failure of TC-6 strongly indicates the entity is not an investment company. The entity does not manage investments on a fair value basis, which is the fundamental hallmark of investment company accounting. The other typical characteristics present do not overcome the absence of TC-6. The entity is likely not an investment company.';
+    cRes.textContent  = 'Likely NOT an Investment Company — TC-6 Absent';
+    cSub.textContent  = 'Fair value basis management is absent — strongest counter-indicator';
+    cBadge.innerHTML  = `<span class="badge badge-fc">FC-1 ✓</span><span class="badge badge-fc">FC-2 ✓</span><span class="badge badge-tc">${tcYes}/6 TC · TC-6 ✗</span>`;
+  } else {
+    setTheme('no', bar, panel);
+    title.textContent = '⛔ Insufficient Evidence — NOT an Investment Company';
+    body.textContent  = `Both fundamental characteristics are met, but only ${tcYes} of 6 typical characteristics are present (plus ${tcPart} partial), and TC-6 (Fair Value Basis) is ${tc6met === 'yes' ? 'present' : 'absent or uncertain'}. The weight of the typical characteristics does not support an investment company conclusion. The entity should apply general GAAP accounting to its assets. Crypto holdings would be subject to ASU 2023-08 fair value option (if elected for in-scope assets) or ASC 350 treatment.`;
+    cRes.textContent  = 'NOT an Investment Company — Insufficient Typical Characteristics';
+    cSub.textContent  = `FC met but insufficient TC evidence — ${tcYes}/6 TC present`;
+    cBadge.innerHTML  = `<span class="badge badge-fc">FC-1 ✓</span><span class="badge badge-fc">FC-2 ✓</span><span class="badge badge-tc">${tcYes}/6 TC</span>`;
+  }
+}
+
+function setTheme(theme, bar, panel) {
+  ['c-unknown','c-yes','c-no','c-judgment'].forEach(c => bar.classList.remove(c));
+  ['cp-unknown','cp-yes','cp-no','cp-judgment'].forEach(c => panel.classList.remove(c));
+  bar.classList.add('c-' + theme);
+  panel.classList.add('cp-' + theme);
+}
+
+// Add data-val attrs to buttons after render and fix event handlers
+document.querySelectorAll('.assess-opt').forEach(btn => {
+  const onclick = btn.getAttribute('onclick') || '';
+  const match = onclick.match(/'(\w+)'/g);
+  if (match && match.length >= 2) {
+    btn.setAttribute('data-val', match[1].replace(/'/g,''));
+  }
+});
+
+loadState();
+</script>
+</body>
+</html>

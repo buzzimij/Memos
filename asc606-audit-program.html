@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASC 606 Revenue Audit Program</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:    #0E1F3D;
+    --navy2:   #1A3461;
+    --blue:    #0057A8;
+    --blue-lt: #E8F0FA;
+    --green:   #166534;
+    --green-lt:#DCFCE7;
+    --red:     #991B1B;
+    --red-lt:  #FEE2E2;
+    --amber:   #92400E;
+    --amber-lt:#FEF3C7;
+    --gray-50: #F8F9FA;
+    --gray-100:#F0F2F5;
+    --gray-200:#E2E6EC;
+    --gray-300:#CBD2DC;
+    --gray-400:#9AA4B2;
+    --gray-600:#5A6270;
+    --gray-800:#2C3240;
+    --border:  #D0D6E0;
+    --text:    #1A1E2A;
+    --shadow:  0 1px 4px rgba(0,0,0,.08);
+  }
+
+  html { font-size: 14px; }
+  body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; background: var(--gray-100); color: var(--text); min-height: 100vh; }
+
+  /* ── TOP BAR ── */
+  .top-bar { background: var(--navy); height: 4px; }
+
+  /* ── HEADER ── */
+  .header { background: var(--navy); color: white; padding: 0; }
+  .header-inner { max-width: 1200px; margin: 0 auto; padding: 28px 32px 24px; }
+  .header-tag { font-size: .65rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .5; margin-bottom: 6px; }
+  .header-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: 4px; }
+  .header-sub { font-size: .82rem; opacity: .6; margin-bottom: 20px; }
+
+  /* Engagement fields */
+  .eng-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 16px; }
+  .eng-field { display: flex; flex-direction: column; gap: 3px; }
+  .eng-label { font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity: .5; }
+  .eng-input { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 5px; color: white; font-size: .82rem; padding: 5px 9px; font-family: inherit; outline: none; }
+  .eng-input:focus { border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.15); }
+  .eng-input::placeholder { opacity: .4; }
+
+  /* ── STATS BAR ── */
+  .stats-bar { background: var(--navy2); border-bottom: 1px solid rgba(255,255,255,.1); }
+  .stats-inner { max-width: 1200px; margin: 0 auto; padding: 12px 32px; display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+  .stat-item { display: flex; flex-direction: column; gap: 1px; }
+  .stat-val { font-size: 1.2rem; font-weight: 800; color: white; line-height: 1; }
+  .stat-lbl { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.45); }
+  .stat-sep { width: 1px; height: 32px; background: rgba(255,255,255,.15); }
+  .progress-wrap { flex: 1; min-width: 200px; }
+  .progress-bar-bg { height: 5px; background: rgba(255,255,255,.15); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .progress-bar-fill { height: 100%; background: #3ecf8e; border-radius: 3px; transition: width .4s ease; }
+  .stat-pct { font-size: .7rem; color: #3ecf8e; font-weight: 700; }
+
+  /* ── TOOLBAR ── */
+  .toolbar { background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow); }
+  .toolbar-inner { max-width: 1200px; margin: 0 auto; padding: 10px 32px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn { border: none; border-radius: 5px; padding: 7px 14px; font-size: .78rem; font-weight: 700; cursor: pointer; transition: opacity .15s; font-family: inherit; letter-spacing: .01em; }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-ghost   { background: var(--gray-100); color: var(--gray-600); border: 1px solid var(--border); }
+  .btn-danger  { background: var(--red-lt); color: var(--red); border: 1px solid #FECACA; }
+  .btn-success { background: var(--green-lt); color: var(--green); border: 1px solid #BBF7D0; }
+  .toolbar-sep { width: 1px; height: 24px; background: var(--border); }
+  .toolbar-label { font-size: .72rem; color: var(--gray-400); font-weight: 600; white-space: nowrap; }
+  .hidden-count { font-size: .72rem; background: var(--amber-lt); color: var(--amber); border: 1px solid #FDE68A; border-radius: 4px; padding: 3px 8px; font-weight: 700; display: none; }
+  .hidden-count.show { display: inline-block; }
+
+  /* Assertion jump links */
+  .jump-links { display: flex; gap: 4px; flex-wrap: wrap; }
+  .jump-link { font-size: .7rem; font-weight: 700; letter-spacing: .04em; color: var(--gray-600); border: 1px solid var(--border); border-radius: 4px; padding: 4px 9px; cursor: pointer; background: none; transition: all .12s; font-family: inherit; text-transform: uppercase; white-space: nowrap; }
+  .jump-link:hover { background: var(--blue-lt); color: var(--blue); border-color: #BDD4F0; }
+
+  /* ── MAIN LAYOUT ── */
+  .main { max-width: 1200px; margin: 0 auto; padding: 28px 32px 80px; }
+
+  /* ── ASSERTION CARD ── */
+  .assertion-card { background: white; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 20px; overflow: hidden; box-shadow: var(--shadow); }
+
+  .assertion-header { display: flex; align-items: center; gap: 14px; padding: 16px 22px; cursor: pointer; user-select: none; border-bottom: 1px solid var(--border); transition: background .12s; }
+  .assertion-header:hover { background: var(--gray-50); }
+  .assertion-badge { font-size: .62rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; flex-shrink: 0; }
+  .asc-occ  { background: #EDE9FE; color: #5B21B6; }
+  .asc-comp { background: #DCFCE7; color: #166534; }
+  .asc-acc  { background: #FEF3C7; color: #92400E; }
+  .asc-cut  { background: #FEE2E2; color: #991B1B; }
+  .asc-cla  { background: #E0F2FE; color: #075985; }
+  .asc-disc { background: #FDF2F8; color: #9D174D; }
+
+  .assertion-title { font-size: 1rem; font-weight: 800; color: var(--navy); flex: 1; }
+  .assertion-desc  { font-size: .75rem; color: var(--gray-400); font-style: italic; }
+  .assertion-stats { font-size: .72rem; color: var(--gray-400); white-space: nowrap; }
+  .assertion-chevron { font-size: .85rem; color: var(--gray-300); transition: transform .2s; flex-shrink: 0; }
+  .assertion-card.collapsed .assertion-chevron { transform: rotate(-90deg); }
+  .assertion-body { display: block; }
+  .assertion-card.collapsed .assertion-body { display: none; }
+
+  /* ── RISK ROW ── */
+  .risk-block { border-bottom: 1px solid var(--gray-100); transition: all .25s ease; overflow: hidden; }
+  .risk-block:last-child { border-bottom: none; }
+  .risk-block.hidden-risk { max-height: 0; opacity: 0; pointer-events: none; padding: 0; margin: 0; border: none; }
+
+  .risk-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 22px 12px; cursor: pointer; }
+  .risk-header:hover { background: var(--gray-50); }
+
+  .risk-toggle-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; padding-top: 2px; }
+  .toggle-label { font-size: .55rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray-400); white-space: nowrap; }
+
+  /* Toggle switch */
+  .toggle-switch { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-track { position: absolute; inset: 0; background: var(--gray-200); border-radius: 10px; cursor: pointer; transition: background .2s; }
+  .toggle-track::after { content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .toggle-switch input:checked + .toggle-track { background: var(--blue); }
+  .toggle-switch input:checked + .toggle-track::after { transform: translateX(16px); }
+
+  .risk-id   { font-size: .68rem; font-weight: 800; color: var(--gray-300); flex-shrink: 0; padding-top: 3px; font-family: monospace; letter-spacing: .04em; }
+  .risk-info { flex: 1; min-width: 0; }
+  .risk-title { font-size: .88rem; font-weight: 700; color: var(--gray-800); line-height: 1.45; margin-bottom: 3px; }
+  .risk-meta  { font-size: .72rem; color: var(--gray-400); }
+  .risk-chevron { font-size: .8rem; color: var(--gray-300); transition: transform .18s; flex-shrink: 0; padding-top: 4px; }
+  .risk-block.open .risk-chevron { transform: rotate(90deg); }
+
+  /* ── PROCEDURES TABLE ── */
+  .procedures-wrap { display: none; background: var(--gray-50); border-top: 1px solid var(--gray-100); padding: 0 22px 16px; }
+  .risk-block.open .procedures-wrap { display: block; }
+
+  .proc-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: .8rem; }
+  .proc-table thead th { background: var(--navy); color: rgba(255,255,255,.8); font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 7px 10px; text-align: left; }
+  .proc-table thead th:first-child { border-radius: 5px 0 0 0; width: 26px; }
+  .proc-table thead th:last-child  { border-radius: 0 5px 0 0; }
+
+  .proc-row { border-bottom: 1px solid var(--border); transition: background .1s; }
+  .proc-row:last-child { border-bottom: none; }
+  .proc-row.done { background: #F0FDF4; }
+  .proc-row.done .proc-text { color: var(--gray-400); text-decoration: line-through; text-decoration-color: var(--gray-300); }
+
+  .proc-row td { padding: 9px 10px; vertical-align: top; }
+  .proc-check-td { width: 26px; text-align: center; padding-top: 10px !important; }
+  .proc-check { width: 15px; height: 15px; accent-color: var(--blue); cursor: pointer; }
+  .proc-step { font-size: .68rem; font-weight: 800; color: var(--gray-400); font-family: monospace; padding-top: 2px; white-space: nowrap; }
+  .proc-text { color: var(--gray-800); line-height: 1.55; }
+  .proc-text strong { color: var(--navy); }
+
+  .proc-input { background: white; border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-size: .75rem; padding: 4px 7px; font-family: inherit; outline: none; width: 100%; }
+  .proc-input:focus { border-color: var(--blue); }
+  .td-wp   { width: 90px; }
+  .td-prep { width: 110px; }
+  .td-date { width: 100px; }
+
+  .proc-date-pair { display: flex; flex-direction: column; gap: 4px; }
+  .proc-date-pair .micro-label { font-size: .58rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--gray-400); }
+
+  /* Note field under procedures */
+  .proc-note-row td { padding: 4px 10px 10px; }
+  .proc-note-input { width: 100%; background: white; border: 1px dashed var(--border); border-radius: 4px; color: var(--gray-600); font-size: .75rem; padding: 5px 8px; font-family: inherit; outline: none; resize: vertical; min-height: 32px; }
+  .proc-note-input:focus { border-color: var(--blue); border-style: solid; }
+
+  /* ── HIDDEN RISKS RESTORE PANEL ── */
+  .restore-bar { background: var(--amber-lt); border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 18px; margin-bottom: 20px; display: none; align-items: center; gap: 12px; }
+  .restore-bar.show { display: flex; }
+  .restore-bar p { font-size: .8rem; color: var(--amber); flex: 1; }
+  .restore-bar p strong { font-weight: 800; }
+
+  /* ── PRINT STYLES ── */
+  @media print {
+    body { background: white; font-size: 11px; }
+    .toolbar, .stats-bar, .top-bar { display: none !important; }
+    .header { background: var(--navy) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .assertion-card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+    .assertion-card.collapsed .assertion-body { display: block !important; }
+    .procedures-wrap { display: block !important; }
+    .hidden-risk { display: none !important; }
+    .risk-header { cursor: default; }
+    .risk-toggle-wrap { display: none; }
+    .proc-input, .proc-note-input { border: none; border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; }
+    .main { padding: 16px; max-width: 100%; }
+    .eng-input { border: none; border-bottom: 1px solid rgba(255,255,255,.4); border-radius: 0; background: transparent; }
+    @page { margin: 1.5cm; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    .header-inner, .stats-inner, .toolbar-inner, .main { padding-left: 16px; padding-right: 16px; }
+    .td-wp, .td-prep, .td-date { display: none; }
+    .eng-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-tag">Audit Program &nbsp;·&nbsp; AICPA Standards &nbsp;·&nbsp; ASC 606</div>
+    <div class="header-title">Revenue Recognition Audit Program</div>
+    <div class="header-sub">Risk of Material Misstatement &amp; Responsive Procedures — All Assertions</div>
+    <div class="eng-grid">
+      <div class="eng-field"><label class="eng-label">Client</label><input class="eng-input" id="fClient" placeholder="Client name" /></div>
+      <div class="eng-field"><label class="eng-label">Period End</label><input class="eng-input" id="fPeriod" placeholder="12/31/20XX" /></div>
+      <div class="eng-field"><label class="eng-label">Prepared By</label><input class="eng-input" id="fPreparer" placeholder="Initials / Name" /></div>
+      <div class="eng-field"><label class="eng-label">Reviewed By</label><input class="eng-input" id="fReviewer" placeholder="Initials / Name" /></div>
+      <div class="eng-field"><label class="eng-label">Date Prepared</label><input class="eng-input" id="fDate" type="date" /></div>
+      <div class="eng-field"><label class="eng-label">W/P Index</label><input class="eng-input" id="fWP" placeholder="e.g. REV-100" /></div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-val" id="statTotal">—</div>
+      <div class="stat-lbl">Total Steps</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <div class="stat-val" id="statDone" style="color:#3ecf8e">0</div>
+      <div class="stat-lbl">Completed</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <div class="stat-val" id="statRemain" style="color:#f5a623">—</div>
+      <div class="stat-lbl">Remaining</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <div class="stat-val" id="statRisks">—</div>
+      <div class="stat-lbl">Active Risks</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="progress-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="stat-lbl" style="color:rgba(255,255,255,.45)">Completion</div>
+        <div class="stat-pct" id="statPct">0%</div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <button class="btn btn-primary" onclick="window.print()">⎙ Print / PDF</button>
+    <button class="btn btn-ghost" onclick="expandAll()">Expand All</button>
+    <button class="btn btn-ghost" onclick="collapseAll()">Collapse All</button>
+    <button class="btn btn-success" onclick="restoreAll()">Restore Hidden Risks</button>
+    <span class="hidden-count" id="hiddenCount"></span>
+    <div class="toolbar-sep"></div>
+    <span class="toolbar-label">Jump to:</span>
+    <div class="jump-links">
+      <button class="jump-link" onclick="scrollTo('occ')">Occurrence</button>
+      <button class="jump-link" onclick="scrollTo('comp')">Completeness</button>
+      <button class="jump-link" onclick="scrollTo('acc')">Accuracy</button>
+      <button class="jump-link" onclick="scrollTo('cut')">Cutoff</button>
+      <button class="jump-link" onclick="scrollTo('cla')">Classification</button>
+      <button class="jump-link" onclick="scrollTo('disc')">Disclosure</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main" id="mainContent"></div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const PROGRAM = [
+  {
+    id: 'occ',
+    assertion: 'Occurrence',
+    badge: 'asc-occ',
+    description: 'Recorded revenue transactions represent goods or services actually transferred to the customer during the period.',
+    risks: [
+      {
+        id: 'OCC-1',
+        risk: 'Revenue recognized without evidence that control of goods or services transferred to the customer',
+        procedures: [
+          { id:'OCC-1-1', step:'1', text:'Select a sample of recorded revenue transactions from the revenue subledger. Inspect supporting documentation — shipping records, delivery confirmations, bills of lading, or customer acceptance forms — to confirm transfer of control occurred on or before the recognition date.' },
+          { id:'OCC-1-2', step:'2', text:'For service arrangements, inspect completion certificates, project milestone documentation, customer sign-offs, or timesheets to verify the service was performed during the period recognized.' },
+          { id:'OCC-1-3', step:'3', text:'Review revenue contracts for control transfer terms (e.g., FOB shipping point vs. destination, customer acceptance clauses, right to invoice criteria). Verify accounting treatment is consistent with contract terms.' },
+          { id:'OCC-1-4', step:'4', text:'For a sample of transactions, send written confirmations directly to customers verifying receipt or acceptance of goods/services as of the stated delivery date.' },
+        ]
+      },
+      {
+        id: 'OCC-2',
+        risk: 'Bill-and-hold arrangements recognized prematurely without meeting all required criteria under ASC 606-10-55-83 through 55-84',
+        procedures: [
+          { id:'OCC-2-1', step:'1', text:'Inquire of management, sales, and warehouse personnel regarding any bill-and-hold arrangements entered into during the period.' },
+          { id:'OCC-2-2', step:'2', text:'For each identified bill-and-hold transaction, inspect the contract and evaluate whether all four criteria are met: (a) reason for arrangement is substantive and at customer\'s request, (b) goods are separately identified as belonging to the customer, (c) goods are ready for physical transfer, and (d) the entity cannot use the goods or redirect them to another customer.' },
+          { id:'OCC-2-3', step:'3', text:'Confirm storage and segregation arrangements directly with warehouse management; verify goods have been identified on inventory records as customer-owned.' },
+          { id:'OCC-2-4', step:'4', text:'Agree the revenue amount and timing to the contract and recognition schedule; verify no revenue was recognized before all criteria were satisfied.' },
+        ]
+      },
+      {
+        id: 'OCC-3',
+        risk: 'Channel stuffing, side agreements, or undisclosed concessions that alter the terms of the arrangement and revenue recognition',
+        procedures: [
+          { id:'OCC-3-1', step:'1', text:'Inquire of sales, customer service, warehousing, and legal personnel regarding the existence of any side agreements, extended payment terms, right-of-return arrangements, or other concessions not reflected in the formal contract.' },
+          { id:'OCC-3-2', step:'2', text:'Analyze subsequent-period sales returns, credits, and allowances by customer and product line; investigate unusual spikes that may indicate prior-period channel stuffing or concessions.' },
+          { id:'OCC-3-3', step:'3', text:'For large or unusual transactions recorded near period-end, inspect contracts and confirm all material terms with customers in writing; verify no amendments or side letters exist.' },
+          { id:'OCC-3-4', step:'4', text:'Review board minutes, legal correspondence, and sales incentive plans for evidence of irregular revenue arrangements or pressure to meet revenue targets.' },
+          { id:'OCC-3-5', step:'5', text:'Examine credit memos issued in the subsequent period; trace those related to prior-period revenue back to original transactions and evaluate impact on recorded revenue.' },
+        ]
+      },
+      {
+        id: 'OCC-4',
+        risk: 'Revenue from related-party transactions recognized without economic substance or not at arm\'s length',
+        procedures: [
+          { id:'OCC-4-1', step:'1', text:'Obtain the complete listing of related-party transactions from management; agree to the related-party disclosure schedule and trace to individual transactions in the revenue subledger.' },
+          { id:'OCC-4-2', step:'2', text:'Inspect contracts with related parties; compare pricing, payment terms, and contract terms to comparable transactions with unrelated third parties.' },
+          { id:'OCC-4-3', step:'3', text:'Evaluate whether related-party revenue transactions have economic substance; document the business purpose and inquire of management regarding the rationale.' },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'comp',
+    assertion: 'Completeness',
+    badge: 'asc-comp',
+    description: 'All revenue for goods transferred or services performed during the period has been recorded; no revenue is omitted.',
+    risks: [
+      {
+        id: 'COMP-1',
+        risk: 'Revenue for goods shipped or services performed has not been recorded in the period (unrecorded revenue)',
+        procedures: [
+          { id:'COMP-1-1', step:'1', text:'Perform a shipping/billing cutoff test: obtain the shipping log or dispatch records for the final [X] days of the period. Select a sample and trace each shipment to a customer invoice and a recorded revenue entry.' },
+          { id:'COMP-1-2', step:'2', text:'Obtain unmatched shipping documents report from the billing system; investigate items shipped but not yet invoiced. Determine whether revenue should be recorded in the audit period.' },
+          { id:'COMP-1-3', step:'3', text:'Reconcile units shipped per warehouse records to units billed per the billing system for the period; investigate and document explanations for differences.' },
+          { id:'COMP-1-4', step:'4', text:'For service arrangements, review project completion logs, service delivery records, and time reporting systems; trace completed engagements to recorded revenue or open receivables.' },
+          { id:'COMP-1-5', step:'5', text:'Perform analytical procedures: compare monthly revenue to prior periods, budget, and backlog schedules. Investigate months with unexpected declines that may indicate omitted revenue.' },
+        ]
+      },
+      {
+        id: 'COMP-2',
+        risk: 'Deferred revenue (contract liabilities) not appropriately released when performance obligations are satisfied',
+        procedures: [
+          { id:'COMP-2-1', step:'1', text:'Obtain a rollforward of the contract liability / deferred revenue account from opening to closing balance. Test mathematical accuracy and agree balances to the trial balance.' },
+          { id:'COMP-2-2', step:'2', text:'Select a sample of amounts released from deferred revenue during the period; inspect supporting evidence that the related performance obligation was satisfied before recognition (e.g., delivery records, acceptance documents, service completion reports).' },
+          { id:'COMP-2-3', step:'3', text:'Review aged deferred revenue items; inquire of management regarding the status of related performance obligations. Investigate items that appear stale or where the obligation may have been satisfied without revenue release.' },
+          { id:'COMP-2-4', step:'4', text:'Agree the ending contract liability balance to the financial statement presentation; verify appropriate classification between current and long-term.' },
+        ]
+      },
+      {
+        id: 'COMP-3',
+        risk: 'Revenue from consignment, sale-or-return, or trial arrangements recognized before the customer sells goods to end customers',
+        procedures: [
+          { id:'COMP-3-1', step:'1', text:'Scan contracts and shipping terms for language indicating consignment, "on approval," "sale or return," or similar arrangements (note: these arrangements do not transfer control to the customer at shipment).' },
+          { id:'COMP-3-2', step:'2', text:'For identified consignment arrangements, review inventory records to confirm goods on consignment are still carried as the entity\'s inventory until the customer sells to an end buyer.' },
+          { id:'COMP-3-3', step:'3', text:'Confirm with customers whether consigned goods have been sold to end customers; reconcile confirmed sales to recorded revenue.' },
+        ]
+      },
+      {
+        id: 'COMP-4',
+        risk: 'Variable consideration (upside adjustments) understated due to overly conservative constraint application, resulting in understated revenue',
+        procedures: [
+          { id:'COMP-4-1', step:'1', text:'Obtain management\'s variable consideration estimates and constraint analysis; evaluate whether the "highly probable" threshold has been applied consistently and whether the constraint is set appropriately given available evidence.' },
+          { id:'COMP-4-2', step:'2', text:'Compare prior-year estimates of constrained variable consideration to the amounts actually received; document findings. Chronic over-constraint may indicate understated revenue.' },
+          { id:'COMP-4-3', step:'3', text:'Inquire of sales and finance management regarding known amounts of variable consideration earned but not yet recorded; investigate any such amounts.' },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'acc',
+    assertion: 'Accuracy / Measurement',
+    badge: 'asc-acc',
+    description: 'Revenue is recorded at the correct amounts in accordance with the five-step ASC 606 model — properly measured transaction price, correctly allocated, and accurately calculated.',
+    risks: [
+      {
+        id: 'ACC-1',
+        risk: 'Variable consideration (volume rebates, discounts, price concessions, returns, penalties) estimated incorrectly, resulting in overstated or understated revenue',
+        procedures: [
+          { id:'ACC-1-1', step:'1', text:'Obtain management\'s variable consideration calculations for each significant type (rebates, discounts, returns, penalties). Test mathematical accuracy of the calculations.' },
+          { id:'ACC-1-2', step:'2', text:'Evaluate the estimation method selected (expected value vs. most likely amount) for appropriateness given the nature of the variable consideration and the distribution of possible outcomes. Document rationale.' },
+          { id:'ACC-1-3', step:'3', text:'Compare current-year variable consideration estimates to historical actual outcomes; quantify estimation error. Evaluate for evidence of management bias (systematic over- or under-estimation).' },
+          { id:'ACC-1-4', step:'4', text:'Inspect contracts for specific variable consideration terms; verify all types of variable consideration identified in contracts are included in management\'s estimate.' },
+          { id:'ACC-1-5', step:'5', text:'For return reserves: obtain the reserve calculation, agree the return rate assumption to historical return data by product/customer, test the reserve rollforward mathematically, and verify the refund liability and associated right-to-recover asset are properly recorded per ASC 606-10-55-23 through 55-29.' },
+        ]
+      },
+      {
+        id: 'ACC-2',
+        risk: 'Significant financing component not identified or incorrectly measured, resulting in misstatement of revenue and interest income/expense',
+        procedures: [
+          { id:'ACC-2-1', step:'1', text:'Scan the contract portfolio for arrangements with payment terms extending beyond 12 months from transfer of control. Note: evaluate management\'s application of the practical expedient under ASC 606-10-32-18 (contracts < 12 months may qualify).' },
+          { id:'ACC-2-2', step:'2', text:'For contracts where a significant financing component exists, verify: (a) the discount rate used reflects the credit characteristics of the customer and the term of the financing, (b) interest income/expense is recognized separately over the contract period, and (c) the transaction price has been adjusted to reflect the cash selling price.' },
+          { id:'ACC-2-3', step:'3', text:'Review management\'s assessment of whether extended payment terms reflect a financing component or are due to other factors (e.g., regulatory, customer protection reasons). Evaluate consistency of this assessment across similar arrangements.' },
+        ]
+      },
+      {
+        id: 'ACC-3',
+        risk: 'Transaction price allocated to performance obligations using incorrect or unsupported standalone selling prices (SSP), resulting in misallocation across periods or line items',
+        procedures: [
+          { id:'ACC-3-1', step:'1', text:'Identify all multi-element arrangements (bundled contracts with more than one performance obligation). Verify each performance obligation has been separately identified and is distinct.' },
+          { id:'ACC-3-2', step:'2', text:'Obtain management\'s SSP analyses for each performance obligation type. Evaluate the SSP determination method: (a) observable price if sold separately, (b) adjusted market assessment approach, (c) expected cost plus margin, or (d) residual approach (only if variable/highly uncertain). Assess reasonableness and consistency.' },
+          { id:'ACC-3-3', step:'3', text:'Test the mathematical accuracy of the allocation calculation for a sample of multi-element contracts. Verify relative SSP proportions are correctly applied to the total transaction price.' },
+          { id:'ACC-3-4', step:'4', text:'Confirm SSPs are updated at appropriate intervals to reflect market conditions; verify consistency of SSPs across similar performance obligations. Investigate outliers.' },
+        ]
+      },
+      {
+        id: 'ACC-4',
+        risk: 'Principal vs. agent determination is incorrect, resulting in revenue reported gross when it should be net (or vice versa)',
+        procedures: [
+          { id:'ACC-4-1', step:'1', text:'Identify all arrangements where the entity may be acting as an intermediary, reseller, or platform (marketplace, fulfillment agent, referral arrangements). Flag for evaluation.' },
+          { id:'ACC-4-2', step:'2', text:'For each identified arrangement, evaluate the control indicators under ASC 606-10-55-37A through 55-40: (a) entity is primarily responsible for fulfilling the promise to the customer, (b) entity has inventory risk before/after transfer, (c) entity has discretion in establishing the price. Document conclusions.' },
+          { id:'ACC-4-3', step:'3', text:'Verify revenue is reported gross (as principal) or net of supplier costs (as agent), consistent with the determination. Quantify the difference and assess materiality impact if classification differs from prior year.' },
+          { id:'ACC-4-4', step:'4', text:'Compare treatment to industry practice and prior-year workpapers; document any changes in determination and accounting policy impact.' },
+        ]
+      },
+      {
+        id: 'ACC-5',
+        risk: 'Noncash consideration measured at incorrect fair value or at the wrong measurement date',
+        procedures: [
+          { id:'ACC-5-1', step:'1', text:'Identify arrangements in which the customer pays with or includes noncash consideration (equity interests, licenses, inventory, services, or other assets).' },
+          { id:'ACC-5-2', step:'2', text:'For each identified arrangement, obtain management\'s fair value measurement. Evaluate the measurement methodology (market approach, income approach, cost approach) and key assumptions.' },
+          { id:'ACC-5-3', step:'3', text:'Verify the measurement date is correct: noncash consideration is generally measured at contract inception date (ASC 606-10-32-21). Investigate any measurement as of a different date.' },
+          { id:'ACC-5-4', step:'4', text:'Assess whether a specialist is needed for complex fair value measurements; document conclusion and any specialist involvement.' },
+        ]
+      },
+      {
+        id: 'ACC-6',
+        risk: 'Contract modifications not properly identified or accounted for (incorrect determination of prospective vs. cumulative catch-up treatment)',
+        procedures: [
+          { id:'ACC-6-1', step:'1', text:'Inquire of management, legal, and sales personnel regarding significant contract modifications during the period. Obtain a listing of modifications and inspect contract amendment documentation.' },
+          { id:'ACC-6-2', step:'2', text:'For each material modification, evaluate the accounting treatment under ASC 606-10-25-12 through 25-13: (a) modification creates a new, separate contract (additional distinct goods/services at SSP) → account for prospectively; (b) modification does not create a new contract → evaluate as termination of original and creation of new contract (cumulative catch-up), or treat prospectively; document conclusion.' },
+          { id:'ACC-6-3', step:'3', text:'Test the mathematical accuracy of any cumulative catch-up adjustments; verify the adjustment is recognized in the period the modification is approved.' },
+        ]
+      },
+      {
+        id: 'ACC-7',
+        risk: 'Revenue for performance obligations satisfied over time measured using an incorrect or unsupported method of measuring progress',
+        procedures: [
+          { id:'ACC-7-1', step:'1', text:'Identify performance obligations that qualify for over-time recognition under ASC 606-10-25-27 (customer simultaneously receives and consumes benefits, entity\'s performance creates/enhances customer-controlled asset, or no alternative use with enforceable right to payment for performance to date).' },
+          { id:'ACC-7-2', step:'2', text:'For each over-time obligation, evaluate the method used to measure progress: output method (units delivered, milestones reached) or input method (costs incurred, labor hours, machine hours). Assess whether the method faithfully depicts the pattern of transfer.' },
+          { id:'ACC-7-3', step:'3', text:'Test the mathematical accuracy of the progress measurement and revenue calculation for a sample of over-time contracts. Agree inputs (costs incurred, total estimated costs, milestones completed) to underlying support.' },
+          { id:'ACC-7-4', step:'4', text:'For input methods using cost-to-cost: verify total estimated costs are updated each period; investigate contracts where actual costs to date are close to or exceed original estimates (possible loss contracts).' },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'cut',
+    assertion: 'Cutoff',
+    badge: 'asc-cut',
+    description: 'Revenue is recognized in the correct accounting period — the period in which control transfers to the customer.',
+    risks: [
+      {
+        id: 'CUT-1',
+        risk: 'Revenue recognized before transfer of control at period-end (premature recognition)',
+        procedures: [
+          { id:'CUT-1-1', step:'1', text:'Select revenue transactions recorded in the final [X] business days before period-end. Inspect shipping records, delivery confirmations, and customer acceptance documents to verify control transferred on or before the balance sheet date.' },
+          { id:'CUT-1-2', step:'2', text:'Obtain a listing of goods in transit at period-end. Determine the appropriate revenue recognition date based on shipping terms (FOB shipping point: control transfers at shipment; FOB destination: control transfers upon delivery). Verify accounting is consistent with terms.' },
+          { id:'CUT-1-3', step:'3', text:'Review period-end journal entries related to revenue; identify and investigate manual journal entries lacking standard supporting documentation, particularly large round-number entries or entries posted after the period-end close.' },
+          { id:'CUT-1-4', step:'4', text:'For service contracts near period-end, verify that revenue recognized corresponds to services actually performed (not contracted but not yet delivered).' },
+        ]
+      },
+      {
+        id: 'CUT-2',
+        risk: 'Revenue recognized in the current period for goods delivered or services performed in a subsequent period (post-period recognition)',
+        procedures: [
+          { id:'CUT-2-1', step:'1', text:'Select invoices and revenue entries recorded in the first [X] business days of the subsequent period. Inspect underlying documentation and verify revenue was not attributable to the prior period.' },
+          { id:'CUT-2-2', step:'2', text:'Review credit memos and revenue reversals recorded in the early subsequent period; determine whether items reversed represent current-period transactions correctly identified, or prior-period errors.' },
+        ]
+      },
+      {
+        id: 'CUT-3',
+        risk: 'Right-of-return arrangements not properly estimated, resulting in revenue recognized that will subsequently be reversed',
+        procedures: [
+          { id:'CUT-3-1', step:'1', text:'Identify product lines or customer segments with contractual or historical return rights. Verify a refund liability (and corresponding reduction in revenue) has been recorded consistent with ASC 606-10-55-23.' },
+          { id:'CUT-3-2', step:'2', text:'Test the return reserve: evaluate the methodology (expected value recommended given large populations), agree historical return rates to actual return data, test mathematical accuracy, and evaluate the reserve for management bias.' },
+          { id:'CUT-3-3', step:'3', text:'Verify that an asset for the right to recover goods (at original carrying amount, adjusted for expected costs to recover) has been recorded when the refund liability is recognized (ASC 606-10-55-28 through 55-29).' },
+          { id:'CUT-3-4', step:'4', text:'Compare the prior-year return reserve estimate to subsequent actual returns; quantify estimation accuracy and consider whether the current-year estimate is adequate.' },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'cla',
+    assertion: 'Classification',
+    badge: 'asc-cla',
+    description: 'Revenue and related contract balances are classified in the correct financial statement line items and categories.',
+    risks: [
+      {
+        id: 'CLA-1',
+        risk: 'Contract assets and accounts receivable are not properly distinguished, resulting in misclassification on the balance sheet',
+        procedures: [
+          { id:'CLA-1-1', step:'1', text:'Obtain the schedule of contract assets; verify each balance represents a conditional right to consideration — i.e., the entity has satisfied a performance obligation but the right to payment is still contingent on something other than passage of time (e.g., satisfying another performance obligation).' },
+          { id:'CLA-1-2', step:'2', text:'Verify accounts receivable represents only unconditional rights to consideration — i.e., the entity has performed and only the passage of time is required before payment is due.' },
+          { id:'CLA-1-3', step:'3', text:'Review reclassifications between contract assets and accounts receivable during the period; evaluate for propriety and agreement to underlying contract terms.' },
+          { id:'CLA-1-4', step:'4', text:'Agree contract asset and accounts receivable balances to trial balance and financial statement presentation.' },
+        ]
+      },
+      {
+        id: 'CLA-2',
+        risk: 'Contract liabilities (deferred revenue) not properly classified between current and long-term on the balance sheet',
+        procedures: [
+          { id:'CLA-2-1', step:'1', text:'Review the contract liability schedule by individual contract; for each balance, evaluate the expected timing of satisfaction of the related performance obligation.' },
+          { id:'CLA-2-2', step:'2', text:'Verify the classification of each contract liability balance (current: expected satisfaction within 12 months; long-term: beyond 12 months) is consistent with the satisfaction timeline.' },
+          { id:'CLA-2-3', step:'3', text:'Agree current and long-term contract liability amounts to the financial statement balance sheet presentation.' },
+        ]
+      },
+      {
+        id: 'CLA-3',
+        risk: 'Revenue classified in incorrect income statement line items or categories (e.g., product vs. service revenue, discontinued operations, other income)',
+        procedures: [
+          { id:'CLA-3-1', step:'1', text:'Review the revenue account structure and chart of accounts; verify amounts are allocated to revenue line items consistent with the nature of the underlying performance obligations.' },
+          { id:'CLA-3-2', step:'2', text:'Investigate unusual or unexpected account combinations in journal entries near period-end; review for transactions that should be classified differently (e.g., gain on sale classified as revenue).' },
+          { id:'CLA-3-3', step:'3', text:'Agree revenue by product/service category to budget and prior-year actual; investigate significant variances and obtain explanations from management. Assess whether explanations are consistent with underlying activity.' },
+        ]
+      },
+      {
+        id: 'CLA-4',
+        risk: 'Gross vs. net revenue presentation is incorrect due to improper principal/agent determination (also linked to ACC-4)',
+        procedures: [
+          { id:'CLA-4-1', step:'1', text:'Cross-reference to ACC-4 workpapers for principal vs. agent conclusions. Verify income statement presentation is consistent with those conclusions.' },
+          { id:'CLA-4-2', step:'2', text:'Quantify the difference between gross and net presentation for any arrangements classified as agent; confirm that cost of revenue reflects only the entity\'s costs, not the full transaction price.' },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'disc',
+    assertion: 'Presentation & Disclosure',
+    badge: 'asc-disc',
+    description: 'Revenue and related contract information are presented and disclosed in conformity with ASC 606 requirements — complete, accurate, and sufficient for users to understand the nature, amount, timing, and uncertainty of revenue.',
+    risks: [
+      {
+        id: 'DISC-1',
+        risk: 'Disaggregation of revenue disclosure does not depict how economic factors affect the nature, amount, timing, and uncertainty of revenue (ASC 606-10-50-5 through 50-6)',
+        procedures: [
+          { id:'DISC-1-1', step:'1', text:'Obtain management\'s disaggregation of revenue schedule. Agree total disaggregated revenue to total revenue per the income statement and to the revenue disaggregation in segment disclosures.' },
+          { id:'DISC-1-2', step:'2', text:'Evaluate whether the categories selected by management depict how economic factors affect revenue. Consider whether the disaggregation adequately addresses type of good/service, geography, market or customer type, contract duration, timing of transfer (point-in-time vs. over time), and sales channel.' },
+          { id:'DISC-1-3', step:'3', text:'Verify consistency between the disaggregation disclosure and information regularly reviewed by the chief operating decision maker (CODM); consider whether segment disclosures provide sufficient context.' },
+        ]
+      },
+      {
+        id: 'DISC-2',
+        risk: 'Contract balances disclosure is incomplete or inaccurate (ASC 606-10-50-8 through 50-10)',
+        procedures: [
+          { id:'DISC-2-1', step:'1', text:'Obtain or prepare a rollforward of contract assets and contract liabilities from opening to closing balance. Test mathematical accuracy; agree opening and closing balances to the prior-year and current-year financial statements.' },
+          { id:'DISC-2-2', step:'2', text:'Verify the disclosure includes: (a) opening and closing balances of receivables, contract assets, and contract liabilities; (b) revenue recognized during the period that was included in the opening contract liability balance; (c) revenue recognized from performance obligations satisfied (or partially satisfied) in prior periods.' },
+          { id:'DISC-2-3', step:'3', text:'Trace the amounts disclosed in the rollforward to the underlying rollforward schedules and agree to the financial statements and notes.' },
+        ]
+      },
+      {
+        id: 'DISC-3',
+        risk: 'Remaining performance obligations disclosure (transaction price allocated to unsatisfied obligations — backlog) is incorrect or omitted (ASC 606-10-50-13 through 50-15)',
+        procedures: [
+          { id:'DISC-3-1', step:'1', text:'Identify contracts with unsatisfied or partially unsatisfied performance obligations at period-end. Obtain management\'s calculation of the aggregate transaction price allocated to remaining performance obligations.' },
+          { id:'DISC-3-2', step:'2', text:'Test the completeness of the remaining performance obligation schedule by tracing to the contract population; verify no significant contracts have been omitted.' },
+          { id:'DISC-3-3', step:'3', text:'Test the accuracy of the transaction price amounts: agree to contract terms and, for variable consideration, verify amounts included meet the constraint threshold (highly probable not to reverse).' },
+          { id:'DISC-3-4', step:'4', text:'Verify disclosure of the expected recognition period (ASC 606-10-50-13(b)) and confirm management\'s application of practical expedients (e.g., contracts with original expected duration ≤12 months, variable consideration allocated entirely to one distinct performance obligation are exempt from this disclosure).' },
+        ]
+      },
+      {
+        id: 'DISC-4',
+        risk: 'Significant judgment and estimate disclosures do not reflect the actual policies and methods applied (ASC 606-10-50-17 through 50-20)',
+        procedures: [
+          { id:'DISC-4-1', step:'1', text:'Obtain management\'s disclosure of significant judgments, including: determination of the timing of satisfaction of performance obligations, determination of the transaction price and variable consideration estimates, methods used to allocate the transaction price, and methods used to measure progress for over-time recognition.' },
+          { id:'DISC-4-2', step:'2', text:'Compare the disclosed policies to the actual methodologies evidenced by contracts, management\'s calculations, and workpapers examined during the audit. Identify and investigate any discrepancies between disclosed and actual practice.' },
+          { id:'DISC-4-3', step:'3', text:'Evaluate whether the disclosures are sufficiently specific and informative to allow financial statement users to understand the nature of the judgments made and the range of potential outcomes.' },
+        ]
+      },
+      {
+        id: 'DISC-5',
+        risk: 'Practical expedients elected by the entity are not disclosed as required (ASC 606-10-50-20)',
+        procedures: [
+          { id:'DISC-5-1', step:'1', text:'Obtain management\'s inventory of practical expedients elected under ASC 606 (e.g., contract portfolio approach, significant financing component exemption for contracts ≤12 months, sales-based and usage-based royalty exception, incremental costs of obtaining a contract expensed if amortization period ≤1 year, remaining performance obligation disclosure exemptions, shipping and handling activities as fulfillment costs).' },
+          { id:'DISC-5-2', step:'2', text:'For each expedient elected, verify: (a) the expedient is disclosed in the financial statement notes, (b) the disclosure is clear as to which specific expedient was elected, and (c) the entity has applied the expedient consistently to all qualifying arrangements.' },
+          { id:'DISC-5-3', step:'3', text:'Verify no expedients are listed in the disclosure that the entity is NOT actually applying; inconsistency between disclosed and applied expedients should be investigated.' },
+        ]
+      },
+      {
+        id: 'DISC-6',
+        risk: 'Costs to obtain or fulfill contracts (contract cost assets) not properly presented or disclosed (ASC 340-40)',
+        procedures: [
+          { id:'DISC-6-1', step:'1', text:'Identify incremental costs of obtaining contracts (e.g., sales commissions) and costs to fulfill contracts that the entity has elected to capitalize under ASC 340-40.' },
+          { id:'DISC-6-2', step:'2', text:'Verify contract cost assets are presented separately from other assets (or disclosed if combined) and that amortization method and period are disclosed.' },
+          { id:'DISC-6-3', step:'3', text:'If management has elected the practical expedient to expense incremental costs with amortization periods of ≤1 year, verify this election is disclosed and consistently applied.' },
+          { id:'DISC-6-4', step:'4', text:'Review contract cost asset balances for impairment indicators; verify management has performed impairment analysis per ASC 340-40-35-3.' },
+        ]
+      },
+    ]
+  },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let state = {}; // { riskId: { relevant: bool, open: bool }, procId: { done: bool, wp: str, preparer: str, date: str, note: str } }
+
+function loadState() {
+  try { state = JSON.parse(localStorage.getItem('asc606_state') || '{}'); } catch { state = {}; }
+}
+function saveState() {
+  try { localStorage.setItem('asc606_state', JSON.stringify(state)); } catch {}
+}
+function riskState(id)   { if (!state[id]) state[id] = { relevant: true, open: false }; return state[id]; }
+function procState(id)   { if (!state[id]) state[id] = { done: false, wp: '', preparer: '', date: '', note: '' }; return state[id]; }
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  loadState();
+  const container = document.getElementById('mainContent');
+  container.innerHTML = '';
+
+  PROGRAM.forEach(assertion => {
+    const card = document.createElement('div');
+    card.className = 'assertion-card';
+    card.id = 'card-' + assertion.id;
+
+    const totalProcs = assertion.risks.reduce((s, r) => s + r.procedures.length, 0);
+    const activeRisks = assertion.risks.filter(r => riskState(r.id).relevant).length;
+
+    card.innerHTML = `
+      <div class="assertion-header" onclick="toggleAssertion('${assertion.id}')">
+        <span class="assertion-badge ${assertion.badge}">${assertion.assertion}</span>
+        <div style="flex:1;min-width:0">
+          <div class="assertion-title">${assertion.assertion}</div>
+          <div class="assertion-desc">${assertion.description}</div>
+        </div>
+        <div class="assertion-stats">${activeRisks} of ${assertion.risks.length} risks active &nbsp;·&nbsp; ${totalProcs} procedures</div>
+        <span class="assertion-chevron">▾</span>
+      </div>
+      <div class="assertion-body" id="body-${assertion.id}">
+        ${assertion.risks.map(risk => renderRisk(assertion.id, risk)).join('')}
+      </div>`;
+    container.appendChild(card);
+  });
+
+  updateStats();
+  restoreInputValues();
+}
+
+function renderRisk(assertionId, risk) {
+  const rs = riskState(risk.id);
+  const hiddenClass = rs.relevant ? '' : 'hidden-risk';
+  const openClass   = rs.open     ? 'open' : '';
+  const checked     = rs.relevant ? 'checked' : '';
+
+  const procsHtml = risk.procedures.map(p => {
+    const ps = procState(p.id);
+    const doneClass = ps.done ? 'done' : '';
+    return `
+      <tr class="proc-row ${doneClass}" id="proc-row-${p.id}">
+        <td class="proc-check-td"><input type="checkbox" class="proc-check" data-proc="${p.id}" ${ps.done ? 'checked' : ''} onchange="toggleProc('${p.id}',this.checked)"></td>
+        <td class="proc-step">${p.step}</td>
+        <td class="proc-text">${p.text}</td>
+        <td class="td-wp"><input class="proc-input" data-field="wp" data-proc="${p.id}" placeholder="REV-XXX" value="${escHtml(ps.wp)}" onchange="updateProcField('${p.id}','wp',this.value)"></td>
+        <td class="td-prep">
+          <div class="proc-date-pair">
+            <span class="micro-label">Preparer</span>
+            <input class="proc-input" data-field="preparer" data-proc="${p.id}" placeholder="Initials" value="${escHtml(ps.preparer)}" onchange="updateProcField('${p.id}','preparer',this.value)">
+          </div>
+        </td>
+        <td class="td-date">
+          <div class="proc-date-pair">
+            <span class="micro-label">Date</span>
+            <input class="proc-input" type="date" data-field="date" data-proc="${p.id}" value="${escHtml(ps.date)}" onchange="updateProcField('${p.id}','date',this.value)">
+          </div>
+        </td>
+      </tr>
+      <tr class="proc-note-row" id="proc-note-${p.id}">
+        <td></td><td></td>
+        <td colspan="4"><textarea class="proc-note-input" data-field="note" data-proc="${p.id}" placeholder="Notes / exceptions / conclusions…" onchange="updateProcField('${p.id}','note',this.value)" rows="1">${escHtml(ps.note)}</textarea></td>
+      </tr>`;
+  }).join('');
+
+  const activeCount = risk.procedures.filter(p => procState(p.id).done).length;
+
+  return `
+    <div class="risk-block ${hiddenClass} ${openClass}" id="risk-${risk.id}">
+      <div class="risk-header" onclick="toggleRisk('${risk.id}')">
+        <div class="risk-toggle-wrap" onclick="event.stopPropagation()">
+          <span class="toggle-label">Relevant</span>
+          <label class="toggle-switch" title="Uncheck to mark this risk as not relevant (no RMM identified) — the risk will be removed from the active program">
+            <input type="checkbox" ${checked} onchange="toggleRelevance('${risk.id}',this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="risk-id">${risk.id}</div>
+        <div class="risk-info">
+          <div class="risk-title">${risk.risk}</div>
+          <div class="risk-meta">${risk.procedures.length} audit procedure${risk.procedures.length !== 1 ? 's' : ''} &nbsp;·&nbsp; ${activeCount} completed</div>
+        </div>
+        <span class="risk-chevron">▶</span>
+      </div>
+      <div class="procedures-wrap">
+        <table class="proc-table">
+          <thead>
+            <tr>
+              <th title="Mark complete">✓</th>
+              <th style="width:28px">#</th>
+              <th>Audit Procedure</th>
+              <th class="td-wp">W/P Ref</th>
+              <th class="td-prep">Preparer</th>
+              <th class="td-date">Date</th>
+            </tr>
+          </thead>
+          <tbody>${procsHtml}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ─── INTERACTIONS ─────────────────────────────────────────────────────────────
+function toggleAssertion(id) {
+  const card = document.getElementById('card-' + id);
+  card.classList.toggle('collapsed');
+}
+
+function toggleRisk(id) {
+  const block = document.getElementById('risk-' + id);
+  const rs = riskState(id);
+  rs.open = !rs.open;
+  block.classList.toggle('open', rs.open);
+  saveState();
+}
+
+function toggleRelevance(id, relevant) {
+  const rs = riskState(id);
+  rs.relevant = relevant;
+  const block = document.getElementById('risk-' + id);
+
+  if (!relevant) {
+    rs.open = false;
+    block.classList.remove('open');
+    // Animate out
+    block.style.maxHeight = block.scrollHeight + 'px';
+    block.style.overflow  = 'hidden';
+    block.style.transition = 'max-height .3s ease, opacity .3s ease, padding .3s ease';
+    requestAnimationFrame(() => {
+      block.style.maxHeight = '0';
+      block.style.opacity   = '0';
+    });
+    setTimeout(() => {
+      block.classList.add('hidden-risk');
+      block.style.maxHeight = '';
+      block.style.opacity   = '';
+      block.style.overflow  = '';
+    }, 320);
+  } else {
+    block.classList.remove('hidden-risk');
+    block.style.opacity = '0';
+    block.style.transition = 'opacity .2s ease';
+    requestAnimationFrame(() => { block.style.opacity = '1'; });
+    setTimeout(() => { block.style.opacity = ''; }, 220);
+  }
+
+  saveState();
+  setTimeout(updateStats, 350);
+  updateHiddenCount();
+}
+
+function toggleProc(id, done) {
+  const ps = procState(id);
+  ps.done = done;
+  const row  = document.getElementById('proc-row-' + id);
+  const note = document.getElementById('proc-note-' + id);
+  row.classList.toggle('done', done);
+  saveState();
+  updateStats();
+  // Update parent risk meta
+  rerenderRiskMeta(id);
+}
+
+function rerenderRiskMeta(procId) {
+  // Find which risk this proc belongs to
+  PROGRAM.forEach(assertion => {
+    assertion.risks.forEach(risk => {
+      if (risk.procedures.some(p => p.id === procId)) {
+        const done = risk.procedures.filter(p => procState(p.id).done).length;
+        const meta = document.querySelector(`#risk-${risk.id} .risk-meta`);
+        if (meta) meta.textContent = `${risk.procedures.length} audit procedure${risk.procedures.length !== 1 ? 's' : ''} · ${done} completed`;
+      }
+    });
+  });
+}
+
+function updateProcField(id, field, value) {
+  const ps = procState(id);
+  ps[field] = value;
+  saveState();
+}
+
+function updateStats() {
+  let totalProcs = 0, totalDone = 0, totalActiveRisks = 0;
+
+  PROGRAM.forEach(assertion => {
+    assertion.risks.forEach(risk => {
+      if (!riskState(risk.id).relevant) return;
+      totalActiveRisks++;
+      risk.procedures.forEach(p => {
+        totalProcs++;
+        if (procState(p.id).done) totalDone++;
+      });
+    });
+  });
+
+  const remain = totalProcs - totalDone;
+  const pct    = totalProcs ? Math.round((totalDone / totalProcs) * 100) : 0;
+
+  document.getElementById('statTotal').textContent   = totalProcs;
+  document.getElementById('statDone').textContent    = totalDone;
+  document.getElementById('statRemain').textContent  = remain;
+  document.getElementById('statRisks').textContent   = totalActiveRisks;
+  document.getElementById('statPct').textContent     = pct + '%';
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function updateHiddenCount() {
+  let count = 0;
+  PROGRAM.forEach(a => a.risks.forEach(r => { if (!riskState(r.id).relevant) count++; }));
+  const el = document.getElementById('hiddenCount');
+  el.textContent = count + ' risk' + (count !== 1 ? 's' : '') + ' hidden';
+  el.classList.toggle('show', count > 0);
+}
+
+function restoreAll() {
+  PROGRAM.forEach(a => a.risks.forEach(r => {
+    const rs = riskState(r.id);
+    rs.relevant = true;
+    const block = document.getElementById('risk-' + r.id);
+    if (block) block.classList.remove('hidden-risk');
+    // Update toggle checkbox
+    const chk = block.querySelector('input[type=checkbox]');
+    if (chk) chk.checked = true;
+  }));
+  saveState();
+  updateStats();
+  updateHiddenCount();
+}
+
+function expandAll() {
+  PROGRAM.forEach(a => {
+    const card = document.getElementById('card-' + a.id);
+    if (card) card.classList.remove('collapsed');
+    a.risks.forEach(r => {
+      if (!riskState(r.id).relevant) return;
+      const rs = riskState(r.id);
+      rs.open = true;
+      const block = document.getElementById('risk-' + r.id);
+      if (block) block.classList.add('open');
+    });
+  });
+  saveState();
+}
+
+function collapseAll() {
+  PROGRAM.forEach(a => {
+    a.risks.forEach(r => {
+      const rs = riskState(r.id);
+      rs.open = false;
+      const block = document.getElementById('risk-' + r.id);
+      if (block) block.classList.remove('open');
+    });
+  });
+  saveState();
+}
+
+function scrollTo(id) {
+  const el = document.getElementById('card-' + id);
+  if (el) { el.classList.remove('collapsed'); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Restore text input values after render (they can't be serialized in innerHTML)
+function restoreInputValues() {
+  // Restore engagement fields
+  const fields = ['fClient','fPeriod','fPreparer','fReviewer','fDate','fWP'];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && state['eng_' + id]) el.value = state['eng_' + id];
+    if (el) el.addEventListener('change', () => {
+      state['eng_' + id] = el.value;
+      saveState();
+    });
+  });
+  // Restore proc note textareas (their value isn't in the DOM value attribute, needs to be set)
+  PROGRAM.forEach(assertion => assertion.risks.forEach(risk => risk.procedures.forEach(p => {
+    const ps = procState(p.id);
+    const noteEl = document.getElementById('proc-note-' + p.id);
+    if (noteEl) {
+      const ta = noteEl.querySelector('textarea');
+      if (ta && ps.note) ta.value = ps.note;
+    }
+  })));
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+render();
+updateHiddenCount();
+</script>
+</body>
+</html>
